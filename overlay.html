@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #000;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* ── Webview sits below the drag bar ── */
+    webview {
+      position: fixed;
+      top: 32px;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 32px);
+      z-index: 1;
+    }
+
+    /* ── Transparent draggable top bar ── */
+    #drag-region {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 32px;
+      -webkit-app-region: drag;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10px;
+      gap: 8px;
+      /* fully transparent — just for dragging & buttons */
+      background: #000;
+    }
+
+    /* ── Window control buttons ── */
+    .ctrl {
+      -webkit-app-region: no-drag;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      opacity: 0.85;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .ctrl:hover { opacity: 1; transform: scale(1.15); }
+    #btn-close    { background: #ff5f57; }
+    #btn-minimize { background: #febc2e; }
+    #btn-maximize { background: #28c840; }
+
+    /* ── CSS injector toggle ── */
+    #css-toggle {
+      -webkit-app-region: no-drag;
+      position: fixed;
+      top: 6px;
+      left: 10px;
+      z-index: 9999;
+      background: #000;
+      border: none;
+      color: rgba(255,255,255,0);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: background 0.2s, color 0.2s;
+    }
+    #css-toggle:hover { background: rgba(255,255,255,0.2); }
+
+    /* ── CSS injector panel ── */
+    #css-panel {
+      position: fixed;
+      top: 36px;
+      left: 10px;
+      width: 340px;
+      background: #1e1e1e;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      z-index: 9998;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      -webkit-app-region: no-drag;
+    }
+    #css-panel.open { display: flex; }
+
+    #css-panel-header {
+      background: #2a2a2a;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #aaa;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #3a3a3a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #css-panel-header span { color: #fff; font-size: 13px; }
+
+    #css-input {
+      width: 100%;
+      height: 200px;
+      background: #1e1e1e;
+      color: #ce9178;
+      border: none;
+      padding: 12px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 12px;
+      resize: none;
+      outline: none;
+      line-height: 1.6;
+    }
+    #css-input::placeholder { color: #555; }
+
+    #css-panel-footer {
+      display: flex;
+      gap: 6px;
+      padding: 8px 10px;
+      background: #252525;
+      border-top: 1px solid #3a3a3a;
+    }
+
+    .panel-btn {
+      flex: 1;
+      padding: 6px;
+      border: none;
+      border-radius: 5px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.15s;
+    }
+    .panel-btn:hover { opacity: 0.85; }
+    #btn-apply { background: #0e7a3e; color: #fff; }
+    #btn-clear { background: #7a1a1a; color: #fff; }
+    #btn-reset { background: #3a3a3a; color: #ccc; }
+
+    #css-status {
+      padding: 4px 10px 6px;
+      font-size: 11px;
+      color: #555;
+      background: #252525;
+      min-height: 22px;
+    }
+    #css-status.ok  { color: #28c840; }
+    #css-status.err { color: #ff5f57; }
+  </style>
+</head>
+<body>
+
+  <webview id="site" src="https://kloak.app/auth?mode=login" allowpopups partition="persist:main"></webview>
+
+  <!-- Transparent drag bar + window controls -->
+  <div id="drag-region">
+    <button class="ctrl" id="btn-minimize"></button>
+    <button class="ctrl" id="btn-maximize"></button>
+    <button class="ctrl" id="btn-close"></button>
+  </div>
+
+  <!-- CSS injector toggle (hidden until hover) -->
+  <button id="css-toggle">⚡ CSS</button>
+
+  <!-- CSS injector panel -->
+  <div id="css-panel">
+    <div id="css-panel-header">
+      <span>CSS Injector</span>
+      <small>injected into webview</small>
+    </div>
+    <textarea id="css-input" placeholder="/* Write your CSS here */
+body { background: red; }
+.navbar { display: none; }"></textarea>
+    <div id="css-panel-footer">
+      <button class="panel-btn" id="btn-apply">▶ Apply</button>
+      <button class="panel-btn" id="btn-clear">✕ Clear</button>
+      <button class="panel-btn" id="btn-reset">↺ Reset</button>
+    </div>
+    <div id="css-status">Ready.</div>
+  </div>
+
+  <script>
+    const webview = document.getElementById('site');
+    const panel   = document.getElementById('css-panel');
+    const toggle  = document.getElementById('css-toggle');
+    const input   = document.getElementById('css-input');
+    const status  = document.getElementById('css-status');
+
+    let injectedKey = null;
+
+    toggle.onclick = () => panel.classList.toggle('open');
+
+    document.getElementById('btn-close').onclick    = () => window.electronAPI.close();
+    document.getElementById('btn-minimize').onclick = () => window.electronAPI.minimize();
+    document.getElementById('btn-maximize').onclick = () => window.electronAPI.maximize();
+
+    document.getElementById('btn-apply').onclick = async () => {
+      const css = input.value.trim();
+      if (!css) { setStatus('Nothing to inject.', ''); return; }
+      try {
+        if (injectedKey) { await webview.removeInsertedCSS(injectedKey); injectedKey = null; }
+        injectedKey = await webview.insertCSS(css);
+        setStatus('✔ CSS applied!', 'ok');
+      } catch (err) { setStatus('✘ Error: ' + err.message, 'err'); }
+    };
+
+    document.getElementById('btn-clear').onclick = async () => {
+      try {
+        if (injectedKey) { await webview.removeInsertedCSS(injectedKey); injectedKey = null; }
+        setStatus('✔ CSS removed from page.', 'ok');
+      } catch (err) { setStatus('✘ Error: ' + err.message, 'err'); }
+    };
+
+    document.getElementById('btn-reset').onclick = async () => {
+      try {
+        if (injectedKey) { await webview.removeInsertedCSS(injectedKey); injectedKey = null; }
+        input.value = '';
+        setStatus('Ready.', '');
+      } catch (err) { setStatus('✘ Error: ' + err.message, 'err'); }
+    };
+
+    webview.addEventListener('did-navigate', async () => {
+      injectedKey = null;
+      const css = input.value.trim();
+      if (css) {
+        try { injectedKey = await webview.insertCSS(css); setStatus('✔ Re-applied after navigation.', 'ok'); }
+        catch (err) { /* silent */ }
+      }
+    });
+
+    function setStatus(msg, type) {
+      status.textContent = msg;
+      status.className = type;
+    }
+  </script>
+
+</body>
+</html>
