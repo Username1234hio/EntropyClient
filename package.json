@@ -1,7 +1,11 @@
 {
   "name": "kloak-desktop-app",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "main": "main.js",
+  "author": {
+    "name": "Username1234hio",
+    "email": "aadsin10@gmail.com"
+  },
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder --publish always",
@@ -48,7 +52,8 @@
         { "target": "rpm", "arch": ["x64", "arm64"] }
       ],
       "icon": "icon.png",
-      "category": "Network"
+      "category": "Network",
+      "maintainer": "Username1234hio <your@email.com>"
     },
     "publish": {
       "provider": "github",
