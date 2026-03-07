@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 jobs:
   build-windows:
@@ -41,7 +42,7 @@ jobs:
         run: npm run dist:mac
 
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
@@ -49,13 +50,24 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Install Linux build deps
+      - name: Install Linux build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y rpm fakeroot dpkg
+          sudo apt-get install -y \
+            rpm \
+            fakeroot \
+            dpkg \
+            libarchive-tools \
+            libopenjp2-tools \
+            snapcraft \
+            libglib2.0-dev \
+            libgtk-3-dev \
+            libnss3 \
+            libxss1 \
+            libasound2
+
+      - name: Install node dependencies
+        run: npm install
 
       - name: Build Linux deb + rpm
         env:

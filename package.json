@@ -1,6 +1,6 @@
 {
   "name": "kloak-desktop-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "main.js",
   "author": {
     "name": "Username1234hio",
@@ -48,8 +48,8 @@
     },
     "linux": {
       "target": [
-        { "target": "deb", "arch": ["x64", "arm64"] },
-        { "target": "rpm", "arch": ["x64", "arm64"] }
+        { "target": "deb", "arch": ["x64"] },
+        { "target": "rpm", "arch": ["x64"] }
       ],
       "icon": "icon.png",
       "category": "Network",
