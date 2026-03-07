@@ -13,7 +13,6 @@
       font-family: 'Segoe UI', sans-serif;
     }
 
-    /* ── Webview sits below the drag bar ── */
     webview {
       position: fixed;
       top: 32px;
@@ -23,7 +22,6 @@
       z-index: 1;
     }
 
-    /* ── Transparent draggable top bar ── */
     #drag-region {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -35,9 +33,34 @@
       justify-content: flex-end;
       padding-right: 10px;
       gap: 8px;
-      /* fully transparent — just for dragging & buttons */
       background: #000;
     }
+
+    /* ── Update button ── */
+    #btn-update {
+      -webkit-app-region: no-drag;
+      position: fixed;
+      top: 5px;
+      left: 10px;
+      z-index: 9999;
+      height: 22px;
+      padding: 0 10px;
+      border: none;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Segoe UI', sans-serif;
+      transition: background 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    #btn-update:hover { background: rgba(255,255,255,0.18); color: #fff; }
+    #btn-update.available   { background: #28c840; color: #fff; }
+    #btn-update.downloading { background: #febc2e; color: #000; cursor: wait; }
+    #btn-update.ready       { background: #28c840; color: #fff; }
+    #btn-update.error       { background: #ff5f57; color: #fff; }
 
     /* ── Window control buttons ── */
     .ctrl {
@@ -59,7 +82,7 @@
       -webkit-app-region: no-drag;
       position: fixed;
       top: 6px;
-      left: 10px;
+      left: 110px;
       z-index: 9999;
       background: #000;
       border: none;
@@ -71,7 +94,7 @@
       letter-spacing: 0.5px;
       transition: background 0.2s, color 0.2s;
     }
-    #css-toggle:hover { background: rgba(255,255,255,0.2); }
+    #css-toggle:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
     /* ── CSS injector panel ── */
     #css-panel {
@@ -157,14 +180,17 @@
 
   <webview id="site" src="https://kloak.app/auth?mode=login" allowpopups partition="persist:main"></webview>
 
-  <!-- Transparent drag bar + window controls -->
+  <!-- Drag bar + window controls -->
   <div id="drag-region">
     <button class="ctrl" id="btn-minimize"></button>
     <button class="ctrl" id="btn-maximize"></button>
     <button class="ctrl" id="btn-close"></button>
   </div>
 
-  <!-- CSS injector toggle (hidden until hover) -->
+  <!-- Update button — left side -->
+  <button id="btn-update">↑ Update</button>
+
+  <!-- CSS injector toggle -->
   <button id="css-toggle">⚡ CSS</button>
 
   <!-- CSS injector panel -->
@@ -190,14 +216,65 @@ body { background: red; }
     const toggle  = document.getElementById('css-toggle');
     const input   = document.getElementById('css-input');
     const status  = document.getElementById('css-status');
+    const updBtn  = document.getElementById('btn-update');
 
     let injectedKey = null;
+    let updateState = 'idle'; // idle | available | downloading | ready | error
 
-    toggle.onclick = () => panel.classList.toggle('open');
-
+    // ── Window controls ──────────────────────────────
     document.getElementById('btn-close').onclick    = () => window.electronAPI.close();
     document.getElementById('btn-minimize').onclick = () => window.electronAPI.minimize();
     document.getElementById('btn-maximize').onclick = () => window.electronAPI.maximize();
+
+    // ── Update button ────────────────────────────────
+    updBtn.onclick = () => {
+      if (updateState === 'idle' || updateState === 'error') {
+        setUpdateState('checking');
+        window.electronAPI.checkForUpdate();
+      } else if (updateState === 'ready') {
+        window.electronAPI.installUpdate();
+      }
+    };
+
+    window.electronAPI.onUpdateStatus((state, progress) => {
+      setUpdateState(state, progress);
+    });
+
+    function setUpdateState(state, progress) {
+      updateState = state;
+      updBtn.className = '';
+      switch (state) {
+        case 'checking':
+          updBtn.textContent = 'Checking...';
+          break;
+        case 'available':
+          updBtn.textContent = '↓ Update available';
+          updBtn.className = 'available';
+          break;
+        case 'downloading':
+          updBtn.textContent = `Downloading ${progress ?? 0}%`;
+          updBtn.className = 'downloading';
+          break;
+        case 'ready':
+          updBtn.textContent = '↻ Restart to update';
+          updBtn.className = 'ready';
+          break;
+        case 'uptodate':
+          updBtn.textContent = '✓ Up to date';
+          setTimeout(() => setUpdateState('idle'), 3000);
+          break;
+        case 'error':
+          updBtn.textContent = '✗ Update error';
+          updBtn.className = 'error';
+          setTimeout(() => setUpdateState('idle'), 4000);
+          break;
+        default:
+          updBtn.textContent = '↑ Update';
+      }
+    }
+
+    // ── CSS injector ─────────────────────────────────
+    toggle.onclick = () => panel.classList.toggle('open');
 
     document.getElementById('btn-apply').onclick = async () => {
       const css = input.value.trim();
