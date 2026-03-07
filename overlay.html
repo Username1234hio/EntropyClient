@@ -11,18 +11,19 @@
       width: 100vw;
       height: 100vh;
       font-family: 'Segoe UI', sans-serif;
+      color: #fff;
     }
 
     webview {
       position: fixed;
-      top: 32px;
-      left: 0;
+      top: 32px; left: 0;
       width: 100%;
       height: calc(100% - 32px);
       z-index: 1;
     }
 
-    #drag-region {
+    /* ── Titlebar ── */
+    #titlebar {
       position: fixed;
       top: 0; left: 0; right: 0;
       height: 32px;
@@ -30,201 +31,402 @@
       z-index: 9999;
       display: flex;
       align-items: center;
-      justify-content: flex-end;
-      padding-right: 10px;
-      gap: 8px;
-      background: #000;
+      background: #111;
+      padding: 0 8px;
+      gap: 6px;
+      border-bottom: 1px solid #222;
     }
 
-    /* ── Update button ── */
-    #btn-update {
+    .tb-btn {
       -webkit-app-region: no-drag;
-      position: fixed;
-      top: 5px;
-      left: 10px;
-      z-index: 9999;
       height: 22px;
-      padding: 0 10px;
+      padding: 0 8px;
       border: none;
       border-radius: 4px;
-      background: rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.6);
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       font-family: 'Segoe UI', sans-serif;
-      transition: background 0.2s, color 0.2s;
+      transition: background 0.15s, color 0.15s;
       white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
-    #btn-update:hover { background: rgba(255,255,255,0.18); color: #fff; }
-    #btn-update.available   { background: #28c840; color: #fff; }
-    #btn-update.downloading { background: #febc2e; color: #000; cursor: wait; }
-    #btn-update.ready       { background: #28c840; color: #fff; }
-    #btn-update.error       { background: #ff5f57; color: #fff; }
+    .tb-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
+    .tb-btn:active { background: rgba(255,255,255,0.22); }
 
-    /* ── Window control buttons ── */
+    /* Nav buttons */
+    #nav-group { display: flex; gap: 2px; }
+    .nav-btn { width: 26px; padding: 0; justify-content: center; font-size: 13px; }
+
+    /* Divider */
+    .divider {
+      width: 1px;
+      height: 16px;
+      background: rgba(255,255,255,0.12);
+      flex-shrink: 0;
+    }
+
+    /* Spacer */
+    .spacer { flex: 1; -webkit-app-region: drag; }
+
+    /* Update button */
+    #btn-update { -webkit-app-region: no-drag; }
+    #btn-update.available   { background: #1a6b2a; color: #4ade80; }
+    #btn-update.downloading { background: #7a5500; color: #febc2e; cursor: wait; }
+    #btn-update.ready       { background: #1a6b2a; color: #4ade80; animation: pulse 1.5s infinite; }
+    #btn-update.error       { background: #7a1a1a; color: #ff5f57; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+
+    /* Window controls */
+    #win-controls { display: flex; gap: 6px; align-items: center; -webkit-app-region: no-drag; padding-left: 4px; }
     .ctrl {
       -webkit-app-region: no-drag;
       width: 12px; height: 12px;
       border-radius: 50%;
       border: none;
       cursor: pointer;
-      opacity: 0.85;
-      transition: opacity 0.2s, transform 0.1s;
+      opacity: 0.8;
+      transition: opacity 0.15s, transform 0.1s;
     }
-    .ctrl:hover { opacity: 1; transform: scale(1.15); }
+    .ctrl:hover { opacity: 1; transform: scale(1.2); }
     #btn-close    { background: #ff5f57; }
     #btn-minimize { background: #febc2e; }
     #btn-maximize { background: #28c840; }
 
-    /* ── CSS injector toggle ── */
-    #css-toggle {
-      -webkit-app-region: no-drag;
-      position: fixed;
-      top: 6px;
-      left: 110px;
-      z-index: 9999;
-      background: #000;
-      border: none;
-      color: rgba(255,255,255,0);
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      letter-spacing: 0.5px;
-      transition: background 0.2s, color 0.2s;
-    }
-    #css-toggle:hover { background: rgba(255,255,255,0.2); color: #fff; }
-
-    /* ── CSS injector panel ── */
-    #css-panel {
+    /* ── Panels base ── */
+    .panel {
       position: fixed;
       top: 36px;
-      left: 10px;
-      width: 340px;
-      background: #1e1e1e;
-      border: 1px solid #3a3a3a;
+      background: #1a1a1a;
+      border: 1px solid #333;
       border-radius: 8px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
       z-index: 9998;
       display: none;
       flex-direction: column;
       overflow: hidden;
       -webkit-app-region: no-drag;
+      font-size: 12px;
     }
-    #css-panel.open { display: flex; }
+    .panel.open { display: flex; }
 
-    #css-panel-header {
-      background: #2a2a2a;
+    .panel-header {
+      background: #252525;
       padding: 8px 12px;
       font-size: 12px;
       color: #aaa;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid #3a3a3a;
+      border-bottom: 1px solid #333;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    #css-panel-header span { color: #fff; font-size: 13px; }
+    .panel-header span { color: #fff; font-size: 13px; font-weight: 600; }
+    .panel-close {
+      background: none; border: none; color: #666;
+      cursor: pointer; font-size: 14px; padding: 0 2px;
+      transition: color 0.15s;
+    }
+    .panel-close:hover { color: #fff; }
 
+    /* ── CSS panel ── */
+    #css-panel { left: 8px; width: 340px; }
     #css-input {
-      width: 100%;
-      height: 200px;
-      background: #1e1e1e;
-      color: #ce9178;
-      border: none;
-      padding: 12px;
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-size: 12px;
-      resize: none;
-      outline: none;
-      line-height: 1.6;
+      width: 100%; height: 180px;
+      background: #141414; color: #ce9178;
+      border: none; padding: 10px;
+      font-family: 'Consolas', monospace; font-size: 12px;
+      resize: none; outline: none; line-height: 1.6;
     }
-    #css-input::placeholder { color: #555; }
-
-    #css-panel-footer {
-      display: flex;
-      gap: 6px;
-      padding: 8px 10px;
-      background: #252525;
-      border-top: 1px solid #3a3a3a;
+    #css-input::placeholder { color: #444; }
+    .panel-footer {
+      display: flex; gap: 6px; padding: 8px 10px;
+      background: #202020; border-top: 1px solid #333;
     }
-
-    .panel-btn {
-      flex: 1;
-      padding: 6px;
-      border: none;
-      border-radius: 5px;
-      font-size: 12px;
-      cursor: pointer;
-      font-family: inherit;
+    .p-btn {
+      flex: 1; padding: 5px; border: none; border-radius: 4px;
+      font-size: 11px; cursor: pointer; font-family: inherit;
       transition: opacity 0.15s;
     }
-    .panel-btn:hover { opacity: 0.85; }
-    #btn-apply { background: #0e7a3e; color: #fff; }
-    #btn-clear { background: #7a1a1a; color: #fff; }
-    #btn-reset { background: #3a3a3a; color: #ccc; }
-
+    .p-btn:hover { opacity: 0.85; }
+    #btn-apply  { background: #0e7a3e; color: #fff; }
+    #btn-clear  { background: #7a1a1a; color: #fff; }
+    #btn-reset  { background: #333; color: #ccc; }
     #css-status {
-      padding: 4px 10px 6px;
-      font-size: 11px;
-      color: #555;
-      background: #252525;
-      min-height: 22px;
+      padding: 4px 10px 6px; font-size: 11px; color: #555;
+      background: #202020; min-height: 22px;
     }
     #css-status.ok  { color: #28c840; }
     #css-status.err { color: #ff5f57; }
+
+    /* CSS presets */
+    #css-presets {
+      display: flex; gap: 4px; padding: 6px 10px;
+      background: #1e1e1e; border-bottom: 1px solid #333;
+      flex-wrap: wrap;
+    }
+    .preset-btn {
+      padding: 3px 7px; border: 1px solid #444; border-radius: 3px;
+      background: #2a2a2a; color: #aaa; font-size: 10px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .preset-btn:hover { background: #333; color: #fff; border-color: #666; }
+
+    /* ── Settings panel ── */
+    #settings-panel { right: 8px; width: 260px; }
+    .setting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; border-bottom: 1px solid #2a2a2a;
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-label { color: #ccc; font-size: 12px; }
+    .setting-sub { color: #555; font-size: 10px; margin-top: 2px; }
+
+    /* Toggle switch */
+    .toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; inset: 0;
+      background: #333; border-radius: 20px;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .slider:before {
+      content: ''; position: absolute;
+      width: 14px; height: 14px; left: 3px; bottom: 3px;
+      background: #888; border-radius: 50%; transition: transform 0.2s, background 0.2s;
+    }
+    .toggle input:checked + .slider { background: #1a5c2a; }
+    .toggle input:checked + .slider:before { transform: translateX(16px); background: #28c840; }
+
+    /* Zoom controls */
+    #zoom-controls { display: flex; gap: 4px; align-items: center; }
+    .zoom-btn {
+      width: 24px; height: 24px; border: 1px solid #444;
+      border-radius: 4px; background: #2a2a2a; color: #ccc;
+      cursor: pointer; font-size: 14px; display: flex;
+      align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .zoom-btn:hover { background: #333; color: #fff; }
+    #zoom-level { color: #aaa; font-size: 11px; min-width: 30px; text-align: center; }
+
+    /* About section */
+    #about-row {
+      padding: 10px 12px; color: #555; font-size: 11px;
+      border-top: 1px solid #2a2a2a; text-align: center; line-height: 1.8;
+    }
+    #about-row a { color: #4a9eff; cursor: pointer; text-decoration: none; }
+    #about-row a:hover { text-decoration: underline; }
+
+    /* ── Splash screen ── */
+    #splash {
+      position: fixed; inset: 0;
+      background: #0d0d0d;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 99999;
+      transition: opacity 0.4s;
+    }
+    #splash.hidden { opacity: 0; pointer-events: none; }
+    #splash-logo {
+      font-size: 32px; font-weight: 700; letter-spacing: 4px;
+      color: #fff; margin-bottom: 20px;
+    }
+    #splash-bar-wrap {
+      width: 180px; height: 2px;
+      background: #222; border-radius: 2px; overflow: hidden;
+    }
+    #splash-bar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #28c840, #4a9eff);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+    #splash-status { color: #444; font-size: 11px; margin-top: 10px; }
   </style>
 </head>
 <body>
 
-  <webview id="site" src="https://kloak.app/auth?mode=login" allowpopups partition="persist:main"></webview>
-
-  <!-- Drag bar + window controls -->
-  <div id="drag-region">
-    <button class="ctrl" id="btn-minimize"></button>
-    <button class="ctrl" id="btn-maximize"></button>
-    <button class="ctrl" id="btn-close"></button>
+  <!-- Splash -->
+  <div id="splash">
+    <div id="splash-logo">KLOAK</div>
+    <div id="splash-bar-wrap"><div id="splash-bar"></div></div>
+    <div id="splash-status">Loading...</div>
   </div>
 
-  <!-- Update button — left side -->
-  <button id="btn-update">↑ Update</button>
+  <!-- Webview -->
+  <webview id="site" src="https://kloak.app/auth?mode=login" allowpopups partition="persist:main"></webview>
 
-  <!-- CSS injector toggle -->
-  <button id="css-toggle">⚡ CSS</button>
+  <!-- Titlebar -->
+  <div id="titlebar">
+    <!-- Nav -->
+    <div id="nav-group">
+      <button class="tb-btn nav-btn" id="btn-back"    title="Back (Alt+Left)">‹</button>
+      <button class="tb-btn nav-btn" id="btn-forward" title="Forward (Alt+Right)">›</button>
+      <button class="tb-btn nav-btn" id="btn-reload"  title="Reload (Ctrl+R)">↻</button>
+    </div>
 
-  <!-- CSS injector panel -->
-  <div id="css-panel">
-    <div id="css-panel-header">
-      <span>CSS Injector</span>
-      <small>injected into webview</small>
+    <div class="divider"></div>
+
+    <!-- CSS toggle -->
+    <button class="tb-btn" id="css-toggle" title="CSS Injector">⚡ CSS</button>
+
+    <div class="spacer"></div>
+
+    <!-- Update -->
+    <button class="tb-btn" id="btn-update">↑ Update</button>
+
+    <div class="divider"></div>
+
+    <!-- Settings -->
+    <button class="tb-btn" id="settings-toggle" title="Settings">⚙</button>
+
+    <div class="divider"></div>
+
+    <!-- Window controls -->
+    <div id="win-controls">
+      <button class="ctrl" id="btn-minimize" title="Minimize"></button>
+      <button class="ctrl" id="btn-maximize" title="Maximize"></button>
+      <button class="ctrl" id="btn-close"    title="Close to tray"></button>
+    </div>
+  </div>
+
+  <!-- CSS Panel -->
+  <div class="panel" id="css-panel">
+    <div class="panel-header">
+      <span>⚡ CSS Injector</span>
+      <button class="panel-close" id="css-close">✕</button>
+    </div>
+    <div id="css-presets">
+      <button class="preset-btn" data-css=".navbar{display:none!important}">Hide navbar</button>
+      <button class="preset-btn" data-css="*{font-family:'Segoe UI',sans-serif!important}">System font</button>
+      <button class="preset-btn" data-css="html{filter:invert(1)hue-rotate(180deg)}">Invert</button>
     </div>
     <textarea id="css-input" placeholder="/* Write your CSS here */
-body { background: red; }
 .navbar { display: none; }"></textarea>
-    <div id="css-panel-footer">
-      <button class="panel-btn" id="btn-apply">▶ Apply</button>
-      <button class="panel-btn" id="btn-clear">✕ Clear</button>
-      <button class="panel-btn" id="btn-reset">↺ Reset</button>
+    <div class="panel-footer">
+      <button class="p-btn" id="btn-apply">▶ Apply</button>
+      <button class="p-btn" id="btn-clear">✕ Clear</button>
+      <button class="p-btn" id="btn-reset">↺ Reset</button>
     </div>
     <div id="css-status">Ready.</div>
   </div>
 
+  <!-- Settings Panel -->
+  <div class="panel" id="settings-panel">
+    <div class="panel-header">
+      <span>⚙ Settings</span>
+      <button class="panel-close" id="settings-close">✕</button>
+    </div>
+
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Launch at startup</div>
+        <div class="setting-sub">Start Kloak with your computer</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-startup">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Desktop notifications</div>
+        <div class="setting-sub">Forward page notifications</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-notifs" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-label">Zoom</div>
+      <div id="zoom-controls">
+        <button class="zoom-btn" id="zoom-out">−</button>
+        <span id="zoom-level">100%</span>
+        <button class="zoom-btn" id="zoom-in">+</button>
+        <button class="zoom-btn" id="zoom-reset" style="font-size:10px">↺</button>
+      </div>
+    </div>
+
+    <div id="about-row"></div>
+  </div>
+
   <script>
-    const webview = document.getElementById('site');
-    const panel   = document.getElementById('css-panel');
-    const toggle  = document.getElementById('css-toggle');
-    const input   = document.getElementById('css-input');
-    const status  = document.getElementById('css-status');
-    const updBtn  = document.getElementById('btn-update');
+    const webview  = document.getElementById('site');
+    const splash   = document.getElementById('splash');
+    const splashB  = document.getElementById('splash-bar');
+    const splashS  = document.getElementById('splash-status');
+    const updBtn   = document.getElementById('btn-update');
 
     let injectedKey = null;
-    let updateState = 'idle'; // idle | available | downloading | ready | error
+    let updateState = 'idle';
+    let zoomStep    = 0;
+    let notifsOn    = true;
+
+    // ── Splash ───────────────────────────────────────
+    let splashPct = 0;
+    const splashInterval = setInterval(() => {
+      splashPct = Math.min(splashPct + Math.random() * 15, 85);
+      splashB.style.width = splashPct + '%';
+    }, 200);
+
+    webview.addEventListener('did-finish-load', () => {
+      clearInterval(splashInterval);
+      splashB.style.width = '100%';
+      splashS.textContent = 'Ready';
+      setTimeout(() => {
+        splash.classList.add('hidden');
+        setTimeout(() => splash.remove(), 400);
+      }, 300);
+    });
 
     // ── Window controls ──────────────────────────────
     document.getElementById('btn-close').onclick    = () => window.electronAPI.close();
     document.getElementById('btn-minimize').onclick = () => window.electronAPI.minimize();
     document.getElementById('btn-maximize').onclick = () => window.electronAPI.maximize();
+
+    // ── Navigation ───────────────────────────────────
+    document.getElementById('btn-back').onclick    = () => webview.goBack();
+    document.getElementById('btn-forward').onclick = () => webview.goForward();
+    document.getElementById('btn-reload').onclick  = () => webview.reload();
+
+    // Update nav button states
+    webview.addEventListener('did-navigate', updateNavBtns);
+    webview.addEventListener('did-navigate-in-page', updateNavBtns);
+    function updateNavBtns() {
+      document.getElementById('btn-back').style.opacity    = webview.canGoBack()    ? '1' : '0.3';
+      document.getElementById('btn-forward').style.opacity = webview.canGoForward() ? '1' : '0.3';
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.altKey && e.key === 'ArrowLeft')  { webview.goBack();   e.preventDefault(); }
+      if (e.altKey && e.key === 'ArrowRight') { webview.goForward(); e.preventDefault(); }
+      if (e.ctrlKey && e.key === 'r')         { webview.reload();   e.preventDefault(); }
+      if (e.ctrlKey && e.key === '=')         { handleZoom(0.5);    e.preventDefault(); }
+      if (e.ctrlKey && e.key === '-')         { handleZoom(-0.5);   e.preventDefault(); }
+      if (e.ctrlKey && e.key === '0')         { handleZoom(0, true); e.preventDefault(); }
+      if (e.ctrlKey && e.key === 'f')         { webview.executeScript({code: `window.find('')`}); }
+    });
+
+    // ── Zoom ─────────────────────────────────────────
+    document.getElementById('zoom-in').onclick    = () => handleZoom(0.5);
+    document.getElementById('zoom-out').onclick   = () => handleZoom(-0.5);
+    document.getElementById('zoom-reset').onclick = () => handleZoom(0, true);
+
+    function handleZoom(delta, reset) {
+      if (reset) zoomStep = 0;
+      else zoomStep = Math.max(-5, Math.min(5, zoomStep + delta));
+      webview.setZoomLevel(zoomStep);
+      const pct = Math.round(Math.pow(1.2, zoomStep) * 100);
+      document.getElementById('zoom-level').textContent = pct + '%';
+    }
 
     // ── Update button ────────────────────────────────
     updBtn.onclick = () => {
@@ -236,84 +438,117 @@ body { background: red; }
       }
     };
 
-    window.electronAPI.onUpdateStatus((state, progress) => {
-      setUpdateState(state, progress);
-    });
+    window.electronAPI.onUpdateStatus((state, progress) => setUpdateState(state, progress));
 
     function setUpdateState(state, progress) {
       updateState = state;
-      updBtn.className = '';
-      switch (state) {
-        case 'checking':
-          updBtn.textContent = 'Checking...';
-          break;
-        case 'available':
-          updBtn.textContent = '↓ Update available';
-          updBtn.className = 'available';
-          break;
-        case 'downloading':
-          updBtn.textContent = `Downloading ${progress ?? 0}%`;
-          updBtn.className = 'downloading';
-          break;
-        case 'ready':
-          updBtn.textContent = '↻ Restart to update';
-          updBtn.className = 'ready';
-          break;
-        case 'uptodate':
-          updBtn.textContent = '✓ Up to date';
-          setTimeout(() => setUpdateState('idle'), 3000);
-          break;
-        case 'error':
-          updBtn.textContent = '✗ Update error';
-          updBtn.className = 'error';
-          setTimeout(() => setUpdateState('idle'), 4000);
-          break;
-        default:
-          updBtn.textContent = '↑ Update';
-      }
+      updBtn.className = 'tb-btn';
+      const map = {
+        idle: '↑ Update', checking: 'Checking...', available: '↓ Update available',
+        downloading: `↓ ${progress ?? 0}%`, ready: '↻ Restart to update',
+        uptodate: '✓ Up to date', error: '✗ Error'
+      };
+      updBtn.textContent = map[state] || '↑ Update';
+      if (['available','downloading','ready','error'].includes(state))
+        updBtn.classList.add(state === 'downloading' ? 'downloading' : state === 'error' ? 'error' : state === 'ready' ? 'ready' : 'available');
+      if (state === 'uptodate' || state === 'error')
+        setTimeout(() => setUpdateState('idle'), 3000);
     }
 
+    // ── Notifications ─────────────────────────────────
+    webview.addEventListener('ipc-message', (e) => {
+      if (e.channel === 'notify' && notifsOn) {
+        window.electronAPI.showNotification(e.args[0], e.args[1]);
+      }
+    });
+
+    // Watch page title for unread indicator
+    webview.addEventListener('page-title-updated', (e) => {
+      const hasUnread = /\(\d+\)/.test(e.title);
+      document.title = hasUnread ? '🔴 Kloak' : 'Kloak';
+    });
+
     // ── CSS injector ─────────────────────────────────
-    toggle.onclick = () => panel.classList.toggle('open');
+    const cssPanel  = document.getElementById('css-panel');
+    const cssToggle = document.getElementById('css-toggle');
+    const cssInput  = document.getElementById('css-input');
+    const cssStatus = document.getElementById('css-status');
+
+    cssToggle.onclick = () => {
+      cssPanel.classList.toggle('open');
+      settingsPanel.classList.remove('open');
+    };
+    document.getElementById('css-close').onclick = () => cssPanel.classList.remove('open');
+
+    // Presets
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.onclick = () => { cssInput.value = btn.dataset.css; };
+    });
 
     document.getElementById('btn-apply').onclick = async () => {
-      const css = input.value.trim();
+      const css = cssInput.value.trim();
       if (!css) { setStatus('Nothing to inject.', ''); return; }
       try {
         if (injectedKey) { await webview.removeInsertedCSS(injectedKey); injectedKey = null; }
         injectedKey = await webview.insertCSS(css);
-        setStatus('✔ CSS applied!', 'ok');
-      } catch (err) { setStatus('✘ Error: ' + err.message, 'err'); }
+        setStatus('✔ Applied!', 'ok');
+      } catch (err) { setStatus('✘ ' + err.message, 'err'); }
     };
 
     document.getElementById('btn-clear').onclick = async () => {
       try {
         if (injectedKey) { await webview.removeInsertedCSS(injectedKey); injectedKey = null; }
-        setStatus('✔ CSS removed from page.', 'ok');
-      } catch (err) { setStatus('✘ Error: ' + err.message, 'err'); }
+        setStatus('✔ Cleared.', 'ok');
+      } catch (err) { setStatus('✘ ' + err.message, 'err'); }
     };
 
     document.getElementById('btn-reset').onclick = async () => {
       try {
         if (injectedKey) { await webview.removeInsertedCSS(injectedKey); injectedKey = null; }
-        input.value = '';
+        cssInput.value = '';
         setStatus('Ready.', '');
-      } catch (err) { setStatus('✘ Error: ' + err.message, 'err'); }
+      } catch (err) { setStatus('✘ ' + err.message, 'err'); }
     };
 
     webview.addEventListener('did-navigate', async () => {
       injectedKey = null;
-      const css = input.value.trim();
+      const css = cssInput.value.trim();
       if (css) {
-        try { injectedKey = await webview.insertCSS(css); setStatus('✔ Re-applied after navigation.', 'ok'); }
-        catch (err) { /* silent */ }
+        try { injectedKey = await webview.insertCSS(css); setStatus('✔ Re-applied.', 'ok'); }
+        catch { /* silent */ }
       }
     });
 
     function setStatus(msg, type) {
-      status.textContent = msg;
-      status.className = type;
+      cssStatus.textContent = msg;
+      cssStatus.className = type;
     }
+
+    // ── Settings panel ───────────────────────────────
+    const settingsPanel = document.getElementById('settings-panel');
+
+    document.getElementById('settings-toggle').onclick = () => {
+      settingsPanel.classList.toggle('open');
+      cssPanel.classList.remove('open');
+    };
+    document.getElementById('settings-close').onclick = () => settingsPanel.classList.remove('open');
+
+    // Startup toggle
+    const startupToggle = document.getElementById('toggle-startup');
+    window.electronAPI.getLoginStartup().then(val => { startupToggle.checked = val; });
+    startupToggle.onchange = () => window.electronAPI.setLoginStartup(startupToggle.checked);
+
+    // Notifications toggle
+    const notifsToggle = document.getElementById('toggle-notifs');
+    notifsToggle.onchange = () => { notifsOn = notifsToggle.checked; };
+
+    // About section
+    window.electronAPI.getVersion().then(v => {
+      document.getElementById('about-row').innerHTML =
+        `Kloak Desktop v${v}<br>
+         <a onclick="window.electronAPI.openExternal('https://kloak.app')">kloak.app</a> &nbsp;·&nbsp;
+         <a onclick="window.electronAPI.openExternal('https://github.com/Username1234hio/KloakDesktopAppBeta-Unoffical-')">GitHub</a>`;
+    });
   </script>
 
 </body>
