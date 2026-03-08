@@ -58,13 +58,41 @@ jobs:
             fakeroot \
             dpkg \
             libarchive-tools \
-            libopenjp2-tools \
-            snapcraft \
             libglib2.0-dev \
             libgtk-3-dev \
             libnss3 \
             libxss1 \
-            libasound2
+            libasound2 \
+            python3-pip
+
+      - name: Install Python imaging
+        run: pip3 install Pillow
+
+      - name: Validate and fix icon.png
+        run: |
+          python3 - << 'PYEOF'
+          from PIL import Image
+          import sys, os
+
+          path = 'icon.png'
+          if not os.path.exists(path):
+              print("ERROR: icon.png not found!")
+              sys.exit(1)
+
+          img = Image.open(path)
+          print(f"Original: {img.size} {img.mode}")
+
+          if img.size != (512, 512):
+              print(f"Resizing to 512x512")
+              img = img.resize((512, 512), Image.LANCZOS)
+
+          if img.mode != 'RGBA':
+              print(f"Converting to RGBA")
+              img = img.convert('RGBA')
+
+          img.save(path, 'PNG')
+          print(f"icon.png ready: {img.size} {img.mode}")
+          PYEOF
 
       - name: Install node dependencies
         run: npm install
