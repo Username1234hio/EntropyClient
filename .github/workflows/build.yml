@@ -42,12 +42,34 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y rpm fakeroot dpkg libarchive-tools
 
-      - run: npm install
+      - name: npm install
+        run: npm install
+
+      - name: Rebuild app-builder from source
+        # The bundled app-builder binary is compiled on macOS (note the
+        # /Volumes/data/Documents path in stack traces) and segfaults on
+        # Linux runners due to glibc version mismatch. Building from source
+        # produces a native binary that matches the runner exactly.
+        run: |
+          git clone --depth 1 https://github.com/develar/app-builder.git /tmp/ab-src
+          cd /tmp/ab-src
+          go build -o app-builder .
+          DEST="$GITHUB_WORKSPACE/node_modules/app-builder-bin/linux/x64/app-builder"
+          cp app-builder "$DEST"
+          chmod +x "$DEST"
+          echo "Rebuilt binary:"
+          file "$DEST"
+          "$DEST" --version
 
       - name: Build Linux deb + rpm
         env:
