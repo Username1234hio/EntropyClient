@@ -1,6 +1,7 @@
 {
   "name": "kloak-desktop-app",
   "version": "1.0.1",
+  "description": "Entropy Client - Unofficial desktop wrapper for kloak.app",
   "main": "main.js",
   "author": {
     "name": "Username1234hio",
@@ -23,6 +24,7 @@
   "build": {
     "appId": "com.kloak.app",
     "productName": "Entropy Client",
+    "generateUpdatesFilesForAllChannels": false,
     "files": [
       "main.js",
       "preload.js",
@@ -57,7 +59,19 @@
       ],
       "icon": "build/icons",
       "category": "Network",
-      "maintainer": "Username1234hio <aadsin10@gmail.com>"
+      "maintainer": "Username1234hio <aadsin10@gmail.com>",
+      "desktop": {
+        "Name": "Entropy Client",
+        "Comment": "Unofficial desktop wrapper for kloak.app"
+      }
+    },
+    "deb": {
+      "afterInstall": null,
+      "afterRemove": null,
+      "fpm": []
+    },
+    "rpm": {
+      "fpm": []
     },
     "publish": {
       "provider": "github",
