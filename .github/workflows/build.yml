@@ -34,7 +34,7 @@ jobs:
         run: npm run dist:mac
 
   build-linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
@@ -45,30 +45,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            rpm \
-            fakeroot \
-            dpkg \
-            libarchive-tools \
-            icnsutils \
-            graphicsmagick \
-            python3-pip
-
-      - name: Validate icon.png
-        run: |
-          pip3 install --quiet Pillow
-          python3 - << 'PYEOF'
-          from PIL import Image
-          import sys, os
-          path = 'icon.png'
-          if not os.path.exists(path):
-              print('ERROR: icon.png missing'); sys.exit(1)
-          img = Image.open(path)
-          if img.size != (512, 512): img = img.resize((512, 512), Image.LANCZOS)
-          if img.mode != 'RGBA': img = img.convert('RGBA')
-          img.save(path, 'PNG')
-          print(f'icon.png OK: {img.size} {img.mode}')
-          PYEOF
+          sudo apt-get install -y rpm fakeroot dpkg libarchive-tools
 
       - run: npm install
 

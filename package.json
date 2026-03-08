@@ -31,6 +31,7 @@
       "icon.ico",
       "icon.png",
       "icon.icns",
+      "build/**",
       "node_modules/**"
     ],
     "win": {
@@ -54,7 +55,7 @@
         { "target": "deb", "arch": ["x64"] },
         { "target": "rpm", "arch": ["x64"] }
       ],
-      "icon": "icon.png",
+      "icon": "build/icons",
       "category": "Network",
       "maintainer": "Username1234hio <aadsin10@gmail.com>"
     },
