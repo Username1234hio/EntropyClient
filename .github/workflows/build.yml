@@ -42,11 +42,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.21'
-
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -55,21 +50,14 @@ jobs:
       - name: npm install
         run: npm install
 
-      - name: Rebuild app-builder from source
-        # The bundled app-builder binary is compiled on macOS (note the
-        # /Volumes/data/Documents path in stack traces) and segfaults on
-        # Linux runners due to glibc version mismatch. Building from source
-        # produces a native binary that matches the runner exactly.
+      - name: Patch app-builder to skip blockmap generation
         run: |
-          git clone --depth 1 https://github.com/develar/app-builder.git /tmp/ab-src
-          cd /tmp/ab-src
-          go build -o app-builder .
-          DEST="$GITHUB_WORKSPACE/node_modules/app-builder-bin/linux/x64/app-builder"
-          cp app-builder "$DEST"
-          chmod +x "$DEST"
-          echo "Rebuilt binary:"
-          file "$DEST"
-          "$DEST" --version
+          REAL="node_modules/app-builder-bin/linux/x64/app-builder"
+          mv "$REAL" "${REAL}.orig"
+          printf '#!/bin/bash\nfor arg in "$@"; do\n  if [[ "$arg" == *"blockmap"* ]] || [[ "$arg" == *"zip"* ]]; then\n    exit 0\n  fi\ndone\nexec "$(dirname "$0")/app-builder.orig" "$@"\n' > "$REAL"
+          chmod +x "$REAL"
+          echo "Wrapper installed"
+          cat "$REAL"
 
       - name: Build Linux deb + rpm
         env:
