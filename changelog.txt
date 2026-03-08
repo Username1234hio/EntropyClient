@@ -1,0 +1,19 @@
+# Entropy Client Changelog
+# Format: VERSION x.x.x followed by entries
+# Entry types: new / imp / fix
+# Lines starting with # are ignored
+
+VERSION 1.0.5!
+new Ambient mode — titlebar tints to match page colours
+new Connection status dot with auto-reconnect on offline
+new Crash recovery screen shown instead of blank page
+new Onboarding tour for new installs
+new Pinnable titlebar widgets (weather, clock, zoom, date...)
+new Multi-account sessions with isolated cookies
+new Domain blocker, session notes, and bookmark manager
+new Changelog popup reads from this file
+imp Customization panel is now a unified 85% modal
+imp Titlebar gradient editor with angle control
+imp Theme scheduler to auto-switch themes by time of day
+fix Keybinds now properly persist across restarts
+Added some cool stuff (KonamiSaywhaaa...)

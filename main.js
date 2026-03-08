@@ -82,10 +82,10 @@ function createTray() {
     : nativeImage.createEmpty();
 
   tray = new Tray(img);
-  tray.setToolTip('Kloak');
+  tray.setToolTip('Entropy Client');
 
   const menu = Menu.buildFromTemplate([
-    { label: 'Open Kloak',      click: () => { win.show(); win.focus(); } },
+    { label: 'Open Entropy Client',      click: () => { win.show(); win.focus(); } },
     { type: 'separator' },
     { label: 'Check for updates', click: () => { win.show(); autoUpdater.checkForUpdates().catch(() => {}); } },
     { type: 'separator' },

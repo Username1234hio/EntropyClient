@@ -4,552 +4,1681 @@
   <meta charset="UTF-8"/>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; overflow: hidden; width: 100vw; height: 100vh; font-family: 'Segoe UI', sans-serif; color: #fff; }
 
-    body {
-      background: #000;
-      overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-      font-family: 'Segoe UI', sans-serif;
-      color: #fff;
-    }
+    webview { position: fixed; top: 32px; left: 0; width: 100%; height: calc(100% - 32px); z-index: 1; }
+    #bg-canvas, #particle-canvas { position: fixed; top: 32px; left: 0; width: 100%; height: calc(100% - 32px); pointer-events: none; z-index: 2; }
+    #custom-cursor { position: fixed; pointer-events: none; z-index: 99998; transform: translate(-50%,-50%); display: none; }
+    #screenshot-flash { position: fixed; inset: 0; z-index: 999998; background: #fff; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
+    #screenshot-flash.flash { opacity: 0.6; }
+    /* ── Connection dot ── */
+    #conn-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: #28c840; box-shadow: 0 0 5px #28c840; transition: background 0.4s, box-shadow 0.4s; -webkit-app-region: no-drag; }
+    #conn-dot.offline  { background: #ff5f57; box-shadow: 0 0 5px #ff5f57; animation: connPulse 1.5s infinite; }
+    #conn-dot.checking { background: #febc2e; box-shadow: 0 0 5px #febc2e; animation: connPulse 0.8s infinite; }
+    @keyframes connPulse { 0%,100%{opacity:1}50%{opacity:0.3} }
 
-    webview {
-      position: fixed;
-      top: 32px; left: 0;
-      width: 100%;
-      height: calc(100% - 32px);
-      z-index: 1;
-    }
+    /* ── Crash recovery ── */
+    #crash-screen { position: fixed; top: 32px; left: 0; right: 0; bottom: 0; background: #0a0a0a; z-index: 9990; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+    #crash-screen.show { display: flex; }
+    #crash-screen .crash-icon { font-size: 52px; }
+    #crash-screen h2 { font-size: 20px; color: #fff; font-weight: 700; }
+    #crash-screen p { font-size: 13px; color: #666; text-align: center; max-width: 320px; line-height: 1.6; }
+    .crash-detail { font-size: 11px; color: #444; font-family: monospace; background: #111; border: 1px solid #2a2a2a; border-radius: 6px; padding: 8px 14px; max-width: 380px; text-align: center; }
+    #crash-reload { padding: 10px 28px; border: none; border-radius: 8px; background: #ff6b00; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
+    #crash-reload:hover { opacity: 0.85; }
+
+    /* ── Onboarding ── */
+    #onboarding { position: fixed; inset: 0; z-index: 999985; background: rgba(0,0,0,0.92); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    #onboarding.show { opacity: 1; pointer-events: all; }
+    #onboarding-card { width: 480px; background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; box-shadow: 0 32px 80px rgba(0,0,0,0.8); transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1); }
+    #onboarding.show #onboarding-card { transform: scale(1); }
+    #ob-progress { height: 3px; background: #1a1a1a; }
+    #ob-progress-bar { height: 100%; background: linear-gradient(90deg,#ff6b00,#ff0080); transition: width 0.4s ease; }
+    #ob-body { padding: 32px; }
+    #ob-step-icon { font-size: 44px; margin-bottom: 14px; }
+    #ob-step-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+    #ob-step-desc { font-size: 13px; color: #888; line-height: 1.7; margin-bottom: 20px; }
+    #ob-feature-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+    .ob-feature { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: rgba(255,255,255,0.04); border-radius: 7px; font-size: 12px; color: #bbb; }
+    #ob-footer { display: flex; align-items: center; justify-content: space-between; }
+    #ob-step-counter { font-size: 11px; color: #555; }
+    #ob-nav { display: flex; gap: 8px; align-items: center; }
+    .ob-btn { padding: 8px 20px; border: none; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
+    .ob-btn:hover { opacity: 0.85; }
+    #ob-back { background: #2a2a2a; color: #aaa; }
+    #ob-next { background: #ff6b00; color: #fff; }
+    #ob-skip { font-size: 11px; color: #444; background: none; border: none; cursor: pointer; padding: 4px 8px; font-family: inherit; }
+    #ob-skip:hover { color: #888; }
+
+    /* ── Changelog popup ── */
+    #changelog-popup { position: fixed; bottom: 20px; right: 20px; z-index: 99980; width: 320px; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.7); transform: translateY(120%); opacity: 0; transition: transform 0.4s cubic-bezier(0.34,1.3,0.64,1), opacity 0.3s; overflow: hidden; }
+    #changelog-popup.show { transform: translateY(0); opacity: 1; }
+    #cl-header { display: flex; align-items: center; gap: 10px; padding: 14px 16px 10px; border-bottom: 1px solid #252525; }
+    #cl-badge { background: linear-gradient(135deg,#ff6b00,#ff0080); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+    #cl-title { font-size: 13px; font-weight: 700; color: #fff; flex: 1; }
+    #cl-close { background: none; border: none; color: #555; cursor: pointer; font-size: 14px; transition: color 0.15s; }
+    #cl-close:hover { color: #fff; }
+    #cl-body { padding: 12px 16px; max-height: 200px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+    .cl-entry { margin-bottom: 12px; }
+    .cl-entry:last-child { margin-bottom: 0; }
+    .cl-tag { display: inline-block; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 2px 6px; border-radius: 3px; margin-bottom: 4px; }
+    .cl-new { background: rgba(40,200,64,0.2); color: #28c840; }
+    .cl-fix { background: rgba(255,95,87,0.2); color: #ff5f57; }
+    .cl-imp { background: rgba(254,188,46,0.2); color: #febc2e; }
+    .cl-entry-text { font-size: 12px; color: #bbb; line-height: 1.5; }
+    #cl-footer { padding: 10px 16px; border-top: 1px solid #252525; display: flex; justify-content: flex-end; }
+    #cl-dismiss { padding: 6px 16px; border: none; border-radius: 6px; background: #2a2a2a; color: #aaa; font-size: 11px; cursor: pointer; font-family: inherit; }
+    #cl-dismiss:hover { background: #333; color: #fff; }
+
+    /* ── Ambient mode ── */
+    #ambient-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 32px; pointer-events: none; z-index: 9998; opacity: 0; transition: opacity 1s; }
+    #ambient-canvas.active { opacity: 1; }
+
 
     /* ── Titlebar ── */
     #titlebar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 32px;
-      -webkit-app-region: drag;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      background: #111;
-      padding: 0 8px;
-      gap: 6px;
-      border-bottom: 1px solid #222;
+      position: fixed; top: 0; left: 0; right: 0; height: 32px;
+      -webkit-app-region: drag; z-index: 9999;
+      display: flex; align-items: center;
+      padding: 0 8px; gap: 5px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: var(--tb-bg, #111);
     }
+    #titlebar.gradient-tb { background: var(--tb-gradient, linear-gradient(90deg,#1a0a00,#0a0018)) !important; }
 
     .tb-btn {
-      -webkit-app-region: no-drag;
-      height: 22px;
-      padding: 0 8px;
-      border: none;
-      border-radius: 4px;
-      background: rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.6);
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Segoe UI', sans-serif;
-      transition: background 0.15s, color 0.15s;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 4px;
+      -webkit-app-region: no-drag; height: 22px; padding: 0 8px; border: none; border-radius: 4px;
+      background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6);
+      font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'Segoe UI', sans-serif;
+      transition: background 0.15s, color 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 4px;
     }
     .tb-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
-    .tb-btn:active { background: rgba(255,255,255,0.22); }
 
-    /* Nav buttons */
     #nav-group { display: flex; gap: 2px; }
     .nav-btn { width: 26px; padding: 0; justify-content: center; font-size: 13px; }
 
-    /* Divider */
-    .divider {
-      width: 1px;
-      height: 16px;
-      background: rgba(255,255,255,0.12);
-      flex-shrink: 0;
+    /* ── Pinned widgets bar ── */
+    #widget-bar {
+      -webkit-app-region: no-drag;
+      display: flex; align-items: center; gap: 4px; flex: 1;
     }
+    .tb-widget {
+      display: flex; align-items: center; gap: 4px;
+      padding: 2px 8px; height: 22px; border-radius: 4px;
+      font-size: 11px; color: rgba(255,255,255,0.55);
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+      white-space: nowrap; transition: background 0.15s;
+      -webkit-app-region: no-drag;
+    }
+    .tb-widget.clickable { cursor: pointer; }
+    .tb-widget.clickable:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
 
-    /* Spacer */
-    .spacer { flex: 1; -webkit-app-region: drag; }
+    .divider { width: 1px; height: 16px; background: rgba(255,255,255,0.1); flex-shrink: 0; }
 
-    /* Update button */
-    #btn-update { -webkit-app-region: no-drag; }
     #btn-update.available   { background: #1a6b2a; color: #4ade80; }
     #btn-update.downloading { background: #7a5500; color: #febc2e; cursor: wait; }
     #btn-update.ready       { background: #1a6b2a; color: #4ade80; animation: pulse 1.5s infinite; }
     #btn-update.error       { background: #7a1a1a; color: #ff5f57; }
-    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.6} }
 
-    /* Window controls */
-    #win-controls { display: flex; gap: 6px; align-items: center; -webkit-app-region: no-drag; padding-left: 4px; }
-    .ctrl {
-      -webkit-app-region: no-drag;
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      border: none;
-      cursor: pointer;
-      opacity: 0.8;
-      transition: opacity 0.15s, transform 0.1s;
-    }
+    #win-controls { display: flex; gap: 6px; align-items: center; -webkit-app-region: no-drag; padding-left: 2px; }
+    .ctrl { -webkit-app-region: no-drag; width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; opacity: 0.8; transition: opacity 0.15s, transform 0.1s; }
     .ctrl:hover { opacity: 1; transform: scale(1.2); }
-    #btn-close    { background: #ff5f57; }
-    #btn-minimize { background: #febc2e; }
-    #btn-maximize { background: #28c840; }
-
-    /* ── Panels base ── */
-    .panel {
-      position: fixed;
-      top: 36px;
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 8px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-      z-index: 9998;
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-      -webkit-app-region: no-drag;
-      font-size: 12px;
-    }
-    .panel.open { display: flex; }
-
-    .panel-header {
-      background: #252525;
-      padding: 8px 12px;
-      font-size: 12px;
-      color: #aaa;
-      border-bottom: 1px solid #333;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .panel-header span { color: #fff; font-size: 13px; font-weight: 600; }
-    .panel-close {
-      background: none; border: none; color: #666;
-      cursor: pointer; font-size: 14px; padding: 0 2px;
-      transition: color 0.15s;
-    }
-    .panel-close:hover { color: #fff; }
-
-    /* ── CSS panel ── */
-    #css-panel { left: 8px; width: 340px; }
-    #css-input {
-      width: 100%; height: 180px;
-      background: #141414; color: #ce9178;
-      border: none; padding: 10px;
-      font-family: 'Consolas', monospace; font-size: 12px;
-      resize: none; outline: none; line-height: 1.6;
-    }
-    #css-input::placeholder { color: #444; }
-    .panel-footer {
-      display: flex; gap: 6px; padding: 8px 10px;
-      background: #202020; border-top: 1px solid #333;
-    }
-    .p-btn {
-      flex: 1; padding: 5px; border: none; border-radius: 4px;
-      font-size: 11px; cursor: pointer; font-family: inherit;
-      transition: opacity 0.15s;
-    }
-    .p-btn:hover { opacity: 0.85; }
-    #btn-apply  { background: #0e7a3e; color: #fff; }
-    #btn-clear  { background: #7a1a1a; color: #fff; }
-    #btn-reset  { background: #333; color: #ccc; }
-    #css-status {
-      padding: 4px 10px 6px; font-size: 11px; color: #555;
-      background: #202020; min-height: 22px;
-    }
-    #css-status.ok  { color: #28c840; }
-    #css-status.err { color: #ff5f57; }
-
-    /* CSS presets */
-    #css-presets {
-      display: flex; gap: 4px; padding: 6px 10px;
-      background: #1e1e1e; border-bottom: 1px solid #333;
-      flex-wrap: wrap;
-    }
-    .preset-btn {
-      padding: 3px 7px; border: 1px solid #444; border-radius: 3px;
-      background: #2a2a2a; color: #aaa; font-size: 10px;
-      cursor: pointer; transition: all 0.15s;
-    }
-    .preset-btn:hover { background: #333; color: #fff; border-color: #666; }
+    #btn-close { background: #ff5f57; } #btn-minimize { background: #febc2e; } #btn-maximize { background: #28c840; }
 
     /* ── Settings panel ── */
-    #settings-panel { right: 8px; width: 260px; }
-    .setting-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 12px; border-bottom: 1px solid #2a2a2a;
-    }
+    .panel { position: fixed; top: 36px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 9998; display: none; flex-direction: column; overflow: hidden; -webkit-app-region: no-drag; font-size: 12px; }
+    .panel.open { display: flex; }
+    .panel-header { background: #252525; padding: 8px 12px; color: #aaa; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .panel-header span { color: #fff; font-size: 13px; font-weight: 600; }
+    .panel-close { background: none; border: none; color: #666; cursor: pointer; font-size: 14px; transition: color 0.15s; }
+    .panel-close:hover { color: #fff; }
+    .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-bottom: 1px solid #2a2a2a; }
     .setting-row:last-child { border-bottom: none; }
-    .setting-label { color: #ccc; font-size: 12px; }
-    .setting-sub { color: #555; font-size: 10px; margin-top: 2px; }
-
-    /* Toggle switch */
+    .setting-label { font-size: 12px; color: #ccc; }
+    .setting-sub { font-size: 10px; color: #555; margin-top: 1px; }
     .toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
     .toggle input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute; inset: 0;
-      background: #333; border-radius: 20px;
-      cursor: pointer; transition: background 0.2s;
-    }
-    .slider:before {
-      content: ''; position: absolute;
-      width: 14px; height: 14px; left: 3px; bottom: 3px;
-      background: #888; border-radius: 50%; transition: transform 0.2s, background 0.2s;
-    }
+    .slider { position: absolute; inset: 0; background: #333; border-radius: 20px; cursor: pointer; transition: background 0.2s; }
+    .slider:before { content:''; position:absolute; width:14px; height:14px; left:3px; bottom:3px; background:#888; border-radius:50%; transition: transform 0.2s, background 0.2s; }
     .toggle input:checked + .slider { background: #1a5c2a; }
     .toggle input:checked + .slider:before { transform: translateX(16px); background: #28c840; }
-
-    /* Zoom controls */
     #zoom-controls { display: flex; gap: 4px; align-items: center; }
-    .zoom-btn {
-      width: 24px; height: 24px; border: 1px solid #444;
-      border-radius: 4px; background: #2a2a2a; color: #ccc;
-      cursor: pointer; font-size: 14px; display: flex;
-      align-items: center; justify-content: center;
-      transition: all 0.15s;
-    }
+    .zoom-btn { width: 24px; height: 24px; border: 1px solid #444; border-radius: 4px; background: #2a2a2a; color: #ccc; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
     .zoom-btn:hover { background: #333; color: #fff; }
     #zoom-level { color: #aaa; font-size: 11px; min-width: 30px; text-align: center; }
-
-    /* About section */
-    #about-row {
-      padding: 10px 12px; color: #555; font-size: 11px;
-      border-top: 1px solid #2a2a2a; text-align: center; line-height: 1.8;
-    }
+    #about-row { padding: 9px 12px; color: #555; font-size: 11px; border-top: 1px solid #2a2a2a; text-align: center; line-height: 1.8; }
     #about-row a { color: #4a9eff; cursor: pointer; text-decoration: none; }
-    #about-row a:hover { text-decoration: underline; }
 
-    /* ── Splash screen ── */
-    #splash {
-      position: fixed; inset: 0;
-      background: #0d0d0d;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      z-index: 99999;
-      transition: opacity 0.4s;
+    #open-extra-btn {
+      margin: 10px 12px 4px; padding: 8px 12px; border: 1px solid #444; border-radius: 6px;
+      background: linear-gradient(135deg,rgba(255,107,0,0.15),rgba(124,58,237,0.15));
+      color: #ccc; font-size: 12px; cursor: pointer; font-family: 'Segoe UI', sans-serif;
+      display: flex; align-items: center; gap: 8px; transition: all 0.2s; -webkit-app-region: no-drag;
     }
+    #open-extra-btn:hover { border-color: #ff6b00; color: #fff; box-shadow: 0 0 12px rgba(255,107,0,0.2); }
+
+    /* ── Modal ── */
+    #modal-backdrop {
+      position: fixed; inset: 0; z-index: 99990;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    #modal-backdrop.open { opacity: 1; pointer-events: all; }
+    #modal {
+      width: 85vw; height: 85vh;
+      background: rgba(15,15,20,0.92); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 14px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.8);
+      display: flex; flex-direction: column; overflow: hidden;
+      transform: scale(0.92) translateY(20px); opacity: 0;
+      transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s;
+    }
+    #modal-backdrop.open #modal { transform: scale(1) translateY(0); opacity: 1; }
+    #modal-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 13px; border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.03); flex-shrink: 0; }
+    #modal-title { font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+    #modal-title span { color: #ff6b00; }
+    #modal-close-btn { width: 28px; height: 28px; border: none; border-radius: 6px; background: rgba(255,255,255,0.07); color: #888; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+    #modal-close-btn:hover { background: rgba(255,95,87,0.3); color: #ff5f57; }
+    #modal-body { display: flex; flex: 1; overflow: hidden; }
+    #modal-sidebar { width: 180px; flex-shrink: 0; border-right: 1px solid rgba(255,255,255,0.07); background: rgba(0,0,0,0.2); display: flex; flex-direction: column; padding: 10px 8px; gap: 3px; }
+    .sidebar-tab { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 500; transition: all 0.15s; border: 1px solid transparent; user-select: none; }
+    .sidebar-tab:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); }
+    .sidebar-tab.active { background: rgba(255,107,0,0.15); border-color: rgba(255,107,0,0.3); color: #ff6b00; }
+    .sidebar-tab.locked { opacity: 0.35; cursor: not-allowed; }
+    .sidebar-tab.locked:hover { background: none; color: rgba(255,255,255,0.5); }
+    .tab-icon { font-size: 14px; width: 18px; text-align: center; }
+    #sidebar-footer { margin-top: auto; padding: 8px 4px 2px; border-top: 1px solid rgba(255,255,255,0.07); font-size: 10px; color: #444; text-align: center; line-height: 1.8; }
+    #sidebar-footer kbd { background: #222; border: 1px solid #333; border-radius: 3px; padding: 1px 4px; font-size: 9px; color: #666; }
+    #modal-content { flex: 1; overflow-y: auto; padding: 20px 24px; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+    #modal-content::-webkit-scrollbar { width: 5px; }
+    #modal-content::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+    .section-title { font-size: 10px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; margin-top: 20px; }
+    .section-title:first-child { margin-top: 0; }
+
+    /* Shared input styles */
+    .code-input { width: 100%; background: rgba(0,0,0,0.4); color: #ce9178; border: 1px solid #333; border-radius: 6px; padding: 10px; font-family: 'Consolas', monospace; font-size: 12px; resize: vertical; outline: none; line-height: 1.6; transition: border-color 0.15s; }
+    .code-input:focus { border-color: #555; }
+    .code-input::placeholder { color: #444; }
+    .action-row { display: flex; gap: 8px; margin-top: 10px; }
+    .act-btn { padding: 7px 16px; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
+    .act-btn:hover { opacity: 0.85; }
+    .btn-green { background: #0e7a3e; color: #fff; }
+    .btn-red   { background: #7a1a1a; color: #fff; }
+    .btn-grey  { background: #333; color: #ccc; }
+    .btn-blue  { background: #1a4a8a; color: #fff; }
+    .status-line { margin-top: 8px; font-size: 11px; color: #555; min-height: 18px; }
+    .status-line.ok  { color: #28c840; }
+    .status-line.err { color: #ff5f57; }
+
+    /* ── CSS Pane ── */
+    #css-presets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .preset-btn { padding: 4px 9px; border: 1px solid #444; border-radius: 4px; background: #2a2a2a; color: #aaa; font-size: 11px; cursor: pointer; transition: all 0.15s; }
+    .preset-btn:hover { background: #333; color: #fff; border-color: #666; }
+    #css-input { height: 200px; }
+
+    /* ── Themes Pane ── */
+    .theme-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+    .theme-card { border-radius: 8px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border 0.15s, transform 0.12s, box-shadow 0.15s; }
+    .theme-card:hover { transform: scale(1.04); box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+    .theme-card.active { border-color: #ff6b00; }
+    .theme-preview { height: 52px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+    .theme-name { padding: 5px 6px; font-size: 10px; text-align: center; background: rgba(0,0,0,0.3); color: #aaa; }
+    .theme-card.active .theme-name { color: #ff6b00; }
+    .slider-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+    .slider-row label { font-size: 11px; color: #888; width: 140px; flex-shrink: 0; }
+    .slider-row input[type=range] { flex: 1; accent-color: #ff6b00; cursor: pointer; }
+    .slider-row span { font-size: 11px; color: #666; width: 40px; text-align: right; }
+
+    /* Titlebar gradient */
+    .color-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+    .color-row label { font-size: 11px; color: #888; }
+    .color-row input[type=color] { width: 36px; height: 24px; border: 1px solid #444; border-radius: 4px; background: #1a1a1a; cursor: pointer; padding: 2px; }
+    .tb-preview { height: 20px; border-radius: 4px; margin-top: 8px; transition: background 0.3s; }
+
+    /* ── Bookmarks Pane ── */
+    #bookmark-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; min-height: 30px; }
+    .bookmark-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: rgba(255,255,255,0.04); border: 1px solid #2a2a2a; border-radius: 7px; transition: border-color 0.15s; }
+    .bookmark-item:hover { border-color: #444; }
+    .bm-favicon { font-size: 14px; flex-shrink: 0; }
+    .bm-info { flex: 1; overflow: hidden; }
+    .bm-name { font-size: 12px; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bm-url { font-size: 10px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bm-go { padding: 3px 8px; border: none; border-radius: 4px; background: rgba(255,107,0,0.2); color: #ff6b00; font-size: 10px; cursor: pointer; transition: background 0.15s; flex-shrink: 0; }
+    .bm-go:hover { background: rgba(255,107,0,0.35); }
+    .bm-del { padding: 3px 8px; border: none; border-radius: 4px; background: rgba(255,95,87,0.15); color: #ff5f57; font-size: 10px; cursor: pointer; transition: background 0.15s; flex-shrink: 0; }
+    .bm-del:hover { background: rgba(255,95,87,0.3); }
+    .add-bm-row { display: grid; grid-template-columns: 1fr 2fr auto; gap: 8px; align-items: center; }
+    .mini-input { background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 5px; color: #ccc; padding: 6px 8px; font-size: 11px; outline: none; font-family: 'Segoe UI', sans-serif; width: 100%; }
+    .mini-input:focus { border-color: #555; }
+    .mini-input::placeholder { color: #444; }
+
+    /* ── Notes Pane ── */
+    #notes-input { height: 280px; color: #d4d4d4; }
+    #notes-status { margin-top: 6px; font-size: 10px; color: #555; }
+
+    /* ── History Pane ── */
+    #history-list { display: flex; flex-direction: column; gap: 4px; }
+    .hist-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: rgba(255,255,255,0.03); border-radius: 6px; cursor: pointer; transition: background 0.15s; }
+    .hist-item:hover { background: rgba(255,255,255,0.07); }
+    .hist-time { font-size: 10px; color: #555; flex-shrink: 0; width: 44px; }
+    .hist-url { font-size: 11px; color: #aaa; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hist-clear { padding: 5px 12px; border: none; border-radius: 5px; background: rgba(255,95,87,0.15); color: #ff5f57; font-size: 11px; cursor: pointer; }
+    .hist-clear:hover { background: rgba(255,95,87,0.3); }
+
+    /* ── Keybinds Pane ── */
+    .kb-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid #222; }
+    .kb-row:last-child { border-bottom: none; }
+    .kb-label { font-size: 12px; color: #ccc; }
+    .kb-sub { font-size: 10px; color: #555; }
+    .kb-recorder {
+      padding: 5px 12px; border: 1px solid #444; border-radius: 5px;
+      background: #2a2a2a; color: #ccc; font-size: 11px; cursor: pointer;
+      min-width: 100px; text-align: center; transition: all 0.15s; font-family: monospace;
+    }
+    .kb-recorder.recording { border-color: #ff6b00; color: #ff6b00; background: rgba(255,107,0,0.1); animation: blink 0.8s infinite; }
+    @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.5} }
+
+    /* ── Accounts Pane ── */
+    .account-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(255,255,255,0.04); border: 1px solid #2a2a2a; border-radius: 8px; margin-bottom: 8px; transition: border-color 0.15s; }
+    .account-card.active-account { border-color: #ff6b00; background: rgba(255,107,0,0.07); }
+    .account-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .account-info { flex: 1; }
+    .account-name { font-size: 12px; color: #ddd; font-weight: 600; }
+    .account-sub { font-size: 10px; color: #555; }
+    .account-switch { padding: 4px 10px; border: none; border-radius: 4px; background: rgba(255,107,0,0.2); color: #ff6b00; font-size: 10px; cursor: pointer; }
+    .account-switch:hover { background: rgba(255,107,0,0.35); }
+    .account-del { padding: 4px 10px; border: none; border-radius: 4px; background: rgba(255,95,87,0.15); color: #ff5f57; font-size: 10px; cursor: pointer; }
+
+    /* ── Request Blocker Pane ── */
+    #block-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; min-height: 20px; }
+    .block-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: rgba(255,95,87,0.07); border: 1px solid rgba(255,95,87,0.2); border-radius: 6px; }
+    .block-domain { flex: 1; font-size: 11px; color: #ccc; font-family: monospace; }
+    .block-del { padding: 3px 8px; border: none; border-radius: 4px; background: rgba(255,95,87,0.2); color: #ff5f57; font-size: 10px; cursor: pointer; }
+    .block-del:hover { background: rgba(255,95,87,0.4); }
+    #block-empty { color: #555; font-size: 11px; text-align: center; padding: 16px; }
+
+    /* ── Fun Pane ── */
+    .fun-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .fun-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 14px; }
+    .fun-card-title { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+    .fun-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .fun-row:last-child { margin-bottom: 0; }
+    .fun-label { font-size: 12px; color: #ccc; }
+    .fun-sub { font-size: 10px; color: #555; }
+    .fun-select { background: #2a2a2a; border: 1px solid #444; color: #ccc; padding: 4px 8px; border-radius: 5px; font-size: 11px; cursor: pointer; outline: none; }
+    .fun-btn { padding: 4px 12px; border: none; border-radius: 5px; background: #2a2a2a; color: #ccc; font-size: 11px; cursor: pointer; transition: all 0.15s; }
+    .fun-btn:hover { background: #333; color: #fff; }
+    #opacity-slider { width: 100%; accent-color: #ff6b00; cursor: pointer; margin-top: 6px; }
+
+    /* ── Easter egg ── */
+    #easter-egg { position: fixed; inset: 0; z-index: 999999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); flex-direction: column; gap: 16px; }
+    #easter-egg.show { display: flex; }
+    #easter-egg-text { font-size: 52px; font-weight: 900; letter-spacing: 6px; background: linear-gradient(90deg,#ff6b00,#ff0080,#7c3aed,#0ea5e9,#10b981); background-size: 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradShift 2s linear infinite; }
+    @keyframes gradShift { 0%{background-position:0%}100%{background-position:300%} }
+    #easter-egg-sub { color: rgba(255,255,255,0.5); font-size: 14px; }
+    #easter-egg-close { padding: 8px 24px; border: none; border-radius: 6px; background: #ff6b00; color: #fff; font-size: 13px; cursor: pointer; }
+
+    /* ── Splash ── */
+    #splash { position: fixed; inset: 0; z-index: 999990; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; transition: opacity 0.5s; background: #000; }
     #splash.hidden { opacity: 0; pointer-events: none; }
-    #splash-logo {
-      font-size: 32px; font-weight: 700; letter-spacing: 4px;
-      color: #fff; margin-bottom: 20px;
-    }
-    #splash-bar-wrap {
-      width: 180px; height: 2px;
-      background: #222; border-radius: 2px; overflow: hidden;
-    }
-    #splash-bar {
-      height: 100%; width: 0%;
-      background: linear-gradient(90deg, #28c840, #4a9eff);
-      border-radius: 2px;
-      transition: width 0.3s ease;
-    }
-    #splash-status { color: #444; font-size: 11px; margin-top: 10px; }
+    #splash-bg { position: absolute; inset: 0; background-image: url('splash.png'); background-size: cover; background-position: center; }
+    #splash-bottom { position: relative; z-index: 2; width: 100%; padding: 0 0 32px; display: flex; flex-direction: column; align-items: center; gap: 10px; background: linear-gradient(transparent,rgba(0,0,0,0.85) 40%); padding-top: 60px; }
+    #splash-bar-wrap { width: 320px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+    #splash-bar { height: 100%; width: 0%; background: linear-gradient(90deg,#ff6b00,#ffb347,#fff); border-radius: 3px; transition: width 0.3s ease; box-shadow: 0 0 8px rgba(255,140,0,0.8); }
+    #splash-status { color: rgba(255,255,255,0.5); font-size: 11px; letter-spacing: 1px; }
+    #splash-version { color: rgba(255,255,255,0.25); font-size: 10px; }
   </style>
 </head>
 <body>
 
-  <!-- Splash -->
-  <div id="splash">
-    <div id="splash-logo">KLOAK</div>
+<canvas id="bg-canvas"></canvas>
+<canvas id="particle-canvas"></canvas>
+<div id="custom-cursor"></div>
+<div id="screenshot-flash"></div>
+
+<!-- Easter egg -->
+<div id="easter-egg">
+  <div id="easter-egg-text">ENTROPY</div>
+  <div id="easter-egg-sub">You found the secret ✦</div>
+  <button id="easter-egg-close" onclick="document.getElementById('easter-egg').classList.remove('show')">Close</button>
+</div>
+
+<!-- Splash -->
+<div id="splash">
+  <div id="splash-bg"></div>
+  <div id="splash-bottom">
     <div id="splash-bar-wrap"><div id="splash-bar"></div></div>
-    <div id="splash-status">Loading...</div>
+    <div id="splash-status">Initializing...</div>
+    <div id="splash-version"></div>
   </div>
+</div>
 
-  <!-- Webview -->
-  <webview id="site" src="https://kloak.app/auth?mode=login" allowpopups partition="persist:main"></webview>
 
-  <!-- Titlebar -->
-  <div id="titlebar">
-    <!-- Nav -->
-    <div id="nav-group">
-      <button class="tb-btn nav-btn" id="btn-back"    title="Back (Alt+Left)">‹</button>
-      <button class="tb-btn nav-btn" id="btn-forward" title="Forward (Alt+Right)">›</button>
-      <button class="tb-btn nav-btn" id="btn-reload"  title="Reload (Ctrl+R)">↻</button>
-    </div>
+<!-- ── Ambient canvas (sits behind titlebar) ── -->
+<canvas id="ambient-canvas"></canvas>
 
-    <div class="divider"></div>
+<!-- ── Connection dot (in titlebar, added via JS) ── -->
 
-    <!-- CSS toggle -->
-    <button class="tb-btn" id="css-toggle" title="CSS Injector">⚡ CSS</button>
+<!-- ── Crash recovery screen ── -->
+<div id="crash-screen">
+  <div class="crash-icon">💥</div>
+  <h2>Page Crashed</h2>
+  <p>The page ran into a problem and had to stop. Your session data is intact.</p>
+  <div class="crash-detail" id="crash-detail">Renderer process crashed unexpectedly.</div>
+  <button id="crash-reload">↺ Reload Page</button>
+</div>
 
-    <div class="spacer"></div>
-
-    <!-- Update -->
-    <button class="tb-btn" id="btn-update">↑ Update</button>
-
-    <div class="divider"></div>
-
-    <!-- Settings -->
-    <button class="tb-btn" id="settings-toggle" title="Settings">⚙</button>
-
-    <div class="divider"></div>
-
-    <!-- Window controls -->
-    <div id="win-controls">
-      <button class="ctrl" id="btn-minimize" title="Minimize"></button>
-      <button class="ctrl" id="btn-maximize" title="Maximize"></button>
-      <button class="ctrl" id="btn-close"    title="Close to tray"></button>
-    </div>
-  </div>
-
-  <!-- CSS Panel -->
-  <div class="panel" id="css-panel">
-    <div class="panel-header">
-      <span>⚡ CSS Injector</span>
-      <button class="panel-close" id="css-close">✕</button>
-    </div>
-    <div id="css-presets">
-      <button class="preset-btn" data-css=".navbar{display:none!important}">Hide navbar</button>
-      <button class="preset-btn" data-css="*{font-family:'Segoe UI',sans-serif!important}">System font</button>
-      <button class="preset-btn" data-css="html{filter:invert(1)hue-rotate(180deg)}">Invert</button>
-    </div>
-    <textarea id="css-input" placeholder="/* Write your CSS here */
-.navbar { display: none; }"></textarea>
-    <div class="panel-footer">
-      <button class="p-btn" id="btn-apply">▶ Apply</button>
-      <button class="p-btn" id="btn-clear">✕ Clear</button>
-      <button class="p-btn" id="btn-reset">↺ Reset</button>
-    </div>
-    <div id="css-status">Ready.</div>
-  </div>
-
-  <!-- Settings Panel -->
-  <div class="panel" id="settings-panel">
-    <div class="panel-header">
-      <span>⚙ Settings</span>
-      <button class="panel-close" id="settings-close">✕</button>
-    </div>
-
-    <div class="setting-row">
-      <div>
-        <div class="setting-label">Launch at startup</div>
-        <div class="setting-sub">Start Kloak with your computer</div>
-      </div>
-      <label class="toggle">
-        <input type="checkbox" id="toggle-startup">
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="setting-row">
-      <div>
-        <div class="setting-label">Desktop notifications</div>
-        <div class="setting-sub">Forward page notifications</div>
-      </div>
-      <label class="toggle">
-        <input type="checkbox" id="toggle-notifs" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="setting-row">
-      <div class="setting-label">Zoom</div>
-      <div id="zoom-controls">
-        <button class="zoom-btn" id="zoom-out">−</button>
-        <span id="zoom-level">100%</span>
-        <button class="zoom-btn" id="zoom-in">+</button>
-        <button class="zoom-btn" id="zoom-reset" style="font-size:10px">↺</button>
+<!-- ── Onboarding ── -->
+<div id="onboarding">
+  <div id="onboarding-card">
+    <div id="ob-progress"><div id="ob-progress-bar" style="width:20%"></div></div>
+    <div id="ob-body">
+      <div id="ob-step-icon">⚡</div>
+      <div id="ob-step-title">Welcome to Entropy Client</div>
+      <div id="ob-step-desc">A supercharged desktop wrapper for kloak.app with themes, effects, and powerful customisation tools.</div>
+      <div id="ob-feature-list"></div>
+      <div id="ob-footer">
+        <span id="ob-step-counter">Step 1 of 5</span>
+        <div id="ob-nav">
+          <button id="ob-skip" class="ob-skip">Skip tour</button>
+          <button class="ob-btn" id="ob-back" style="display:none">← Back</button>
+          <button class="ob-btn" id="ob-next">Next →</button>
+        </div>
       </div>
     </div>
-
-    <div id="about-row"></div>
   </div>
+</div>
 
-  <script>
-    const webview  = document.getElementById('site');
-    const splash   = document.getElementById('splash');
-    const splashB  = document.getElementById('splash-bar');
-    const splashS  = document.getElementById('splash-status');
-    const updBtn   = document.getElementById('btn-update');
+<!-- ── Changelog popup ── -->
+<div id="changelog-popup">
+  <div id="cl-header">
+    <span id="cl-badge">NEW</span>
+    <span id="cl-title">What's new</span>
+    <button id="cl-close">✕</button>
+  </div>
+  <div id="cl-body"></div>
+  <div id="cl-footer"><button id="cl-dismiss">Got it</button></div>
+</div>
+<webview id="site" src="https://kloak.app/auth?mode=login" allowpopups partition="persist:main"></webview>
 
-    let injectedKey = null;
-    let updateState = 'idle';
-    let zoomStep    = 0;
-    let notifsOn    = true;
+<!-- Titlebar -->
+<div id="titlebar">
+  <div id="nav-group">
+    <button class="tb-btn nav-btn" id="btn-back">‹</button>
+    <button class="tb-btn nav-btn" id="btn-forward">›</button>
+    <button class="tb-btn nav-btn" id="btn-reload">↻</button>
+  </div>
+  <div class="divider"></div>
+  <!-- Pinned widgets -->
+  <div id="widget-bar"></div>
+  <div class="divider"></div>
+  <div id="conn-dot" title="Connected"></div>
+  <div class="divider"></div>
+  <button class="tb-btn" id="btn-update">↑ Update</button>
+  <div class="divider"></div>
+  <button class="tb-btn" id="settings-toggle">⚙</button>
+  <div class="divider"></div>
+  <div id="win-controls">
+    <button class="ctrl" id="btn-minimize"></button>
+    <button class="ctrl" id="btn-maximize"></button>
+    <button class="ctrl" id="btn-close"></button>
+  </div>
+</div>
 
-    // ── Splash ───────────────────────────────────────
-    let splashPct = 0;
-    const splashInterval = setInterval(() => {
-      splashPct = Math.min(splashPct + Math.random() * 15, 85);
-      splashB.style.width = splashPct + '%';
-    }, 200);
+<!-- Settings Panel -->
+<div class="panel" id="settings-panel" style="right:8px;width:260px;">
+  <div class="panel-header">
+    <span>⚙ Settings</span>
+    <button class="panel-close" id="settings-close">✕</button>
+  </div>
+  <button id="open-extra-btn" style="margin:10px 12px 4px;padding:8px 12px;border:1px solid #444;border-radius:6px;background:linear-gradient(135deg,rgba(255,107,0,0.15),rgba(124,58,237,0.15));color:#ccc;font-size:12px;cursor:pointer;font-family:'Segoe UI',sans-serif;display:flex;align-items:center;gap:8px;transition:all 0.2s;-webkit-app-region:no-drag;width:calc(100% - 24px);">
+    <span style="font-size:16px">🎨</span>
+    <span style="flex:1"><div style="font-weight:600;color:#ccc;font-size:12px">Customization</div><div style="font-size:10px;color:#555;margin-top:1px">CSS · Themes · Effects & more</div></span>
+    <span style="opacity:0.4;font-size:10px">▶</span>
+  </button>
+  <div class="setting-row">
+    <div><div class="setting-label">Launch at startup</div><div class="setting-sub">Start with your computer</div></div>
+    <label class="toggle"><input type="checkbox" id="toggle-startup"><span class="slider"></span></label>
+  </div>
+  <div class="setting-row">
+    <div><div class="setting-label">Desktop notifications</div><div class="setting-sub">Forward page notifications</div></div>
+    <label class="toggle"><input type="checkbox" id="toggle-notifs" checked><span class="slider"></span></label>
+  </div>
+  <div class="setting-row">
+    <div class="setting-label">Zoom</div>
+    <div id="zoom-controls">
+      <button class="zoom-btn" id="zoom-out">−</button>
+      <span id="zoom-level">100%</span>
+      <button class="zoom-btn" id="zoom-in">+</button>
+      <button class="zoom-btn" id="zoom-reset-btn" style="font-size:10px">↺</button>
+    </div>
+  </div>
+  <div id="about-row" style="display:none"></div>
+</div>
 
-    webview.addEventListener('did-finish-load', () => {
-      clearInterval(splashInterval);
-      splashB.style.width = '100%';
-      splashS.textContent = 'Ready';
-      setTimeout(() => {
-        splash.classList.add('hidden');
-        setTimeout(() => splash.remove(), 400);
-      }, 300);
-    });
+<!-- ══ MODAL ══ -->
+<div id="modal-backdrop">
+  <div id="modal">
+    <div id="modal-header">
+      <div id="modal-title">✦ <span>Entropy</span> Customization</div>
+      <button id="modal-close-btn">✕</button>
+    </div>
+    <div id="modal-body">
+      <div id="modal-sidebar">
+        <div class="sidebar-tab active" data-tab="main"><span class="tab-icon">🏠</span> Main Settings</div>
+        <div class="sidebar-tab" data-tab="css"><span class="tab-icon">⚡</span> CSS Injector</div>
+        <div class="sidebar-tab" data-tab="themes"><span class="tab-icon">🎨</span> Themes</div>
 
-    // ── Window controls ──────────────────────────────
-    document.getElementById('btn-close').onclick    = () => window.electronAPI.close();
-    document.getElementById('btn-minimize').onclick = () => window.electronAPI.minimize();
-    document.getElementById('btn-maximize').onclick = () => window.electronAPI.maximize();
+        <div class="sidebar-tab" data-tab="bookmarks"><span class="tab-icon">🔖</span> Bookmarks</div>
+        <div class="sidebar-tab" data-tab="notes"><span class="tab-icon">📝</span> Notes</div>
+        <div class="sidebar-tab" data-tab="history"><span class="tab-icon">🕐</span> History</div>
+        <div class="sidebar-tab" data-tab="keybinds"><span class="tab-icon">⌨️</span> Keybinds</div>
+        <div class="sidebar-tab" data-tab="accounts"><span class="tab-icon">👤</span> Accounts</div>
+        <div class="sidebar-tab" data-tab="blocker"><span class="tab-icon">🚫</span> Blocker</div>
+        <div class="sidebar-tab locked" id="fun-tab" data-tab="fun"><span class="tab-icon">✨</span> Fun & Effects</div>
+        <div id="sidebar-footer"><kbd>Esc</kbd> to close<br><span id="konami-hint" style="display:none;color:#ff6b00;font-size:9px">✦ secret unlocked</span></div>
+      </div>
 
-    // ── Navigation ───────────────────────────────────
-    document.getElementById('btn-back').onclick    = () => webview.goBack();
-    document.getElementById('btn-forward').onclick = () => webview.goForward();
-    document.getElementById('btn-reload').onclick  = () => webview.reload();
+      <div id="modal-content">
 
-    // Update nav button states
-    webview.addEventListener('did-navigate', updateNavBtns);
-    webview.addEventListener('did-navigate-in-page', updateNavBtns);
-    function updateNavBtns() {
-      document.getElementById('btn-back').style.opacity    = webview.canGoBack()    ? '1' : '0.3';
-      document.getElementById('btn-forward').style.opacity = webview.canGoForward() ? '1' : '0.3';
-    }
+        <!-- Main Settings -->
+        <div class="tab-pane active" id="pane-main">
+          <div class="section-title">Pinned Widgets</div>
+          <div style="font-size:11px;color:#666;margin-bottom:12px">Choose which widgets appear in the titlebar.</div>
+          <div id="widget-config" style="display:flex;flex-direction:column;gap:8px"></div>
 
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      if (e.altKey && e.key === 'ArrowLeft')  { webview.goBack();   e.preventDefault(); }
-      if (e.altKey && e.key === 'ArrowRight') { webview.goForward(); e.preventDefault(); }
-      if (e.ctrlKey && e.key === 'r')         { webview.reload();   e.preventDefault(); }
-      if (e.ctrlKey && e.key === '=')         { handleZoom(0.5);    e.preventDefault(); }
-      if (e.ctrlKey && e.key === '-')         { handleZoom(-0.5);   e.preventDefault(); }
-      if (e.ctrlKey && e.key === '0')         { handleZoom(0, true); e.preventDefault(); }
-      if (e.ctrlKey && e.key === 'f')         { webview.executeScript({code: `window.find('')`}); }
-    });
+          <div class="section-title" style="margin-top:20px">Widget Preview</div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:6px;min-height:38px">
+            <span style="font-size:10px;color:#444;margin-right:4px">PREVIEW</span>
+            <div id="widget-preview-bar" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+          </div>
 
-    // ── Zoom ─────────────────────────────────────────
-    document.getElementById('zoom-in').onclick    = () => handleZoom(0.5);
-    document.getElementById('zoom-out').onclick   = () => handleZoom(-0.5);
-    document.getElementById('zoom-reset').onclick = () => handleZoom(0, true);
+          <div class="section-title" style="margin-top:20px">General</div>
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+              <div><div class="setting-label">Launch at startup</div><div class="setting-sub">Start Entropy Client with your computer</div></div>
+              <label class="toggle"><input type="checkbox" id="ms-startup"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+              <div><div class="setting-label">Desktop notifications</div><div class="setting-sub">Forward page alerts as system notifications</div></div>
+              <label class="toggle"><input type="checkbox" id="ms-notifs" checked><span class="slider"></span></label>
+            </div>
+            <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+              <div class="setting-label">Zoom level</div>
+              <div style="display:flex;gap:4px;align-items:center">
+                <button class="zoom-btn" onclick="handleZoom(-0.5)">−</button>
+                <span id="ms-zoom-level" style="font-size:11px;color:#aaa;min-width:36px;text-align:center">100%</span>
+                <button class="zoom-btn" onclick="handleZoom(0.5)">+</button>
+                <button class="zoom-btn" onclick="handleZoom(0,true)" style="font-size:10px">↺</button>
+              </div>
+            </div>
+            <div class="setting-row" style="padding:9px 0">
+              <div><div class="setting-label">Minimise to tray on close</div><div class="setting-sub">Keep running in background</div></div>
+              <label class="toggle"><input type="checkbox" id="ms-tray" checked><span class="slider"></span></label>
+            </div>
+            <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+              <div><div class="setting-label">Ambient mode</div><div class="setting-sub">Tint titlebar to match page colours</div></div>
+              <label class="toggle"><input type="checkbox" id="ms-ambient"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row" style="padding:9px 0">
+              <div><div class="setting-label">Onboarding tour</div><div class="setting-sub">Replay the welcome walkthrough</div></div>
+              <button class="act-btn btn-grey" onclick="obStep=0;renderObStep();document.getElementById('onboarding').classList.add('show');" style="padding:5px 12px;font-size:11px">▶ Replay</button>
+            </div>
+          </div>
 
-    function handleZoom(delta, reset) {
-      if (reset) zoomStep = 0;
-      else zoomStep = Math.max(-5, Math.min(5, zoomStep + delta));
-      webview.setZoomLevel(zoomStep);
-      const pct = Math.round(Math.pow(1.2, zoomStep) * 100);
-      document.getElementById('zoom-level').textContent = pct + '%';
-    }
+          <div class="section-title" style="margin-top:24px">About</div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid #2a2a2a;border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#fff">Entropy Client</div>
+                <div id="about-version" style="font-size:11px;color:#555;margin-top:2px">Loading...</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="act-btn btn-grey" id="about-kloak-btn" style="padding:5px 10px;font-size:11px">🌐 kloak.app</button>
+                <button class="act-btn btn-grey" id="about-github-btn" style="padding:5px 10px;font-size:11px">⌥ GitHub</button>
+              </div>
+            </div>
+            <div style="padding:8px 10px;background:rgba(255,107,0,0.06);border:1px solid rgba(255,107,0,0.15);border-radius:6px;font-size:11px;color:#888;line-height:1.6">
+              ⚠️ We are not affiliated with, or endorsed in any way by Kloak.app. This is an unofficial desktop wrapper made by the community.
+            </div>
+          </div>
+        </div>
 
-    // ── Update button ────────────────────────────────
-    updBtn.onclick = () => {
-      if (updateState === 'idle' || updateState === 'error') {
-        setUpdateState('checking');
-        window.electronAPI.checkForUpdate();
-      } else if (updateState === 'ready') {
-        window.electronAPI.installUpdate();
-      }
-    };
 
-    window.electronAPI.onUpdateStatus((state, progress) => setUpdateState(state, progress));
+        <!-- CSS (was previously first, now just in place) -->
+        <div class="tab-pane" id="pane-css">
+          <div class="section-title">Quick Presets</div>
+          <div id="css-presets">
+            <button class="preset-btn" data-css=".navbar{display:none!important}">Hide navbar</button>
+            <button class="preset-btn" data-css="*{font-family:'Segoe UI',sans-serif!important}">System font</button>
+            <button class="preset-btn" data-css="html{filter:invert(1)hue-rotate(180deg)}">Invert</button>
+            <button class="preset-btn" data-css="*{border-radius:0!important}">Sharp corners</button>
+          </div>
+          <div class="section-title">CSS Editor</div>
+          <textarea class="code-input" id="css-input" style="height:200px" placeholder="/* Write your custom CSS */
+body { background: #0a0a0a !important; }"></textarea>
+          <div class="action-row">
+            <button class="act-btn btn-green" id="btn-apply">▶ Apply</button>
+            <button class="act-btn btn-red"   id="btn-clear">✕ Clear</button>
+            <button class="act-btn btn-grey"  id="btn-reset">↺ Reset</button>
+          </div>
+          <div class="status-line" id="css-status">Ready.</div>
+        </div>
 
-    function setUpdateState(state, progress) {
-      updateState = state;
-      updBtn.className = 'tb-btn';
-      const map = {
-        idle: '↑ Update', checking: 'Checking...', available: '↓ Update available',
-        downloading: `↓ ${progress ?? 0}%`, ready: '↻ Restart to update',
-        uptodate: '✓ Up to date', error: '✗ Error'
+        <!-- Themes -->
+        <div class="tab-pane" id="pane-themes">
+          <div class="section-title">Built-in Themes</div>
+          <div class="theme-grid" id="theme-grid"></div>
+
+          <div class="section-title">Titlebar Gradient</div>
+          <label class="toggle" style="display:flex;align-items:center;gap:10px;cursor:pointer">
+            <input type="checkbox" id="tb-gradient-toggle">
+            <span class="slider" style="position:relative;width:36px;height:20px;display:inline-block;flex-shrink:0"></span>
+            <span style="font-size:12px;color:#aaa">Enable gradient titlebar</span>
+          </label>
+          <div class="color-row">
+            <label>Color A</label><input type="color" id="tb-color-a" value="#1a0a00">
+            <label>Color B</label><input type="color" id="tb-color-b" value="#0a0018">
+            <label>Angle</label>
+            <input type="range" id="tb-angle" min="0" max="360" value="90" style="width:80px;accent-color:#ff6b00">
+            <span id="tb-angle-val" style="font-size:10px;color:#666">90°</span>
+          </div>
+          <div class="tb-preview" id="tb-preview"></div>
+
+          <div class="section-title">Theme Scheduler</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+            <div>
+              <div style="font-size:10px;color:#666;margin-bottom:4px">Day theme (6am–6pm)</div>
+              <select class="fun-select" id="sched-day" style="width:100%"></select>
+            </div>
+            <div>
+              <div style="font-size:10px;color:#666;margin-bottom:4px">Night theme (6pm–6am)</div>
+              <select class="fun-select" id="sched-night" style="width:100%"></select>
+            </div>
+          </div>
+          <label class="toggle" style="display:flex;align-items:center;gap:10px;cursor:pointer">
+            <input type="checkbox" id="sched-toggle">
+            <span class="slider" style="position:relative;width:36px;height:20px;display:inline-block;flex-shrink:0"></span>
+            <span style="font-size:12px;color:#aaa">Enable auto scheduler</span>
+          </label>
+
+          <div class="section-title">Modal Appearance</div>
+          <div class="slider-row"><label>Background opacity</label><input type="range" id="modal-opacity-slider" min="10" max="98" value="92"><span id="modal-opacity-val">92%</span></div>
+          <div class="slider-row"><label>Blur intensity</label><input type="range" id="modal-blur-slider" min="0" max="40" value="20"><span id="modal-blur-val">20px</span></div>
+
+          <div class="section-title">Custom CSS Theme</div>
+          <textarea class="code-input" id="custom-css-input" style="height:80px" placeholder="body { background: #0a0a0a !important; }"></textarea>
+          <button class="act-btn btn-blue" id="apply-custom-theme" style="margin-top:8px">▶ Apply Custom Theme</button>
+        </div>
+
+        <!-- Bookmarks -->
+        <div class="tab-pane" id="pane-bookmarks">
+          <div class="section-title">Saved Bookmarks</div>
+          <div id="bookmark-list"></div>
+          <div class="section-title">Add Bookmark</div>
+          <div class="add-bm-row">
+            <input class="mini-input" id="bm-name" placeholder="Name">
+            <input class="mini-input" id="bm-url"  placeholder="https://...">
+            <button class="act-btn btn-green" id="bm-add" style="white-space:nowrap">+ Add</button>
+          </div>
+          <div class="status-line" id="bm-status"></div>
+        </div>
+
+        <!-- Notes -->
+        <div class="tab-pane" id="pane-notes">
+          <div class="section-title">Session Notes</div>
+          <textarea class="code-input" id="notes-input" style="height:280px;color:#d4d4d4;font-family:'Segoe UI',sans-serif" placeholder="Jot down notes, IDs, links..."></textarea>
+          <div class="action-row">
+            <button class="act-btn btn-green" id="notes-save">💾 Save</button>
+            <button class="act-btn btn-grey"  id="notes-clear">✕ Clear</button>
+          </div>
+          <div style="margin-top:6px;font-size:10px;color:#555" id="notes-status">Notes are saved to disk.</div>
+        </div>
+
+        <!-- History -->
+        <div class="tab-pane" id="pane-history">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div class="section-title" style="margin:0">Session History</div>
+            <button class="hist-clear" id="history-clear">✕ Clear</button>
+          </div>
+          <div id="history-list"><div style="color:#555;font-size:11px;text-align:center;padding:20px">No history yet.</div></div>
+        </div>
+
+        <!-- Keybinds -->
+        <div class="tab-pane" id="pane-keybinds">
+          <div class="section-title">Keyboard Shortcuts</div>
+          <div id="keybind-list"></div>
+          <div style="margin-top:12px;font-size:10px;color:#555">Click a shortcut to re-record it. Press Escape to cancel.</div>
+        </div>
+
+        <!-- Accounts -->
+        <div class="tab-pane" id="pane-accounts">
+          <div class="section-title">Sessions</div>
+          <div id="account-list"></div>
+          <div class="section-title">Add Session</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input class="mini-input" id="acc-name" placeholder="Session name (e.g. Work)" style="flex:1">
+            <input type="color" id="acc-color" value="#ff6b00" style="width:36px;height:34px;border:1px solid #444;border-radius:5px;background:#1a1a1a;cursor:pointer;padding:2px">
+            <button class="act-btn btn-green" id="acc-add">+ Add</button>
+          </div>
+          <div class="status-line" id="acc-status"></div>
+        </div>
+
+        <!-- Blocker -->
+        <div class="tab-pane" id="pane-blocker">
+          <div class="section-title">Blocked Domains</div>
+          <div id="block-list"><div id="block-empty">No domains blocked.</div></div>
+          <div class="section-title">Add Domain</div>
+          <div style="display:flex;gap:8px">
+            <input class="mini-input" id="block-input" placeholder="e.g. ads.example.com" style="flex:1">
+            <button class="act-btn btn-red" id="block-add">🚫 Block</button>
+          </div>
+          <div class="status-line" id="block-status"></div>
+          <div style="margin-top:14px;padding:10px;background:rgba(255,95,87,0.06);border:1px solid rgba(255,95,87,0.15);border-radius:6px;font-size:11px;color:#888">
+            Blocked domains are intercepted before they load. Takes effect immediately for new requests.
+          </div>
+        </div>
+
+        <!-- Fun -->
+        <div class="tab-pane" id="pane-fun">
+          <div class="fun-grid">
+            <div class="fun-card">
+              <div class="fun-card-title">🌌 Background</div>
+              <div class="fun-row"><div class="fun-label">Effect</div>
+                <select class="fun-select" id="bg-effect">
+                  <option value="none">None</option><option value="stars">⭐ Stars</option>
+                  <option value="matrix">🟩 Matrix</option><option value="aurora">🌈 Aurora</option>
+                  <option value="fire">🔥 Fire</option><option value="blackhole">🌀 Black Hole</option>
+                  <option value="nebula">🌌 Nebula</option>
+                </select>
+              </div>
+              <div class="fun-label" style="font-size:10px;color:#666;margin-bottom:4px">Opacity</div>
+              <input type="range" id="opacity-slider" min="5" max="60" value="20">
+            </div>
+            <div class="fun-card">
+              <div class="fun-card-title">✨ Particles</div>
+              <div class="fun-row"><div class="fun-label">Type</div>
+                <select class="fun-select" id="particle-type">
+                  <option value="none">None</option><option value="sparkle">✦ Sparkles</option>
+                  <option value="snow">❄ Snow</option><option value="bubbles">○ Bubbles</option>
+                  <option value="fire">🔥 Embers</option><option value="hearts">♥ Hearts</option>
+                </select>
+              </div>
+            </div>
+            <div class="fun-card">
+              <div class="fun-card-title">🖱️ Cursor</div>
+              <div class="fun-row"><div class="fun-label">Style</div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <select class="fun-select" id="cursor-style">
+                    <option value="none">Default</option><option value="crosshair">✛ Crosshair</option>
+                    <option value="star">⭐ Star</option><option value="fire">🔥 Fire</option>
+                    <option value="sword">⚔️ Sword</option><option value="entropy">🌀 Entropy</option>
+                  </select>
+                  <span id="cursor-preview"></span>
+                </div>
+              </div>
+            </div>
+            <div class="fun-card">
+              <div class="fun-card-title">🔊 Sounds</div>
+              <div class="fun-row"><div class="fun-label">Pack</div>
+                <select class="fun-select" id="sound-pack">
+                  <option value="none">None</option><option value="retro">🕹️ Retro</option>
+                  <option value="soft">🎵 Soft</option><option value="sci-fi">🚀 Sci-Fi</option>
+                  <option value="nature">🌿 Nature</option>
+                </select>
+              </div>
+              <div class="fun-row"><div class="fun-label">Nav sounds</div>
+                <label class="toggle"><input type="checkbox" id="sound-nav" checked><span class="slider"></span></label>
+              </div>
+            </div>
+            <div class="fun-card" style="grid-column:span 2">
+              <div class="fun-card-title">🥚 Easter Eggs</div>
+              <div class="fun-row">
+                <div><div class="fun-label">Konami Code</div><div class="fun-sub">↑↑↓↓←→←→BA</div></div>
+                <label class="toggle"><input type="checkbox" id="konami-toggle" checked><span class="slider"></span></label>
+              </div>
+              <div class="fun-row">
+                <div><div class="fun-label">Screenshot</div><div class="fun-sub">Ctrl+Shift+S</div></div>
+                <button class="fun-btn" id="screenshot-btn">📸 Capture</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /modal-content -->
+    </div><!-- /modal-body -->
+  </div><!-- /modal -->
+</div><!-- /modal-backdrop -->
+
+<script>
+const webview  = document.getElementById('site');
+const bgCanvas = document.getElementById('bg-canvas');
+const pCanvas  = document.getElementById('particle-canvas');
+const bgCtx    = bgCanvas.getContext('2d');
+const pCtx     = pCanvas.getContext('2d');
+const backdrop = document.getElementById('modal-backdrop');
+
+let injectedKey=null, themeKey=null, updateState='idle', zoomStep=0;
+let notifsOn=true, activeTheme='default', bgOpacity=0.2, currentCursor='none';
+let konamiOn=true, soundPack='none', funUnlocked=false;
+let sessionHistory=[], blockedDomains=[], keybinds={}, accounts=[], activeAccount='main';
+let schedEnabled=false, schedDay='default', schedNight='midnight';
+let notes='', bookmarks=[];
+
+function resizeCanvases(){bgCanvas.width=pCanvas.width=window.innerWidth;bgCanvas.height=pCanvas.height=window.innerHeight-32;}
+resizeCanvases(); window.addEventListener('resize',resizeCanvases);
+
+// ── Splash ───────────────────────────────────────
+window.electronAPI.getVersion().then(v=>document.getElementById('splash-version').textContent='v'+v);
+const splashMsgs=['Initializing...','Loading modules...','Connecting...','Almost ready...'];
+let splashPct=0,msgIdx=0;
+const splashInt=setInterval(()=>{
+  splashPct=Math.min(splashPct+Math.random()*18,88);
+  document.getElementById('splash-bar').style.width=splashPct+'%';
+  document.getElementById('splash-status').textContent=splashMsgs[Math.min(msgIdx++,splashMsgs.length-1)];
+},400);
+webview.addEventListener('did-finish-load',()=>{
+  clearInterval(splashInt);
+  document.getElementById('splash-bar').style.width='100%';
+  document.getElementById('splash-status').textContent='Ready';
+  setTimeout(()=>{const s=document.getElementById('splash');s.classList.add('hidden');setTimeout(()=>s.remove(),500);},350);
+  recordHistory(webview.getURL());
+});
+
+// ── Window controls ──────────────────────────────
+document.getElementById('btn-close').onclick=()=>window.electronAPI.close();
+document.getElementById('btn-minimize').onclick=()=>window.electronAPI.minimize();
+document.getElementById('btn-maximize').onclick=()=>window.electronAPI.maximize();
+
+// ── Navigation ────────────────────────────────────
+document.getElementById('btn-back').onclick=()=>{playSound('nav');webview.goBack();};
+document.getElementById('btn-forward').onclick=()=>{playSound('nav');webview.goForward();};
+document.getElementById('btn-reload').onclick=()=>{playSound('nav');webview.reload();};
+function updateNavBtns(){
+  document.getElementById('btn-back').style.opacity=webview.canGoBack()?'1':'0.3';
+  document.getElementById('btn-forward').style.opacity=webview.canGoForward()?'1':'0.3';
+}
+
+// ── Keybinds system ───────────────────────────────
+const DEFAULT_KEYBINDS={
+  back:       {label:'Go back',          sub:'Navigate backward',        default:'Alt+ArrowLeft',  action:()=>webview.goBack()},
+  forward:    {label:'Go forward',       sub:'Navigate forward',         default:'Alt+ArrowRight', action:()=>webview.goForward()},
+  reload:     {label:'Reload',           sub:'Refresh the page',         default:'Ctrl+r',         action:()=>webview.reload()},
+  zoomin:     {label:'Zoom in',          sub:'',                         default:'Ctrl+=',         action:()=>handleZoom(0.5)},
+  zoomout:    {label:'Zoom out',         sub:'',                         default:'Ctrl+-',         action:()=>handleZoom(-0.5)},
+  zoomreset:  {label:'Reset zoom',       sub:'',                         default:'Ctrl+0',         action:()=>handleZoom(0,true)},
+  screenshot: {label:'Screenshot',       sub:'Capture webview',          default:'Ctrl+Shift+S',   action:()=>takeScreenshot()},
+  modal:      {label:'Open modal',       sub:'Customization panel',      default:'Ctrl+,',         action:()=>openModal()},
+  settings:   {label:'Toggle settings',  sub:'',                         default:'Ctrl+Shift+P',   action:()=>document.getElementById('settings-panel').classList.toggle('open')},
+};
+// Load saved keybinds
+try { const saved=JSON.parse(localStorage.getItem('ec_keybinds')||'{}'); Object.keys(saved).forEach(k=>{if(DEFAULT_KEYBINDS[k]) DEFAULT_KEYBINDS[k].current=saved[k];}); } catch{}
+Object.keys(DEFAULT_KEYBINDS).forEach(k=>{ if(!DEFAULT_KEYBINDS[k].current) DEFAULT_KEYBINDS[k].current=DEFAULT_KEYBINDS[k].default; });
+
+document.addEventListener('keydown',e=>{
+  if(backdrop.classList.contains('open')&&document.activeElement?.tagName==='INPUT') return;
+  const combo=buildCombo(e);
+  Object.values(DEFAULT_KEYBINDS).forEach(kb=>{ if(combo===kb.current){kb.action();e.preventDefault();} });
+  handleKonami(e);
+});
+function buildCombo(e){
+  const parts=[];
+  if(e.ctrlKey||e.metaKey) parts.push('Ctrl');
+  if(e.altKey) parts.push('Alt');
+  if(e.shiftKey) parts.push('Shift');
+  if(!['Control','Alt','Shift','Meta'].includes(e.key)) parts.push(e.key);
+  return parts.join('+');
+}
+
+// Render keybind list
+function renderKeybinds(){
+  const list=document.getElementById('keybind-list');
+  list.innerHTML='';
+  let recording=null;
+  Object.entries(DEFAULT_KEYBINDS).forEach(([id,kb])=>{
+    const row=document.createElement('div'); row.className='kb-row';
+    row.innerHTML=`<div><div class="kb-label">${kb.label}</div>${kb.sub?'<div class="kb-sub">'+kb.sub+'</div>':''}</div><button class="kb-recorder" id="kb-${id}">${kb.current}</button>`;
+    list.appendChild(row);
+    const btn=row.querySelector(`#kb-${id}`);
+    btn.onclick=()=>{
+      if(recording){document.getElementById('kb-'+recording).classList.remove('recording');document.getElementById('kb-'+recording).textContent=DEFAULT_KEYBINDS[recording].current;}
+      recording=id; btn.classList.add('recording'); btn.textContent='Press keys...';
+      const handler=(e)=>{
+        if(e.key==='Escape'){btn.classList.remove('recording');btn.textContent=kb.current;recording=null;document.removeEventListener('keydown',handler,true);return;}
+        e.preventDefault(); e.stopPropagation();
+        const combo=buildCombo(e);
+        if(['Control','Alt','Shift','Meta'].includes(e.key)) return;
+        kb.current=combo; btn.textContent=combo; btn.classList.remove('recording');
+        recording=null; document.removeEventListener('keydown',handler,true);
+        try{const s=JSON.parse(localStorage.getItem('ec_keybinds')||'{}');s[id]=combo;localStorage.setItem('ec_keybinds',JSON.stringify(s));}catch{}
       };
-      updBtn.textContent = map[state] || '↑ Update';
-      if (['available','downloading','ready','error'].includes(state))
-        updBtn.classList.add(state === 'downloading' ? 'downloading' : state === 'error' ? 'error' : state === 'ready' ? 'ready' : 'available');
-      if (state === 'uptodate' || state === 'error')
-        setTimeout(() => setUpdateState('idle'), 3000);
+      document.addEventListener('keydown',handler,true);
+    };
+  });
+}
+
+// ── Zoom ─────────────────────────────────────────
+document.getElementById('zoom-in').onclick=()=>handleZoom(0.5);
+document.getElementById('zoom-out').onclick=()=>handleZoom(-0.5);
+document.getElementById('zoom-reset-btn').onclick=()=>handleZoom(0,true);
+function handleZoom(d,reset){
+  if(reset)zoomStep=0; else zoomStep=Math.max(-5,Math.min(5,zoomStep+d));
+  webview.setZoomLevel(zoomStep);
+  document.getElementById('zoom-level').textContent=Math.round(Math.pow(1.2,zoomStep)*100)+'%';
+}
+
+// ── Update ────────────────────────────────────────
+const updBtn=document.getElementById('btn-update');
+updBtn.onclick=()=>{if(updateState==='idle'||updateState==='error'){setUpdateState('checking');window.electronAPI.checkForUpdate();}else if(updateState==='ready')window.electronAPI.installUpdate();};
+window.electronAPI.onUpdateStatus((s,p)=>setUpdateState(s,p));
+function setUpdateState(s,p){
+  updateState=s;updBtn.className='tb-btn';
+  const m={idle:'↑ Update',checking:'Checking...',available:'↓ Available',downloading:`↓ ${p??0}%`,ready:'↻ Restart',uptodate:'✓ Latest',error:'✗ Error'};
+  updBtn.textContent=m[s]||'↑ Update';
+  if(['available','ready'].includes(s))updBtn.classList.add('available');
+  if(s==='downloading')updBtn.classList.add('downloading');
+  if(s==='error')updBtn.classList.add('error');
+  if(s==='uptodate'||s==='error')setTimeout(()=>setUpdateState('idle'),3000);
+}
+
+// ── Notifications ─────────────────────────────────
+webview.addEventListener('page-title-updated',e=>{document.title=/\(\d+\)/.test(e.title)?'🔴 Entropy Client':'Entropy Client';});
+
+// ── Settings panel ────────────────────────────────
+const settingsPanel=document.getElementById('settings-panel');
+document.getElementById('settings-toggle').onclick=()=>settingsPanel.classList.toggle('open');
+document.getElementById('settings-close').onclick=()=>settingsPanel.classList.remove('open');
+window.electronAPI.getLoginStartup().then(v=>document.getElementById('toggle-startup').checked=v);
+document.getElementById('toggle-startup').onchange=e=>window.electronAPI.setLoginStartup(e.target.checked);
+document.getElementById('toggle-notifs').onchange=e=>{notifsOn=e.target.checked;};
+window.electronAPI.getVersion().then(v=>{
+  document.getElementById('about-row').innerHTML=`Entropy Client v${v}<br><a onclick="window.electronAPI.openExternal('https://kloak.app')">kloak.app</a> &nbsp;·&nbsp; <a onclick="window.electronAPI.openExternal('https://github.com/Username1234hio/KloakDesktopAppBeta-Unoffical-')">GitHub</a>`;
+  const av=document.getElementById('about-version');
+  if(av)av.textContent='Version '+v;
+});
+document.getElementById('about-kloak-btn').onclick=()=>window.electronAPI.openExternal('https://kloak.app');
+document.getElementById('about-github-btn').onclick=()=>window.electronAPI.openExternal('https://github.com/Username1234hio/KloakDesktopAppBeta-Unoffical-');
+
+// ── Modal ─────────────────────────────────────────
+document.getElementById('open-extra-btn').onclick=()=>{settingsPanel.classList.remove('open');openModal();};
+document.getElementById('modal-close-btn').onclick=closeModal;
+backdrop.addEventListener('click',e=>{if(e.target===backdrop)closeModal();});
+function openModal(){backdrop.classList.add('open');playSound('open');renderKeybinds();renderBookmarks();renderAccounts();renderHistory();renderBlockList();syncMainSettings();renderWidgetConfig();}
+
+// ── Main Settings tab ─────────────────────────────
+function syncMainSettings(){
+  // Sync toggles with settings panel
+  const su=document.getElementById('ms-startup');
+  const sn=document.getElementById('ms-notifs');
+  window.electronAPI.getLoginStartup().then(v=>{if(su)su.checked=v;});
+  if(sn)sn.checked=notifsOn;
+  if(document.getElementById('ms-zoom-level'))document.getElementById('ms-zoom-level').textContent=Math.round(Math.pow(1.2,zoomStep)*100)+'%';
+  const amb=document.getElementById('ms-ambient');if(amb)amb.checked=ambientEnabled;
+}
+document.getElementById('ms-startup').onchange=e=>{window.electronAPI.setLoginStartup(e.target.checked);document.getElementById('toggle-startup').checked=e.target.checked;};
+document.getElementById('ms-notifs').onchange=e=>{notifsOn=e.target.checked;document.getElementById('toggle-notifs').checked=e.target.checked;};
+document.getElementById('ms-ambient').onchange=e=>setAmbientEnabled(e.target.checked);
+
+// ── Widget system ─────────────────────────────────
+const WIDGETS = {
+  weather: {
+    label: 'Weather', icon: '⛅', desc: 'Current temperature & conditions',
+    render: () => `<span>${cachedWeather.icon||'⛅'}</span><span>${cachedWeather.temp||'--°F'}</span>`,
+    clickable: true, onClick: fetchWeather,
+  },
+  clock: {
+    label: 'Clock', icon: '🕐', desc: 'Live time display',
+    render: () => `<span>🕐</span><span>${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>`,
+    clickable: false, interval: 5000,
+  },
+  date: {
+    label: 'Date', icon: '📅', desc: 'Current date',
+    render: () => `<span>📅</span><span>${new Date().toLocaleDateString([],{month:'short',day:'numeric'})}</span>`,
+    clickable: false, interval: 60000,
+  },
+  page_title: {
+    label: 'Page Title', icon: '🏷️', desc: 'Current page title (truncated)',
+    render: () => `<span>🏷️</span><span style="max-width:120px;overflow:hidden;text-overflow:ellipsis">${(document.title||'Entropy Client').replace(/^🔴 /,'').slice(0,24)}</span>`,
+    clickable: false, interval: 2000,
+  },
+  zoom: {
+    label: 'Zoom Level', icon: '🔍', desc: 'Current zoom percentage',
+    render: () => `<span>🔍</span><span>${Math.round(Math.pow(1.2,zoomStep)*100)}%</span>`,
+    clickable: true, onClick: ()=>handleZoom(0,true),
+  },
+  account: {
+    label: 'Active Account', icon: '👤', desc: 'Current session name',
+    render: () => { const acc=accounts.find(a=>a.id===activeAccount)||{name:'Main',color:'#ff6b00'}; return `<span style="color:${acc.color}">●</span><span>${acc.name}</span>`; },
+    clickable: false, interval: 2000,
+  },
+};
+
+let pinnedWidgets = [];
+let cachedWeather = {};
+const widgetIntervals = {};
+
+try { pinnedWidgets = JSON.parse(localStorage.getItem('ec_pinned_widgets')||'[]'); } catch { pinnedWidgets = []; }
+
+function savePinnedWidgets(){ localStorage.setItem('ec_pinned_widgets', JSON.stringify(pinnedWidgets)); }
+
+function renderWidgetBar(){
+  const bar = document.getElementById('widget-bar');
+  bar.innerHTML = '';
+  pinnedWidgets.forEach(id => {
+    const def = WIDGETS[id]; if(!def) return;
+    const el = document.createElement('div');
+    el.className = 'tb-widget' + (def.clickable ? ' clickable' : '');
+    el.id = 'tb-widget-' + id;
+    el.innerHTML = def.render();
+    if(def.clickable && def.onClick) el.onclick = def.onClick;
+    bar.appendChild(el);
+    // Set up interval refresh
+    if(def.interval){
+      clearInterval(widgetIntervals[id]);
+      widgetIntervals[id] = setInterval(()=>{ const w=document.getElementById('tb-widget-'+id); if(w) w.innerHTML=def.render(); }, def.interval);
+    }
+  });
+}
+
+function renderWidgetConfig(){
+  const cfg = document.getElementById('widget-config');
+  const prev = document.getElementById('widget-preview-bar');
+  cfg.innerHTML = '';
+  Object.entries(WIDGETS).forEach(([id, def]) => {
+    const pinned = pinnedWidgets.includes(id);
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,0.03);border:1px solid #2a2a2a;border-radius:7px;';
+    row.innerHTML = `
+      <span style="font-size:16px">${def.icon}</span>
+      <div style="flex:1">
+        <div style="font-size:12px;color:#ccc;font-weight:500">${def.label}</div>
+        <div style="font-size:10px;color:#555">${def.desc}</div>
+      </div>
+      <label class="toggle"><input type="checkbox" ${pinned?'checked':''} data-widget="${id}"><span class="slider"></span></label>
+    `;
+    row.querySelector('input').onchange = e => {
+      if(e.target.checked){ if(!pinnedWidgets.includes(id)) pinnedWidgets.push(id); }
+      else { pinnedWidgets = pinnedWidgets.filter(w=>w!==id); clearInterval(widgetIntervals[id]); }
+      savePinnedWidgets();
+      renderWidgetBar();
+      // update preview
+      prev.innerHTML = '';
+      pinnedWidgets.forEach(wid => { const d=WIDGETS[wid]; if(!d)return; const el=document.createElement('div'); el.className='tb-widget'; el.innerHTML=d.render(); prev.appendChild(el); });
+    };
+    cfg.appendChild(row);
+  });
+  // Initial preview
+  prev.innerHTML = '';
+  pinnedWidgets.forEach(wid => { const d=WIDGETS[wid]; if(!d)return; const el=document.createElement('div'); el.className='tb-widget'; el.innerHTML=d.render(); prev.appendChild(el); });
+}
+
+// Widget config rendered when modal opens or main tab clicked
+function closeModal(){backdrop.classList.remove('open');playSound('close');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&backdrop.classList.contains('open'))closeModal();});
+
+document.querySelectorAll('.sidebar-tab').forEach(tab=>{
+  tab.onclick=()=>{
+    if(tab.classList.contains('locked'))return;
+    document.querySelectorAll('.sidebar-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('pane-'+tab.dataset.tab).classList.add('active');
+    playSound('nav');
+  };
+});
+
+// ── CSS Injector ─────────────────────────────────
+document.querySelectorAll('.preset-btn').forEach(btn=>{btn.onclick=()=>{document.getElementById('css-input').value=btn.dataset.css;};});
+document.getElementById('btn-apply').onclick=async()=>{
+  const css=document.getElementById('css-input').value.trim();
+  if(!css){setStatus('Nothing to inject.','');return;}
+  try{if(injectedKey){await webview.removeInsertedCSS(injectedKey);injectedKey=null;}injectedKey=await webview.insertCSS(css);setStatus('✔ Applied!','ok');}
+  catch(err){setStatus('✘ '+err.message,'err');}
+};
+document.getElementById('btn-clear').onclick=async()=>{try{if(injectedKey){await webview.removeInsertedCSS(injectedKey);injectedKey=null;}setStatus('✔ Cleared.','ok');}catch(err){setStatus('✘ '+err.message,'err');}};
+document.getElementById('btn-reset').onclick=async()=>{try{if(injectedKey){await webview.removeInsertedCSS(injectedKey);injectedKey=null;}document.getElementById('css-input').value='';setStatus('Ready.','');}catch(err){setStatus('✘ '+err.message,'err');}};
+webview.addEventListener('did-navigate',async()=>{
+  injectedKey=null;
+  const css=document.getElementById('css-input').value.trim();
+  if(css){try{injectedKey=await webview.insertCSS(css);setStatus('✔ Re-applied.','ok');}catch{}}
+  if(activeTheme!=='default'){const t=THEMES.find(t=>t.id===activeTheme);if(t&&t.css){try{themeKey=await webview.insertCSS(t.css);}catch{}}}
+  applyBlockRules();
+});
+function setStatus(msg,type){const s=document.getElementById('css-status');s.textContent=msg;s.className='status-line '+type;}
+
+// ── Themes ───────────────────────────────────────
+const THEMES=[
+  {id:'default',   name:'Default',   preview:{bg:'#1e2124',accent:'#94a3b8'},css:''},
+  {id:'entropy',   name:'Entropy',   preview:{bg:'#0d0800',accent:'#ff6b00'},css:'body,html{background:#0d0800!important}'},
+  {id:'midnight',  name:'Midnight',  preview:{bg:'#0a0a18',accent:'#818cf8'},css:'body,html{background:#0a0a18!important}'},
+  {id:'forest',    name:'Forest',    preview:{bg:'#0a1a0a',accent:'#4ade80'},css:'body,html{background:#0a1a0a!important}'},
+  {id:'ocean',     name:'Ocean',     preview:{bg:'#071428',accent:'#38bdf8'},css:'body,html{background:#071428!important}'},
+  {id:'rose',      name:'Rose',      preview:{bg:'#180a0f',accent:'#fb7185'},css:'body,html{background:#180a0f!important}'},
+  {id:'amoled',    name:'AMOLED',    preview:{bg:'#000',accent:'#444'},      css:'body,html{background:#000!important}'},
+  {id:'solarized', name:'Solarized', preview:{bg:'#002b36',accent:'#268bd2'},css:'body,html{background:#002b36!important}'},
+  {id:'synthwave', name:'Synthwave', preview:{bg:'#1a0533',accent:'#f72585'},css:'body,html{background:#1a0533!important}'},
+  {id:'mocha',     name:'Mocha',     preview:{bg:'#181310',accent:'#cba6f7'},css:'body,html{background:#181310!important}'},
+];
+
+// Populate scheduler dropdowns
+['sched-day','sched-night'].forEach(id=>{
+  const sel=document.getElementById(id);
+  THEMES.forEach(t=>{const o=document.createElement('option');o.value=t.id;o.textContent=t.name;sel.appendChild(o);});
+});
+document.getElementById('sched-night').value='midnight';
+
+const grid=document.getElementById('theme-grid');
+THEMES.forEach(theme=>{
+  const card=document.createElement('div');
+  card.className='theme-card'+(theme.id==='default'?' active':'');
+  card.innerHTML=`<div class="theme-preview" style="background:${theme.preview.bg};color:${theme.preview.accent}">${theme.name}</div><div class="theme-name">${theme.name}</div>`;
+  card.onclick=()=>applyTheme(theme.id);
+  grid.appendChild(card);
+});
+async function applyTheme(id){
+  if(themeKey){try{await webview.removeInsertedCSS(themeKey);themeKey=null;}catch{}}
+  activeTheme=id;
+  document.querySelectorAll('.theme-card').forEach((c,i)=>c.classList.toggle('active',THEMES[i].id===id));
+  const t=THEMES.find(t=>t.id===id);
+  if(t&&t.css){try{themeKey=await webview.insertCSS(t.css);}catch{}}
+}
+document.getElementById('apply-custom-theme').onclick=async()=>{
+  const css=document.getElementById('custom-css-input').value.trim();
+  if(!css)return;
+  if(themeKey){try{await webview.removeInsertedCSS(themeKey);themeKey=null;}catch{}}
+  activeTheme='custom';
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('active'));
+  try{themeKey=await webview.insertCSS(css);}catch{}
+};
+
+// Theme scheduler
+setInterval(()=>{
+  if(!schedEnabled)return;
+  const h=new Date().getHours();
+  const id=h>=6&&h<18?schedDay:schedNight;
+  if(id!==activeTheme)applyTheme(id);
+},60000);
+document.getElementById('sched-toggle').onchange=e=>{schedEnabled=e.target.checked;if(schedEnabled){const h=new Date().getHours();applyTheme(h>=6&&h<18?document.getElementById('sched-day').value:document.getElementById('sched-night').value);}};
+document.getElementById('sched-day').onchange=e=>{schedDay=e.target.value;};
+document.getElementById('sched-night').onchange=e=>{schedNight=e.target.value;};
+
+// Titlebar gradient
+function updateTbGradient(){
+  const on=document.getElementById('tb-gradient-toggle').checked;
+  const a=document.getElementById('tb-color-a').value;
+  const b=document.getElementById('tb-color-b').value;
+  const angle=document.getElementById('tb-angle').value;
+  const tb=document.getElementById('titlebar');
+  if(on){tb.style.background=`linear-gradient(${angle}deg,${a},${b})`;tb.classList.add('gradient-tb');}
+  else{tb.style.background='';tb.classList.remove('gradient-tb');}
+  document.getElementById('tb-preview').style.background=`linear-gradient(${angle}deg,${a},${b})`;
+}
+['tb-gradient-toggle','tb-color-a','tb-color-b','tb-angle'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{document.getElementById('tb-angle-val').textContent=document.getElementById('tb-angle').value+'°';updateTbGradient();}));
+updateTbGradient();
+
+// Modal appearance
+document.getElementById('modal-opacity-slider').oninput=e=>{document.getElementById('modal-opacity-val').textContent=e.target.value+'%';document.getElementById('modal').style.background=`rgba(15,15,20,${e.target.value/100})`;};
+document.getElementById('modal-blur-slider').oninput=e=>{document.getElementById('modal-blur-val').textContent=e.target.value+'px';document.getElementById('modal').style.backdropFilter=`blur(${e.target.value}px)`;};
+
+// ── Bookmarks ─────────────────────────────────────
+try{bookmarks=JSON.parse(localStorage.getItem('ec_bookmarks')||'[]');}catch{}
+function renderBookmarks(){
+  const list=document.getElementById('bookmark-list');
+  list.innerHTML=bookmarks.length?'':'<div style="color:#555;font-size:11px;text-align:center;padding:16px">No bookmarks yet.</div>';
+  bookmarks.forEach((bm,i)=>{
+    const d=document.createElement('div');d.className='bookmark-item';
+    d.innerHTML=`<span class="bm-favicon">🔖</span><div class="bm-info"><div class="bm-name">${bm.name}</div><div class="bm-url">${bm.url}</div></div><button class="bm-go">Go →</button><button class="bm-del">✕</button>`;
+    d.querySelector('.bm-go').onclick=()=>{webview.loadURL(bm.url);closeModal();};
+    d.querySelector('.bm-del').onclick=()=>{bookmarks.splice(i,1);saveBookmarks();renderBookmarks();};
+    list.appendChild(d);
+  });
+}
+function saveBookmarks(){localStorage.setItem('ec_bookmarks',JSON.stringify(bookmarks));}
+document.getElementById('bm-add').onclick=()=>{
+  const name=document.getElementById('bm-name').value.trim();
+  let url=document.getElementById('bm-url').value.trim();
+  if(!name||!url){document.getElementById('bm-status').textContent='Name and URL required.';return;}
+  if(!/^https?:\/\//i.test(url))url='https://'+url;
+  bookmarks.push({name,url});saveBookmarks();renderBookmarks();
+  document.getElementById('bm-name').value='';document.getElementById('bm-url').value='';
+  document.getElementById('bm-status').textContent='✔ Saved!';
+  setTimeout(()=>document.getElementById('bm-status').textContent='',2000);
+};
+// Bookmark current page button
+document.getElementById('bm-url').addEventListener('focus',()=>{if(!document.getElementById('bm-url').value)document.getElementById('bm-url').value=webview.getURL()||'';});
+
+// ── Notes ─────────────────────────────────────────
+try{notes=localStorage.getItem('ec_notes')||'';}catch{}
+document.getElementById('notes-input').value=notes;
+document.getElementById('notes-save').onclick=()=>{
+  notes=document.getElementById('notes-input').value;
+  localStorage.setItem('ec_notes',notes);
+  document.getElementById('notes-status').textContent='✔ Saved at '+new Date().toLocaleTimeString();
+};
+document.getElementById('notes-clear').onclick=()=>{document.getElementById('notes-input').value='';notes='';localStorage.removeItem('ec_notes');document.getElementById('notes-status').textContent='Cleared.';};
+// Auto-save every 30s
+setInterval(()=>{const v=document.getElementById('notes-input').value;if(v!==notes){notes=v;localStorage.setItem('ec_notes',notes);}},30000);
+
+// ── History ───────────────────────────────────────
+function recordHistory(url){
+  if(!url||url==='about:blank')return;
+  sessionHistory.unshift({url,time:new Date().toLocaleTimeString()});
+  if(sessionHistory.length>50)sessionHistory.pop();
+}
+function renderHistory(){
+  const list=document.getElementById('history-list');
+  list.innerHTML=sessionHistory.length?'':'<div style="color:#555;font-size:11px;text-align:center;padding:20px">No history yet.</div>';
+  sessionHistory.forEach(h=>{
+    const d=document.createElement('div');d.className='hist-item';
+    d.innerHTML=`<span class="hist-time">${h.time}</span><span class="hist-url">${h.url}</span>`;
+    d.onclick=()=>{webview.loadURL(h.url);closeModal();};
+    list.appendChild(d);
+  });
+}
+document.getElementById('history-clear').onclick=()=>{sessionHistory=[];renderHistory();};
+
+// ── Accounts ──────────────────────────────────────
+try{accounts=JSON.parse(localStorage.getItem('ec_accounts')||'[]');}catch{}
+if(!accounts.length)accounts=[{id:'main',name:'Main',color:'#ff6b00',partition:'persist:main'}];
+function renderAccounts(){
+  const list=document.getElementById('account-list');list.innerHTML='';
+  accounts.forEach(acc=>{
+    const d=document.createElement('div');d.className='account-card'+(acc.id===activeAccount?' active-account':'');
+    d.innerHTML=`<div class="account-avatar" style="background:${acc.color}22;color:${acc.color}">${acc.name[0].toUpperCase()}</div><div class="account-info"><div class="account-name">${acc.name}</div><div class="account-sub">Session: ${acc.partition}</div></div>${acc.id!=='main'?'<button class="account-switch">Switch</button><button class="account-del">✕</button>':'<button class="account-switch">Switch</button>'}`;
+    d.querySelector('.account-switch').onclick=()=>switchAccount(acc);
+    const del=d.querySelector('.account-del');
+    if(del)del.onclick=()=>{if(acc.id==='main')return;accounts=accounts.filter(a=>a.id!==acc.id);saveAccounts();renderAccounts();};
+    list.appendChild(d);
+  });
+}
+function switchAccount(acc){
+  activeAccount=acc.id;
+  webview.setAttribute('partition',acc.partition);
+  webview.loadURL('https://kloak.app/auth?mode=login');
+  closeModal();
+}
+function saveAccounts(){localStorage.setItem('ec_accounts',JSON.stringify(accounts));}
+document.getElementById('acc-add').onclick=()=>{
+  const name=document.getElementById('acc-name').value.trim();
+  const color=document.getElementById('acc-color').value;
+  if(!name){document.getElementById('acc-status').textContent='Enter a name.';return;}
+  const id='acc_'+Date.now();
+  accounts.push({id,name,color,partition:'persist:'+id});
+  saveAccounts();renderAccounts();
+  document.getElementById('acc-name').value='';
+  document.getElementById('acc-status').textContent='✔ Session created!';
+  setTimeout(()=>document.getElementById('acc-status').textContent='',2000);
+};
+
+// ── Request Blocker ───────────────────────────────
+try{blockedDomains=JSON.parse(localStorage.getItem('ec_blocked')||'[]');}catch{}
+function renderBlockList(){
+  const list=document.getElementById('block-list');list.innerHTML='';
+  if(!blockedDomains.length){list.innerHTML='<div id="block-empty">No domains blocked.</div>';return;}
+  blockedDomains.forEach((d,i)=>{
+    const el=document.createElement('div');el.className='block-item';
+    el.innerHTML=`<span class="block-domain">${d}</span><button class="block-del">Unblock</button>`;
+    el.querySelector('.block-del').onclick=()=>{blockedDomains.splice(i,1);saveBlocked();renderBlockList();applyBlockRules();};
+    list.appendChild(el);
+  });
+}
+function saveBlocked(){localStorage.setItem('ec_blocked',JSON.stringify(blockedDomains));}
+function applyBlockRules(){
+  // Inject CSS to hide iframes/images from blocked domains (best we can do in webview without request interception)
+  const css=blockedDomains.map(d=>`img[src*="${d}"],iframe[src*="${d}"]{display:none!important}`).join('\n');
+  if(css){try{webview.insertCSS(css);}catch{}}
+}
+document.getElementById('block-add').onclick=()=>{
+  const val=document.getElementById('block-input').value.trim().replace(/^https?:\/\//,'').split('/')[0];
+  if(!val){document.getElementById('block-status').textContent='Enter a domain.';return;}
+  if(blockedDomains.includes(val)){document.getElementById('block-status').textContent='Already blocked.';return;}
+  blockedDomains.push(val);saveBlocked();renderBlockList();applyBlockRules();
+  document.getElementById('block-input').value='';
+  document.getElementById('block-status').textContent='✔ Blocked!';
+  setTimeout(()=>document.getElementById('block-status').textContent='',2000);
+};
+
+// ── Weather ───────────────────────────────────────
+async function fetchWeather(){
+  try{
+    const geo=await fetch('https://ipapi.co/json/').then(r=>r.json());
+    const w=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${geo.latitude}&longitude=${geo.longitude}&current_weather=true&temperature_unit=fahrenheit`).then(r=>r.json());
+    const code=w.current_weather.weathercode;
+    const temp=Math.round(w.current_weather.temperature);
+    const icons={0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',48:'🌫',51:'🌦',61:'🌧',71:'🌨',80:'🌦',95:'⛈'};
+    const icon=icons[code]||icons[Math.floor(code/10)*10]||'🌡';
+    cachedWeather={icon,temp:temp+'°F',city:geo.city};
+    // update widget if pinned
+    const w2=document.getElementById('tb-widget-weather');
+    if(w2)w2.innerHTML=WIDGETS.weather.render();
+  }catch{cachedWeather={icon:'⛅',temp:'--°F'};}
+}
+
+fetchWeather();
+setInterval(fetchWeather,10*60*1000);
+
+// ── Seasonal effects ──────────────────────────────
+(function checkSeasonal(){
+  const m=new Date().getMonth()+1,d=new Date().getDate();
+  if(m===12){document.getElementById('particle-type').value='snow';startParticles('snow');}
+  else if(m===2&&d>=10&&d<=16){document.getElementById('particle-type').value='hearts';startParticles('hearts');}
+  else if(m===10&&d>=25){document.getElementById('particle-type').value='fire';startParticles('fire');}
+})();
+
+// ── Animated backgrounds ──────────────────────────
+const BG_EFFECTS={
+  none:null,
+  stars:(ctx,w,h,t)=>{ctx.clearRect(0,0,w,h);for(let i=0;i<120;i++){const x=((Math.sin(i*2.4+t*0.0001)+1)/2)*w,y=((Math.cos(i*1.7+t*0.00007)+1)/2)*h,a=(0.4+Math.sin(i*3+t*0.002)*0.4)*bgOpacity*3;ctx.beginPath();ctx.arc(x,y,0.5+Math.sin(i+t*0.001)*0.5,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fill();}},
+  matrix:(()=>{const cols=[];let init=false;return(ctx,w,h)=>{if(!init||cols.length!==Math.floor(w/14)){cols.length=0;for(let i=0;i<Math.floor(w/14);i++)cols.push(Math.random()*h);init=true;}ctx.fillStyle=`rgba(0,0,0,${bgOpacity*2})`;ctx.fillRect(0,0,w,h);ctx.fillStyle=`rgba(0,255,70,${bgOpacity*4})`;ctx.font='13px monospace';cols.forEach((y,i)=>{ctx.fillText(String.fromCharCode(0x30A0+Math.random()*96),i*14,y);if(y>h&&Math.random()>0.975)cols[i]=0;else cols[i]+=14;});};})(),
+  aurora:(ctx,w,h,t)=>{ctx.clearRect(0,0,w,h);['#00ff88','#0088ff','#8800ff','#ff0088'].forEach((color,c)=>{const grad=ctx.createLinearGradient(0,0,w,0);for(let i=0;i<=10;i++){const a=Math.sin(i/10*Math.PI*2+t*0.0008+c)*bgOpacity*0.8;grad.addColorStop(i/10,color+Math.floor(Math.max(0,a)*255).toString(16).padStart(2,'0'));}ctx.beginPath();ctx.moveTo(0,h*0.3);for(let x=0;x<=w;x+=4)ctx.lineTo(x,h*(0.2+0.15*Math.sin(x/80+t*0.0006+c*1.2)));ctx.lineTo(w,0);ctx.lineTo(0,0);ctx.closePath();ctx.fillStyle=grad;ctx.fill();});},
+  fire:(()=>{let buf=null,buf2=null;return(ctx,w,h)=>{const W=Math.floor(w/3),H=Math.floor(h/3);if(!buf||buf.length!==W*H){buf=new Uint8Array(W*H);buf2=new Uint8Array(W*H);}for(let x=0;x<W;x++)buf[(H-1)*W+x]=Math.random()>0.4?220+Math.random()*35:0;for(let y=0;y<H-1;y++)for(let x=0;x<W;x++){const v=(buf[y*W+((x-1+W)%W)]+buf[y*W+x]+buf[y*W+((x+1)%W)]+buf[(y+1)*W+x])/4.05;buf2[y*W+x]=v>0?v-1:0;}[buf,buf2]=[buf2,buf];const img=ctx.createImageData(W,H);for(let i=0;i<W*H;i++){const v=buf[i];img.data[i*4]=Math.min(255,v*2);img.data[i*4+1]=Math.max(0,v-100)*2;img.data[i*4+2]=0;img.data[i*4+3]=v*bgOpacity*4;}ctx.putImageData(img,0,0);ctx.drawImage(bgCanvas,0,0,W,H,0,0,w,h);};})(),
+  blackhole:(ctx,w,h,t)=>{ctx.clearRect(0,0,w,h);const cx=w/2,cy=h/2,r=Math.min(w,h)*0.25;for(let i=0;i<200;i++){const angle=(i/200)*Math.PI*2+t*0.0005,dist=r*(0.6+0.4*Math.sin(i*0.3+t*0.001)),x=cx+Math.cos(angle)*dist,y=cy+Math.sin(angle)*dist*0.35;ctx.beginPath();ctx.arc(x,y,1.5,0,Math.PI*2);ctx.fillStyle=`rgba(255,${Math.floor(100+dist)},0,${bgOpacity*(0.3+0.7*(1-dist/(r*1.2)))})`;ctx.fill();}const grd=ctx.createRadialGradient(cx,cy,0,cx,cy,r*0.5);grd.addColorStop(0,`rgba(0,0,0,${bgOpacity*5})`);grd.addColorStop(1,'rgba(0,0,0,0)');ctx.beginPath();ctx.arc(cx,cy,r*0.5,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();},
+  nebula:(ctx,w,h,t)=>{ctx.clearRect(0,0,w,h);[{x:0.3,y:0.4,c:'#7c3aed'},{x:0.7,y:0.3,c:'#0ea5e9'},{x:0.5,y:0.7,c:'#f72585'}].forEach((cl,i)=>{const grd=ctx.createRadialGradient(cl.x*w+Math.sin(t*0.0003+i)*30,cl.y*h+Math.cos(t*0.0002+i)*20,0,cl.x*w,cl.y*h,Math.min(w,h)*0.4);grd.addColorStop(0,cl.c+Math.floor(bgOpacity*180).toString(16).padStart(2,'0'));grd.addColorStop(1,cl.c+'00');ctx.fillStyle=grd;ctx.fillRect(0,0,w,h);});},
+};
+let bgFrame=null;
+function startBgEffect(name){if(bgFrame)cancelAnimationFrame(bgFrame);if(name==='none'){bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);return;}const fn=BG_EFFECTS[name];if(!fn)return;function loop(t){fn(bgCtx,bgCanvas.width,bgCanvas.height,t);bgFrame=requestAnimationFrame(loop);}bgFrame=requestAnimationFrame(loop);}
+document.getElementById('bg-effect').onchange=e=>startBgEffect(e.target.value);
+document.getElementById('opacity-slider').oninput=e=>{bgOpacity=e.target.value/100;};
+
+// ── Particles ─────────────────────────────────────
+const PARTICLE_SYSTEMS={
+  sparkle:()=>{const ps=[];for(let i=0;i<60;i++)ps.push({x:Math.random()*pCanvas.width,y:Math.random()*pCanvas.height,vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5,life:Math.random(),size:Math.random()*3+1,h:Math.random()*60+20});return(ctx,w,h)=>{ctx.clearRect(0,0,w,h);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.life+=0.01;if(p.x<0||p.x>w||p.y<0||p.y>h){p.x=Math.random()*w;p.y=Math.random()*h;}const a=Math.sin(p.life*Math.PI)*0.8;ctx.beginPath();ctx.arc(p.x,p.y,p.size*a,0,Math.PI*2);ctx.fillStyle=`hsla(${p.h},100%,70%,${a})`;ctx.fill();});};},
+  snow:()=>{const ps=Array.from({length:80},()=>({x:Math.random()*1400,y:Math.random()*800,vy:0.3+Math.random()*0.7,vx:(Math.random()-0.5)*0.3,r:1+Math.random()*2.5,sw:Math.random()*Math.PI*2}));return(ctx,w,h)=>{ctx.clearRect(0,0,w,h);ps.forEach(p=>{p.sw+=0.01;p.y+=p.vy;p.x+=p.vx+Math.sin(p.sw)*0.3;if(p.y>h){p.y=-5;p.x=Math.random()*w;}ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(200,230,255,0.7)';ctx.fill();});};},
+  bubbles:()=>{const ps=Array.from({length:30},()=>({x:Math.random()*1400,y:Math.random()*800+800,vy:-(0.3+Math.random()*0.5),r:3+Math.random()*8,sw:Math.random()*Math.PI*2}));return(ctx,w,h)=>{ctx.clearRect(0,0,w,h);ps.forEach(p=>{p.sw+=0.02;p.y+=p.vy;p.x+=Math.sin(p.sw)*0.5;if(p.y<-20){p.y=h+20;p.x=Math.random()*w;}ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.strokeStyle='rgba(150,220,255,0.4)';ctx.lineWidth=1;ctx.stroke();});};},
+  fire:()=>{const ps=Array.from({length:50},()=>({x:Math.random()*1400,y:800+Math.random()*100,vy:-(1+Math.random()*2),vx:(Math.random()-0.5)*1.5,life:Math.random(),size:2+Math.random()*4}));return(ctx,w,h)=>{ctx.clearRect(0,0,w,h);ps.forEach(p=>{p.y+=p.vy;p.x+=p.vx;p.life+=0.02;p.size*=0.99;if(p.life>1||p.size<0.5){p.x=Math.random()*w;p.y=h+10;p.life=0;p.size=2+Math.random()*4;p.vy=-(1+Math.random()*2);p.vx=(Math.random()-0.5)*1.5;}ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fillStyle=`rgba(255,${Math.floor(100*(1-p.life))},0,${(1-p.life)*0.8})`;ctx.fill();});};},
+  hearts:()=>{const ps=Array.from({length:20},()=>({x:Math.random()*1400,y:Math.random()*800+800,vy:-(0.4+Math.random()*0.6),vx:(Math.random()-0.5)*0.5,size:8+Math.random()*12,sw:Math.random()*Math.PI*2}));return(ctx,w,h)=>{ctx.clearRect(0,0,w,h);ps.forEach(p=>{p.sw+=0.015;p.y+=p.vy;p.x+=Math.sin(p.sw)*0.4+p.vx;if(p.y<-30){p.y=h+30;p.x=Math.random()*w;}const s=p.size;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(Math.PI);ctx.beginPath();ctx.moveTo(0,-s*0.5);ctx.bezierCurveTo(s*0.5,-s,s,-s*0.3,0,s*0.5);ctx.bezierCurveTo(-s,-s*0.3,-s*0.5,-s,0,-s*0.5);ctx.fillStyle='rgba(255,80,120,0.5)';ctx.fill();ctx.restore();});};},
+};
+let pFrame=null,pDraw=null;
+function startParticles(name){if(pFrame)cancelAnimationFrame(pFrame);if(name==='none'){pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);pDraw=null;return;}pDraw=PARTICLE_SYSTEMS[name]?.();if(!pDraw)return;function loop(){pDraw(pCtx,pCanvas.width,pCanvas.height);pFrame=requestAnimationFrame(loop);}pFrame=requestAnimationFrame(loop);}
+document.getElementById('particle-type').onchange=e=>startParticles(e.target.value);
+
+// ── Custom cursor ─────────────────────────────────
+const CURSORS={none:{el:'',css:''},crosshair:{el:'✛',css:'font-size:20px;color:#ff6b00;text-shadow:0 0 8px #ff6b00'},star:{el:'⭐',css:'font-size:18px'},fire:{el:'🔥',css:'font-size:20px'},sword:{el:'⚔️',css:'font-size:20px'},entropy:{el:'🌀',css:'font-size:20px;filter:drop-shadow(0 0 6px #7c3aed)'}};
+const cursorEl=document.getElementById('custom-cursor');
+document.addEventListener('mousemove',e=>{if(currentCursor==='none')return;cursorEl.style.left=e.clientX+'px';cursorEl.style.top=e.clientY+'px';});
+function setCursor(name){currentCursor=name;const c=CURSORS[name];if(name==='none'){cursorEl.style.display='none';document.body.style.cursor='';return;}cursorEl.style.display='block';cursorEl.innerHTML=`<span style="${c.css}">${c.el}</span>`;document.body.style.cursor='none';document.getElementById('cursor-preview').textContent=c.el;}
+document.getElementById('cursor-style').onchange=e=>setCursor(e.target.value);
+
+// ── Sounds ────────────────────────────────────────
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+const SOUNDS={retro:{nav:()=>beep(440,0.05,'square'),open:()=>beep(660,0.08,'square'),close:()=>beep(220,0.08,'square')},soft:{nav:()=>beep(528,0.06,'sine'),open:()=>beep(622,0.08,'sine'),close:()=>beep(415,0.08,'sine')},'sci-fi':{nav:()=>{beep(200,0.03,'sawtooth');setTimeout(()=>beep(400,0.03,'sawtooth'),60);},open:()=>sweep(200,800,0.1,'sawtooth'),close:()=>sweep(800,200,0.1,'sawtooth')},nature:{nav:()=>beep(392,0.05,'sine'),open:()=>{beep(523,0.04,'sine');setTimeout(()=>beep(659,0.04,'sine'),80);},close:()=>{beep(659,0.04,'sine');setTimeout(()=>beep(523,0.04,'sine'),80);}}};
+function beep(freq,dur,type='sine'){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(0.15,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);o.start();o.stop(audioCtx.currentTime+dur);}
+function sweep(f1,f2,dur,type='sine'){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type=type;o.frequency.setValueAtTime(f1,audioCtx.currentTime);o.frequency.linearRampToValueAtTime(f2,audioCtx.currentTime+dur);g.gain.setValueAtTime(0.12,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);o.start();o.stop(audioCtx.currentTime+dur);}
+function playSound(type){if(soundPack==='none')return;try{SOUNDS[soundPack]?.[type]?.();}catch{}}
+document.getElementById('sound-pack').onchange=e=>{soundPack=e.target.value;if(soundPack!=='none')playSound('open');};
+webview.addEventListener('did-start-navigation',()=>{if(document.getElementById('sound-nav').checked)playSound('nav');});
+
+// ── Screenshot ────────────────────────────────────
+function takeScreenshot(){const flash=document.getElementById('screenshot-flash');flash.classList.add('flash');playSound('open');setTimeout(()=>flash.classList.remove('flash'),200);webview.capturePage().then(img=>{const a=document.createElement('a');a.href=img.toDataURL();a.download=`entropy-${Date.now()}.png`;a.click();});}
+document.getElementById('screenshot-btn').onclick=takeScreenshot;
+
+// ── Konami / Easter egg ───────────────────────────
+const KONAMI=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiIdx=0;
+function handleKonami(e){
+  if(!konamiOn)return;
+  if(e.key===KONAMI[konamiIdx]){konamiIdx++;if(konamiIdx===KONAMI.length){konamiIdx=0;triggerEasterEgg();}}else konamiIdx=0;
+}
+document.getElementById('konami-toggle').onchange=e=>{konamiOn=e.target.checked;};
+function triggerEasterEgg(){
+  if(!funUnlocked){funUnlocked=true;const ft=document.getElementById('fun-tab');ft.classList.remove('locked');document.getElementById('konami-hint').style.display='block';ft.style.background='rgba(255,107,0,0.3)';ft.style.borderColor='#ff6b00';setTimeout(()=>{ft.style.background='';ft.style.borderColor='';},1500);}
+  playSound('open');openModal();
+  document.querySelectorAll('.sidebar-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('fun-tab').classList.add('active');
+  document.getElementById('pane-fun').classList.add('active');
+  document.getElementById('bg-effect').value='blackhole';startBgEffect('blackhole');
+  document.getElementById('particle-type').value='sparkle';startParticles('sparkle');
+  document.getElementById('easter-egg').classList.add('show');
+  for(let i=0;i<5;i++)setTimeout(()=>beep(220+Math.random()*880,0.3,'sine'),i*120);
+}
+
+
+// ══════════════════════════════════════════════════
+// CONNECTION STATUS DOT
+// ══════════════════════════════════════════════════
+const connDot = document.getElementById('conn-dot');
+let wasOffline = false;
+let reconnectTimer = null;
+
+function setConnState(state) {
+  connDot.className = state === 'online' ? '' : state;
+  const labels = { online: 'Connected', offline: 'No connection — will retry', checking: 'Checking connection...' };
+  connDot.title = labels[state] || 'Connected';
+  if (state === 'offline' && !wasOffline) {
+    wasOffline = true;
+    scheduleReconnect();
+  }
+  if (state === 'online' && wasOffline) {
+    wasOffline = false;
+    clearTimeout(reconnectTimer);
+    // Reload webview once connection is back
+    webview.reload();
+  }
+}
+
+function scheduleReconnect() {
+  clearTimeout(reconnectTimer);
+  reconnectTimer = setTimeout(async () => {
+    setConnState('checking');
+    try {
+      await fetch('https://www.google.com/generate_204', { mode: 'no-cors', cache: 'no-store' });
+      setConnState('online');
+    } catch {
+      setConnState('offline');
+      scheduleReconnect();
+    }
+  }, 5000);
+}
+
+window.addEventListener('online',  () => setConnState('online'));
+window.addEventListener('offline', () => setConnState('offline'));
+// Poll quietly every 30s
+setInterval(async () => {
+  try {
+    await fetch('https://www.google.com/generate_204', { mode: 'no-cors', cache: 'no-store' });
+    if (wasOffline) setConnState('online');
+  } catch {
+    setConnState('offline');
+  }
+}, 30000);
+
+// ══════════════════════════════════════════════════
+// CRASH RECOVERY
+// ══════════════════════════════════════════════════
+const crashScreen = document.getElementById('crash-screen');
+
+webview.addEventListener('crashed', (e) => {
+  crashScreen.classList.add('show');
+  document.getElementById('crash-detail').textContent =
+    e.reason ? `Reason: ${e.reason}` : 'Renderer process crashed unexpectedly.';
+});
+
+webview.addEventListener('render-process-gone', (e) => {
+  if (e.details && e.details.reason !== 'clean-exit') {
+    crashScreen.classList.add('show');
+    document.getElementById('crash-detail').textContent =
+      `Process gone: ${e.details.reason || 'unknown reason'}`;
+  }
+});
+
+webview.addEventListener('did-fail-load', (e) => {
+  // Only show for serious failures, not user-cancelled navigations
+  if (e.errorCode && e.errorCode !== -3 && e.errorCode !== 0) {
+    crashScreen.classList.add('show');
+    document.getElementById('crash-detail').textContent =
+      `Load failed (${e.errorCode}): ${e.errorDescription || 'unknown error'}`;
+  }
+});
+
+webview.addEventListener('did-finish-load', () => {
+  // Hide crash screen on successful load
+  crashScreen.classList.remove('show');
+});
+
+document.getElementById('crash-reload').onclick = () => {
+  crashScreen.classList.remove('show');
+  webview.reload();
+};
+
+// ══════════════════════════════════════════════════
+// ONBOARDING
+// ══════════════════════════════════════════════════
+const OB_STEPS = [
+  {
+    icon: '⚡', title: 'Welcome to Entropy Client',
+    desc: 'A supercharged desktop wrapper for kloak.app. Lets take a quick tour of whats available.',
+    features: [
+      ['🎨', 'Full theme system with 10 built-in themes'],
+      ['⚡', 'CSS injector to customise any element'],
+      ['✨', 'Animated backgrounds and particle effects'],
+    ]
+  },
+  {
+    icon: '🎨', title: 'Customization Modal',
+    desc: 'Click the Customization button in Settings, or press Ctrl+, to open the full customization panel.',
+    features: [
+      ['🔖', 'Save bookmarks and jump to pages instantly'],
+      ['📝', 'Built-in notes that persist between sessions'],
+      ['🕐', 'Session history for the last 50 pages visited'],
+    ]
+  },
+  {
+    icon: '⌨️', title: 'Keyboard Shortcuts',
+    desc: 'Every shortcut is fully remappable from the Keybinds tab in the customization panel.',
+    features: [
+      ['Ctrl+,', 'Open customization modal'],
+      ['Ctrl+Shift+S', 'Take a screenshot'],
+      ['Alt+← / →', 'Navigate back and forward'],
+    ]
+  },
+  {
+    icon: '📌', title: 'Titlebar Widgets',
+    desc: 'Pin live widgets to your titlebar from the Main Settings tab — weather, clock, zoom level and more.',
+    features: [
+      ['⛅', 'Live weather from your location'],
+      ['🕐', 'Real-time clock display'],
+      ['👤', 'Active account indicator'],
+    ]
+  },
+  {
+    icon: '🚀', title: 'You are all set!',
+    desc: 'Entropy Client is ready to use. You can revisit this tour anytime from Main Settings.',
+    features: [
+      ['✦', 'Try the Konami code for a secret surprise'],
+      ['🚫', 'Block unwanted domains in the Blocker tab'],
+      ['👤', 'Create multiple accounts with isolated sessions'],
+    ]
+  },
+];
+
+let obStep = 0;
+
+function renderObStep() {
+  const step = OB_STEPS[obStep];
+  document.getElementById('ob-step-icon').textContent = step.icon;
+  document.getElementById('ob-step-title').textContent = step.title;
+  document.getElementById('ob-step-desc').textContent = step.desc;
+  document.getElementById('ob-step-counter').textContent = `Step ${obStep + 1} of ${OB_STEPS.length}`;
+  document.getElementById('ob-progress-bar').style.width = `${((obStep + 1) / OB_STEPS.length) * 100}%`;
+  document.getElementById('ob-back').style.display = obStep > 0 ? '' : 'none';
+  document.getElementById('ob-next').textContent = obStep === OB_STEPS.length - 1 ? '✓ Get Started' : 'Next →';
+
+  const list = document.getElementById('ob-feature-list');
+  list.innerHTML = '';
+  step.features.forEach(([icon, text]) => {
+    const el = document.createElement('div');
+    el.className = 'ob-feature';
+    el.innerHTML = `<span style="font-size:16px;min-width:24px;text-align:center">${icon}</span><span>${text}</span>`;
+    list.appendChild(el);
+  });
+}
+
+function closeOnboarding() {
+  document.getElementById('onboarding').classList.remove('show');
+  localStorage.setItem('ec_onboarding_done', '1');
+}
+
+document.getElementById('ob-next').onclick = () => {
+  if (obStep < OB_STEPS.length - 1) { obStep++; renderObStep(); }
+  else closeOnboarding();
+};
+document.getElementById('ob-back').onclick = () => {
+  if (obStep > 0) { obStep--; renderObStep(); }
+};
+document.getElementById('ob-skip').onclick = closeOnboarding;
+
+// Show onboarding on first launch
+renderObStep();
+if (!localStorage.getItem('ec_onboarding_done')) {
+  setTimeout(() => document.getElementById('onboarding').classList.add('show'), 1200);
+}
+
+// ══════════════════════════════════════════════════
+// CHANGELOG POPUP
+// ══════════════════════════════════════════════════
+// Changelog is loaded from changelog.txt in the app directory.
+//
+// Format for changelog.txt:
+//   VERSION 1.0.5
+//   new Added some cool feature
+//   imp Improved something existing
+//   fix Fixed a bug with X
+//
+// Lines starting with "new", "imp", or "fix" become tagged entries.
+// The VERSION line is used for the seen-check so the popup shows once per version.
+// Lines starting with # are ignored (comments).
+
+let clVersion = null;
+
+async function loadChangelog() {
+  try {
+    const res = await fetch('./changelog.txt');
+    if (!res.ok) return null;
+    const text = await res.text();
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+
+    let version = null;
+    const entries = [];
+
+    for (const line of lines) {
+      if (line.toUpperCase().startsWith('VERSION')) {
+        version = line.replace(/^VERSION\s*/i, '').trim();
+      } else if (/^(new|imp|fix)\s+/i.test(line)) {
+        const type = line.slice(0, 3).toLowerCase();
+        const text = line.slice(3).trim();
+        entries.push({ type, text });
+      }
     }
 
-    // ── Notifications ─────────────────────────────────
-    webview.addEventListener('ipc-message', (e) => {
-      if (e.channel === 'notify' && notifsOn) {
-        window.electronAPI.showNotification(e.args[0], e.args[1]);
-      }
-    });
+    return version && entries.length ? { version, entries } : null;
+  } catch {
+    return null;
+  }
+}
 
-    // Watch page title for unread indicator
-    webview.addEventListener('page-title-updated', (e) => {
-      const hasUnread = /\(\d+\)/.test(e.title);
-      document.title = hasUnread ? '🔴 Kloak' : 'Kloak';
-    });
+async function initChangelog() {
+  const cl = await loadChangelog();
+  if (!cl) return;
 
-    // ── CSS injector ─────────────────────────────────
-    const cssPanel  = document.getElementById('css-panel');
-    const cssToggle = document.getElementById('css-toggle');
-    const cssInput  = document.getElementById('css-input');
-    const cssStatus = document.getElementById('css-status');
+  clVersion = cl.version;
 
-    cssToggle.onclick = () => {
-      cssPanel.classList.toggle('open');
-      settingsPanel.classList.remove('open');
-    };
-    document.getElementById('css-close').onclick = () => cssPanel.classList.remove('open');
+  // Only show if this version hasn't been seen and onboarding is done
+  if (localStorage.getItem('ec_changelog_seen') === clVersion) return;
+  if (!localStorage.getItem('ec_onboarding_done')) return;
 
-    // Presets
-    document.querySelectorAll('.preset-btn').forEach(btn => {
-      btn.onclick = () => { cssInput.value = btn.dataset.css; };
-    });
+  const body = document.getElementById('cl-body');
+  body.innerHTML = '';
+  cl.entries.forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'cl-entry';
+    const labels = { new: 'New', imp: 'Improved', fix: 'Fix' };
+    div.innerHTML = `<span class="cl-tag cl-${e.type}">${labels[e.type] || e.type}</span><div class="cl-entry-text">${e.text}</div>`;
+    body.appendChild(div);
+  });
+  document.getElementById('cl-title').textContent = `What's new in v${cl.version}`;
+  setTimeout(() => document.getElementById('changelog-popup').classList.add('show'), 2000);
+}
 
-    document.getElementById('btn-apply').onclick = async () => {
-      const css = cssInput.value.trim();
-      if (!css) { setStatus('Nothing to inject.', ''); return; }
-      try {
-        if (injectedKey) { await webview.removeInsertedCSS(injectedKey); injectedKey = null; }
-        injectedKey = await webview.insertCSS(css);
-        setStatus('✔ Applied!', 'ok');
-      } catch (err) { setStatus('✘ ' + err.message, 'err'); }
-    };
+function hideChangelog() {
+  document.getElementById('changelog-popup').classList.remove('show');
+  if (clVersion) localStorage.setItem('ec_changelog_seen', clVersion);
+}
 
-    document.getElementById('btn-clear').onclick = async () => {
-      try {
-        if (injectedKey) { await webview.removeInsertedCSS(injectedKey); injectedKey = null; }
-        setStatus('✔ Cleared.', 'ok');
-      } catch (err) { setStatus('✘ ' + err.message, 'err'); }
-    };
+document.getElementById('cl-close').onclick   = hideChangelog;
+document.getElementById('cl-dismiss').onclick = hideChangelog;
 
-    document.getElementById('btn-reset').onclick = async () => {
-      try {
-        if (injectedKey) { await webview.removeInsertedCSS(injectedKey); injectedKey = null; }
-        cssInput.value = '';
-        setStatus('Ready.', '');
-      } catch (err) { setStatus('✘ ' + err.message, 'err'); }
-    };
+initChangelog();
 
-    webview.addEventListener('did-navigate', async () => {
-      injectedKey = null;
-      const css = cssInput.value.trim();
-      if (css) {
-        try { injectedKey = await webview.insertCSS(css); setStatus('✔ Re-applied.', 'ok'); }
-        catch { /* silent */ }
-      }
-    });
+// ══════════════════════════════════════════════════
+// AMBIENT MODE
+// ══════════════════════════════════════════════════
+const ambientCanvas = document.getElementById('ambient-canvas');
+const ambCtx = ambientCanvas.getContext('2d');
+let ambientEnabled = false;
+let ambientFrame = null;
+let ambientColors = ['#ff6b00', '#1a1a2e'];
 
-    function setStatus(msg, type) {
-      cssStatus.textContent = msg;
-      cssStatus.className = type;
+function setAmbientEnabled(on) {
+  ambientEnabled = on;
+  localStorage.setItem('ec_ambient', on ? '1' : '0');
+  if (on) {
+    ambientCanvas.classList.add('active');
+    sampleWebviewColors();
+    if (!ambientFrame) runAmbient();
+  } else {
+    ambientCanvas.classList.remove('active');
+    cancelAnimationFrame(ambientFrame);
+    ambientFrame = null;
+    // Restore normal titlebar bg
+    if (!document.getElementById('tb-gradient-toggle').checked) {
+      document.getElementById('titlebar').style.background = '';
     }
+  }
+}
 
-    // ── Settings panel ───────────────────────────────
-    const settingsPanel = document.getElementById('settings-panel');
-
-    document.getElementById('settings-toggle').onclick = () => {
-      settingsPanel.classList.toggle('open');
-      cssPanel.classList.remove('open');
+async function sampleWebviewColors() {
+  try {
+    // Capture a thin strip of the webview top and sample dominant colors
+    const img = await webview.capturePage({ x: 0, y: 0, width: Math.min(webview.offsetWidth, 800), height: 80 });
+    const dataUrl = img.toDataURL();
+    const image = new Image();
+    image.onload = () => {
+      const offscreen = document.createElement('canvas');
+      offscreen.width = 16; offscreen.height = 4;
+      const ctx2 = offscreen.getContext('2d');
+      ctx2.drawImage(image, 0, 0, 16, 4);
+      const data = ctx2.getImageData(0, 0, 16, 4).data;
+      // Sample a few pixels for dominant color
+      let r = 0, g = 0, b = 0, count = 0;
+      for (let i = 0; i < data.length; i += 16) {
+        r += data[i]; g += data[i+1]; b += data[i+2]; count++;
+      }
+      r = Math.round(r / count); g = Math.round(g / count); b = Math.round(b / count);
+      const brighten = (v) => Math.min(255, Math.round(v * 0.6 + 20));
+      ambientColors = [`rgb(${brighten(r)},${brighten(g)},${brighten(b)})`, `rgb(${Math.round(r*0.3)},${Math.round(g*0.3)},${Math.round(b*0.3)})`];
     };
-    document.getElementById('settings-close').onclick = () => settingsPanel.classList.remove('open');
+    image.src = dataUrl;
+  } catch {}
+}
 
-    // Startup toggle
-    const startupToggle = document.getElementById('toggle-startup');
-    window.electronAPI.getLoginStartup().then(val => { startupToggle.checked = val; });
-    startupToggle.onchange = () => window.electronAPI.setLoginStartup(startupToggle.checked);
+function runAmbient() {
+  function tick() {
+    if (!ambientEnabled) return;
+    const w = ambientCanvas.width = window.innerWidth;
+    ambientCanvas.height = 32;
+    const grad = ambCtx.createLinearGradient(0, 0, w, 0);
+    grad.addColorStop(0, ambientColors[1]);
+    grad.addColorStop(0.5, ambientColors[0]);
+    grad.addColorStop(1, ambientColors[1]);
+    ambCtx.fillStyle = grad;
+    ambCtx.fillRect(0, 0, w, 32);
+    ambientFrame = requestAnimationFrame(tick);
+  }
+  tick();
+}
 
-    // Notifications toggle
-    const notifsToggle = document.getElementById('toggle-notifs');
-    notifsToggle.onchange = () => { notifsOn = notifsToggle.checked; };
+// Re-sample on every navigation
+webview.addEventListener('did-finish-load', () => {
+  if (ambientEnabled) sampleWebviewColors();
+});
+webview.addEventListener('did-navigate', () => {
+  if (ambientEnabled) setTimeout(sampleWebviewColors, 500);
+});
 
-    // About section
-    window.electronAPI.getVersion().then(v => {
-      document.getElementById('about-row').innerHTML =
-        `Kloak Desktop v${v}<br>
-         <a onclick="window.electronAPI.openExternal('https://kloak.app')">kloak.app</a> &nbsp;·&nbsp;
-         <a onclick="window.electronAPI.openExternal('https://github.com/Username1234hio/KloakDesktopAppBeta-Unoffical-')">GitHub</a>`;
-    });
-  </script>
+// Re-sample every 8s when active (page content can change)
+setInterval(() => { if (ambientEnabled) sampleWebviewColors(); }, 8000);
 
+// Restore state
+if (localStorage.getItem('ec_ambient') === '1') setAmbientEnabled(true);
+
+// ── Init ──────────────────────────────────────────
+renderWidgetBar();
+document.querySelector('[data-tab="main"]').addEventListener('click', renderWidgetConfig);
+</script>
 </body>
 </html>

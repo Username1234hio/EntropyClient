@@ -1,6 +1,6 @@
 {
   "name": "kloak-desktop-app",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "main": "main.js",
   "author": {
     "name": "Username1234hio",
@@ -22,13 +22,15 @@
   },
   "build": {
     "appId": "com.kloak.app",
-    "productName": "Kloak",
+    "productName": "Entropy Client",
     "files": [
       "main.js",
       "preload.js",
       "overlay.html",
+      "splash.png",
       "icon.ico",
-      "node_modules/**"
+      "node_modules/**",
+      "changelog.txt"
     ],
     "win": {
       "target": "nsis",
