@@ -11,14 +11,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Install dependencies
         run: npm install
-
       - name: Build Windows installer
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -28,15 +25,12 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Install dependencies
         run: npm install
-
-      - name: Build macOS DMG (Intel + Silicon)
+      - name: Build macOS DMG
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npm run dist:mac
@@ -50,7 +44,7 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Linux build dependencies
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -58,40 +52,46 @@ jobs:
             fakeroot \
             dpkg \
             libarchive-tools \
-            libglib2.0-dev \
-            libgtk-3-dev \
-            libnss3 \
-            libxss1 \
-            libasound2 \
+            icnsutils \
+            graphicsmagick \
             python3-pip
 
-      - name: Install Python imaging
-        run: pip3 install Pillow
-
-      - name: Validate and fix icon.png
+      - name: Ensure icon.png is valid 512x512 RGBA
         run: |
+          pip3 install --quiet Pillow
           python3 - << 'PYEOF'
           from PIL import Image
           import sys, os
 
           path = 'icon.png'
           if not os.path.exists(path):
-              print("ERROR: icon.png not found!")
+              print('ERROR: icon.png missing from repo root')
+              sys.exit(1)
+
+          try:
+              img = Image.open(path)
+              img.verify()
+          except Exception as e:
+              print(f'ERROR: icon.png is corrupt: {e}')
               sys.exit(1)
 
           img = Image.open(path)
-          print(f"Original: {img.size} {img.mode}")
+          changed = False
 
           if img.size != (512, 512):
-              print(f"Resizing to 512x512")
+              print(f'Resizing {img.size} -> (512, 512)')
               img = img.resize((512, 512), Image.LANCZOS)
+              changed = True
 
           if img.mode != 'RGBA':
-              print(f"Converting to RGBA")
+              print(f'Converting {img.mode} -> RGBA')
               img = img.convert('RGBA')
+              changed = True
 
-          img.save(path, 'PNG')
-          print(f"icon.png ready: {img.size} {img.mode}")
+          if changed:
+              img.save(path, 'PNG')
+
+          print(f'icon.png OK: {img.size} {img.mode}')
           PYEOF
 
       - name: Install node dependencies

@@ -1,6 +1,6 @@
 {
   "name": "kloak-desktop-app",
-  "version": "1.1.0",
+  "version": "1.0.1",
   "main": "main.js",
   "author": {
     "name": "Username1234hio",
@@ -29,8 +29,9 @@
       "overlay.html",
       "splash.png",
       "icon.ico",
-      "node_modules/**",
-      "changelog.txt"
+      "icon.png",
+      "icon.icns",
+      "node_modules/**"
     ],
     "win": {
       "target": "nsis",
