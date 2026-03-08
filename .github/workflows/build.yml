@@ -14,9 +14,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install dependencies
-        run: npm install
-      - name: Build Windows installer
+      - run: npm install
+      - name: Build Windows
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npm run dist:win
@@ -28,15 +27,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install dependencies
-        run: npm install
-      - name: Build macOS DMG
+      - run: npm install
+      - name: Build macOS
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npm run dist:mac
 
   build-linux:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
 
@@ -56,46 +54,23 @@ jobs:
             graphicsmagick \
             python3-pip
 
-      - name: Ensure icon.png is valid 512x512 RGBA
+      - name: Validate icon.png
         run: |
           pip3 install --quiet Pillow
           python3 - << 'PYEOF'
           from PIL import Image
           import sys, os
-
           path = 'icon.png'
           if not os.path.exists(path):
-              print('ERROR: icon.png missing from repo root')
-              sys.exit(1)
-
-          try:
-              img = Image.open(path)
-              img.verify()
-          except Exception as e:
-              print(f'ERROR: icon.png is corrupt: {e}')
-              sys.exit(1)
-
+              print('ERROR: icon.png missing'); sys.exit(1)
           img = Image.open(path)
-          changed = False
-
-          if img.size != (512, 512):
-              print(f'Resizing {img.size} -> (512, 512)')
-              img = img.resize((512, 512), Image.LANCZOS)
-              changed = True
-
-          if img.mode != 'RGBA':
-              print(f'Converting {img.mode} -> RGBA')
-              img = img.convert('RGBA')
-              changed = True
-
-          if changed:
-              img.save(path, 'PNG')
-
+          if img.size != (512, 512): img = img.resize((512, 512), Image.LANCZOS)
+          if img.mode != 'RGBA': img = img.convert('RGBA')
+          img.save(path, 'PNG')
           print(f'icon.png OK: {img.size} {img.mode}')
           PYEOF
 
-      - name: Install node dependencies
-        run: npm install
+      - run: npm install
 
       - name: Build Linux deb + rpm
         env:
