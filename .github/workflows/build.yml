@@ -31,39 +31,51 @@ jobs:
 
       - run: npm install
 
-      - name: Generate icon.icns from icon.png
+      - name: Generate valid icon.icns from icon.png
         run: |
-          # Build a proper .iconset from icon.png using sips, then pack with iconutil
-          mkdir -p entropy.iconset
-          for size in 16 32 64 128 256 512; do
-            sips -z $size $size icon.png --out entropy.iconset/icon_${size}x${size}.png
-            double=$((size * 2))
-            sips -z $double $double icon.png --out entropy.iconset/icon_${size}x${size}@2x.png
-          done
-          iconutil -c icns entropy.iconset -o icon.icns
-          echo "Generated icon.icns:"
-          ls -lh icon.icns
+          mkdir -p AppIcon.iconset
+          sips -z 16   16   icon.png --out AppIcon.iconset/icon_16x16.png
+          sips -z 32   32   icon.png --out AppIcon.iconset/icon_16x16@2x.png
+          sips -z 32   32   icon.png --out AppIcon.iconset/icon_32x32.png
+          sips -z 64   64   icon.png --out AppIcon.iconset/icon_32x32@2x.png
+          sips -z 128  128  icon.png --out AppIcon.iconset/icon_128x128.png
+          sips -z 256  256  icon.png --out AppIcon.iconset/icon_128x128@2x.png
+          sips -z 256  256  icon.png --out AppIcon.iconset/icon_256x256.png
+          sips -z 512  512  icon.png --out AppIcon.iconset/icon_256x256@2x.png
+          sips -z 512  512  icon.png --out AppIcon.iconset/icon_512x512.png
+          sips -z 1024 1024 icon.png --out AppIcon.iconset/icon_512x512@2x.png
+          iconutil -c icns AppIcon.iconset -o icon.icns
+          echo "Generated: $(ls -lh icon.icns)"
 
-      - name: Patch app-builder icon converter
+      - name: Patch electron-builder to skip icon conversion
         run: |
-          # Find the app-builder binary and wrap it to skip icon conversion panics
-          AB=$(find node_modules -name 'app-builder' -type f 2>/dev/null | head -1)
-          if [ -n "$AB" ]; then
-            mv "$AB" "${AB}.orig"
-            cat > "$AB" << 'SHEOF'
-          #!/bin/bash
-          # Skip icon-convert calls that cause panics; pass everything else through
-          if [[ "$*" == *"icon-convert"* ]]; then
-            echo "icon-convert skipped by wrapper" >&2
-            exit 0
-          fi
-          exec "${BASH_SOURCE[0]}.orig" "$@"
-          SHEOF
-            chmod +x "$AB"
-            echo "Patched app-builder at: $AB"
-          else
-            echo "app-builder binary not found — skipping patch"
-          fi
+          node -e "$(cat << 'JSEOF'
+          const fs = require('fs');
+          const { execSync } = require('child_process');
+          const dirs = [
+            'node_modules/app-builder-lib/out',
+            'node_modules/electron-builder-lib/out',
+            'node_modules/electron-builder/out',
+          ];
+          let n = 0;
+          for (const dir of dirs) {
+            if (!fs.existsSync(dir)) continue;
+            let files;
+            try { files = execSync('find ' + dir + ' -name "*.js"', {encoding:'utf8'}).trim().split('\n').filter(Boolean); }
+            catch(e) { continue; }
+            for (const f of files) {
+              let s; try { s = fs.readFileSync(f,'utf8'); } catch(e) { continue; }
+              const o = s;
+              s = s.replace(/\"icon-convert\"/g, '"icon-convert-disabled"');
+              s = s.replace(/'icon-convert'/g, "'icon-convert-disabled'");
+              s = s.replace(/await [\w.]+\.convertIcon\([^)]*\)/g, 'null');
+              s = s.replace(/await [\w.]+\.checkAndResolveIcons\([^)]*\)/g, 'null');
+              if (s !== o) { fs.writeFileSync(f,s); console.log('patched:',f); n++; }
+            }
+          }
+          console.log('total patched:',n);
+          JSEOF
+          )"
 
       - name: Build macOS
         env:
@@ -92,49 +104,28 @@ jobs:
           node << 'JSEOF'
           const fs = require('fs');
           const path = require('path');
-
-          // Find and patch the file that triggers "adding autoupdate files"
-          // This is in electron-builder's LinuxTargetHelper or similar
           const searchDirs = [
             'node_modules/electron-builder/out',
             'node_modules/electron-builder-lib/out',
             'node_modules/app-builder-lib/out',
           ];
-
           let patched = 0;
           for (const dir of searchDirs) {
             if (!fs.existsSync(dir)) continue;
-            const files = fs.readdirSync(dir, { recursive: true })
-              .filter(f => f.endsWith('.js'));
+            const files = fs.readdirSync(dir, { recursive: true }).filter(f => f.endsWith('.js'));
             for (const file of files) {
               const full = path.join(dir, file);
               let src = fs.readFileSync(full, 'utf8');
-              // Patch out the autoupdate/blockmap generation call
               if (src.includes('adding autoupdate files') || src.includes('addAutoUpdateFiles') || src.includes('blockmap')) {
                 const orig = src;
-                // Replace the function that generates autoupdate files with a no-op
-                src = src.replace(
-                  /async\s+addAutoUpdateFiles[^}]+\{[^}]+\}/g,
-                  'async addAutoUpdateFiles() { return; }'
-                );
-                src = src.replace(
-                  /await\s+[\w.]+\.addAutoUpdateFiles\([^)]*\)/g,
-                  '/* autoupdate disabled */'
-                );
-                // Also patch any direct app-builder blockmap calls
-                src = src.replace(
-                  /"blockmap"/g,
-                  '"blockmap-disabled"'
-                );
-                if (src !== orig) {
-                  fs.writeFileSync(full, src);
-                  console.log('Patched:', full);
-                  patched++;
-                }
+                src = src.replace(/async\s+addAutoUpdateFiles[^}]+\{[^}]+\}/g, 'async addAutoUpdateFiles() { return; }');
+                src = src.replace(/await\s+[\w.]+\.addAutoUpdateFiles\([^)]*\)/g, '/* autoupdate disabled */');
+                src = src.replace(/"blockmap"/g, '"blockmap-disabled"');
+                if (src !== orig) { fs.writeFileSync(full, src); console.log('Patched:', full); patched++; }
               }
             }
           }
-          console.log(`Total files patched: ${patched}`);
+          console.log('Total files patched:', patched);
           JSEOF
 
       - name: Build Linux deb + rpm
