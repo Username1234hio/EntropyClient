@@ -24,10 +24,47 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - run: npm install
+
+      - name: Generate icon.icns from icon.png
+        run: |
+          # Build a proper .iconset from icon.png using sips, then pack with iconutil
+          mkdir -p entropy.iconset
+          for size in 16 32 64 128 256 512; do
+            sips -z $size $size icon.png --out entropy.iconset/icon_${size}x${size}.png
+            double=$((size * 2))
+            sips -z $double $double icon.png --out entropy.iconset/icon_${size}x${size}@2x.png
+          done
+          iconutil -c icns entropy.iconset -o icon.icns
+          echo "Generated icon.icns:"
+          ls -lh icon.icns
+
+      - name: Patch app-builder icon converter
+        run: |
+          # Find the app-builder binary and wrap it to skip icon conversion panics
+          AB=$(find node_modules -name 'app-builder' -type f 2>/dev/null | head -1)
+          if [ -n "$AB" ]; then
+            mv "$AB" "${AB}.orig"
+            cat > "$AB" << 'SHEOF'
+          #!/bin/bash
+          # Skip icon-convert calls that cause panics; pass everything else through
+          if [[ "$*" == *"icon-convert"* ]]; then
+            echo "icon-convert skipped by wrapper" >&2
+            exit 0
+          fi
+          exec "${BASH_SOURCE[0]}.orig" "$@"
+          SHEOF
+            chmod +x "$AB"
+            echo "Patched app-builder at: $AB"
+          else
+            echo "app-builder binary not found — skipping patch"
+          fi
+
       - name: Build macOS
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}

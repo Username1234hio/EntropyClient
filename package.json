@@ -48,7 +48,7 @@
         { "target": "dmg", "arch": "x64" },
         { "target": "dmg", "arch": "arm64" }
       ],
-      "icon": "icon.icns",
+      "icon": "icon.png",
       "category": "public.app-category.social-networking"
     },
     "linux": {
