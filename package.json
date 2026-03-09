@@ -1,6 +1,6 @@
 {
   "name": "kloak-desktop-app",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Entropy Client - Unofficial desktop wrapper for kloak.app",
   "main": "main.js",
   "author": {
