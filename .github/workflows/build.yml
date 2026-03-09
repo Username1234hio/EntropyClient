@@ -50,14 +50,55 @@ jobs:
       - name: npm install
         run: npm install
 
-      - name: Patch app-builder to skip blockmap generation
+      - name: Patch out autoupdate file generation
         run: |
-          REAL="node_modules/app-builder-bin/linux/x64/app-builder"
-          mv "$REAL" "${REAL}.orig"
-          printf '#!/bin/bash\nfor arg in "$@"; do\n  if [[ "$arg" == *"blockmap"* ]] || [[ "$arg" == *"zip"* ]]; then\n    exit 0\n  fi\ndone\nexec "$(dirname "$0")/app-builder.orig" "$@"\n' > "$REAL"
-          chmod +x "$REAL"
-          echo "Wrapper installed"
-          cat "$REAL"
+          node << 'JSEOF'
+          const fs = require('fs');
+          const path = require('path');
+
+          // Find and patch the file that triggers "adding autoupdate files"
+          // This is in electron-builder's LinuxTargetHelper or similar
+          const searchDirs = [
+            'node_modules/electron-builder/out',
+            'node_modules/electron-builder-lib/out',
+            'node_modules/app-builder-lib/out',
+          ];
+
+          let patched = 0;
+          for (const dir of searchDirs) {
+            if (!fs.existsSync(dir)) continue;
+            const files = fs.readdirSync(dir, { recursive: true })
+              .filter(f => f.endsWith('.js'));
+            for (const file of files) {
+              const full = path.join(dir, file);
+              let src = fs.readFileSync(full, 'utf8');
+              // Patch out the autoupdate/blockmap generation call
+              if (src.includes('adding autoupdate files') || src.includes('addAutoUpdateFiles') || src.includes('blockmap')) {
+                const orig = src;
+                // Replace the function that generates autoupdate files with a no-op
+                src = src.replace(
+                  /async\s+addAutoUpdateFiles[^}]+\{[^}]+\}/g,
+                  'async addAutoUpdateFiles() { return; }'
+                );
+                src = src.replace(
+                  /await\s+[\w.]+\.addAutoUpdateFiles\([^)]*\)/g,
+                  '/* autoupdate disabled */'
+                );
+                // Also patch any direct app-builder blockmap calls
+                src = src.replace(
+                  /"blockmap"/g,
+                  '"blockmap-disabled"'
+                );
+                if (src !== orig) {
+                  fs.writeFileSync(full, src);
+                  console.log('Patched:', full);
+                  patched++;
+                }
+              }
+            }
+          }
+          console.log(`Total files patched: ${patched}`);
+          JSEOF
 
       - name: Build Linux deb + rpm
         env:
