@@ -82,9 +82,9 @@
       display: flex; align-items: center;
       padding: 0 8px; gap: 5px;
       border-bottom: 1px solid rgba(255,255,255,0.08);
-      background: var(--tb-bg, #111);
+      background: #111;
+      transition: background 0.5s ease;
     }
-    #titlebar.gradient-tb { background: var(--tb-gradient, linear-gradient(90deg,#1a0a00,#0a0018)) !important; }
 
     .tb-btn {
       -webkit-app-region: no-drag; height: 22px; padding: 0 8px; border: none; border-radius: 4px;
@@ -99,8 +99,9 @@
 
     /* ── Pinned widgets bar ── */
     #widget-bar {
-      -webkit-app-region: no-drag;
+      -webkit-app-region: drag;
       display: flex; align-items: center; gap: 4px; flex: 1;
+      padding: 0 4px;
     }
     .tb-widget {
       display: flex; align-items: center; gap: 4px;
@@ -125,6 +126,82 @@
     .ctrl { -webkit-app-region: no-drag; width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; opacity: 0.8; transition: opacity 0.15s, transform 0.1s; }
     .ctrl:hover { opacity: 1; transform: scale(1.2); }
     #btn-close { background: #ff5f57; } #btn-minimize { background: #febc2e; } #btn-maximize { background: #28c840; }
+
+
+    /* ── Favourites star ── */
+    #btn-star {
+      width: 26px; height: 26px; padding: 0; border: none; background: transparent;
+      font-size: 15px; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; border-radius: 5px; transition: background 0.15s;
+      -webkit-app-region: no-drag; color: rgba(255,255,255,0.45); flex-shrink: 0;
+      user-select: none;
+    }
+    #btn-star:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
+    #btn-star.starred { color: #febc2e; }
+    @keyframes starSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    #btn-star.spin { animation: starSpin 0.45s cubic-bezier(0.4,0,0.2,1); }
+
+    /* ── Favourites popup ── */
+    #fav-popup {
+      position: fixed; top: 40px; left: 120px;
+      width: 300px; max-height: 420px;
+      background: #141414; border: 1px solid #2a2a2a;
+      border-radius: 10px; box-shadow: 0 12px 40px rgba(0,0,0,0.8);
+      z-index: 9999; display: none; flex-direction: column;
+      overflow: hidden; -webkit-app-region: no-drag;
+      transform-origin: top left;
+      animation: favPop 0.18s cubic-bezier(0.34,1.4,0.64,1);
+    }
+    #fav-popup.open { display: flex; }
+    @keyframes favPop { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
+    #fav-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; border-bottom: 1px solid #222;
+      font-size: 12px; font-weight: 700; color: #ccc;
+    }
+    #fav-header span:first-child { font-size: 15px; }
+    #fav-list {
+      flex: 1; overflow-y: auto; padding: 8px;
+      scrollbar-width: thin; scrollbar-color: #333 transparent;
+    }
+    .fav-server {
+      margin-bottom: 6px; border-radius: 7px;
+      border: 1px solid #222; overflow: hidden;
+    }
+    .fav-server-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px; background: rgba(255,255,255,0.04);
+      cursor: pointer; transition: background 0.12s; user-select: none;
+    }
+    .fav-server-header:hover { background: rgba(255,255,255,0.08); }
+    .fav-server-icon { font-size: 14px; }
+    .fav-server-name { flex: 1; font-size: 12px; font-weight: 600; color: #ddd; }
+    .fav-server-count { font-size: 10px; color: #555; }
+    .fav-chevron { font-size: 9px; color: #555; transition: transform 0.2s; }
+    .fav-server.expanded .fav-chevron { transform: rotate(90deg); }
+    .fav-channels { display: none; padding: 4px 8px 6px 30px; }
+    .fav-server.expanded .fav-channels { display: flex; flex-direction: column; gap: 3px; }
+    .fav-channel {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 8px; border-radius: 5px; cursor: pointer;
+      font-size: 11px; color: #888; transition: background 0.1s, color 0.1s;
+    }
+    .fav-channel:hover { background: rgba(255,107,0,0.12); color: #ff9955; }
+    .fav-channel-remove {
+      margin-left: auto; opacity: 0; font-size: 10px; color: #555;
+      background: none; border: none; cursor: pointer; padding: 0 2px;
+      transition: opacity 0.15s; font-family: inherit;
+    }
+    .fav-channel:hover .fav-channel-remove { opacity: 1; }
+    #fav-empty {
+      text-align: center; padding: 28px 16px;
+      font-size: 11px; color: #444; line-height: 1.7;
+    }
+    #fav-empty .fav-empty-star { font-size: 28px; margin-bottom: 8px; }
+    #fav-footer {
+      padding: 8px 12px; border-top: 1px solid #1a1a1a;
+      font-size: 10px; color: #444; text-align: center;
+    }
 
     /* ── Settings panel ── */
     .panel { position: fixed; top: 36px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 9998; display: none; flex-direction: column; overflow: hidden; -webkit-app-region: no-drag; font-size: 12px; }
@@ -382,7 +459,7 @@
       <div id="ob-step-desc">A supercharged desktop wrapper for kloak.app with themes, effects, and powerful customisation tools.</div>
       <div id="ob-feature-list"></div>
       <div id="ob-footer">
-        <span id="ob-step-counter">Step 1 of 5</span>
+        <span id="ob-step-counter">Step 1 of 6</span>
         <div id="ob-nav">
           <button id="ob-skip" class="ob-skip">Skip tour</button>
           <button class="ob-btn" id="ob-back" style="display:none">← Back</button>
@@ -403,6 +480,23 @@
   <div id="cl-body"></div>
   <div id="cl-footer"><button id="cl-dismiss">Got it</button></div>
 </div>
+
+<!-- ── Favourites popup ── -->
+<div id="fav-popup">
+  <div id="fav-header">
+    <span>⭐</span>
+    <span>Favourite Channels</span>
+  </div>
+  <div id="fav-list">
+    <div id="fav-empty">
+      <div class="fav-empty-star">☆</div>
+      <div><strong style="color:#666">No favourites yet</strong></div>
+      <div>Navigate to a server and left-click the<br>★ star icon to save a channel.</div>
+    </div>
+  </div>
+  <div id="fav-footer">Right-click star to open · Left-click star to save current channel</div>
+</div>
+
 <webview id="site" src="https://kloak.app/auth?mode=login" allowpopups partition="persist:main"></webview>
 
 <!-- Titlebar -->
@@ -411,6 +505,7 @@
     <button class="tb-btn nav-btn" id="btn-back">‹</button>
     <button class="tb-btn nav-btn" id="btn-forward">›</button>
     <button class="tb-btn nav-btn" id="btn-reload">↻</button>
+    <button id="btn-star" title="Left-click to star this page · Right-click to view favourites">☆</button>
   </div>
   <div class="divider"></div>
   <!-- Pinned widgets -->
@@ -473,13 +568,14 @@
         <div class="sidebar-tab" data-tab="css"><span class="tab-icon">⚡</span> CSS Injector</div>
         <div class="sidebar-tab" data-tab="themes"><span class="tab-icon">🎨</span> Themes</div>
 
-        <div class="sidebar-tab" data-tab="bookmarks"><span class="tab-icon">🔖</span> Bookmarks</div>
+        <div class="sidebar-tab" data-tab="bookmarks"><span class="tab-icon">⭐</span> Starred Channels</div>
         <div class="sidebar-tab" data-tab="notes"><span class="tab-icon">📝</span> Notes</div>
         <div class="sidebar-tab" data-tab="history"><span class="tab-icon">🕐</span> History</div>
         <div class="sidebar-tab" data-tab="keybinds"><span class="tab-icon">⌨️</span> Keybinds</div>
         <div class="sidebar-tab" data-tab="accounts"><span class="tab-icon">👤</span> Accounts</div>
         <div class="sidebar-tab" data-tab="blocker"><span class="tab-icon">🚫</span> Blocker</div>
         <div class="sidebar-tab locked" id="fun-tab" data-tab="fun"><span class="tab-icon">✨</span> Fun & Effects</div>
+        <div class="sidebar-tab locked" id="addons-tab" data-tab="addons" style="opacity:0.38;cursor:not-allowed;pointer-events:none"><span class="tab-icon">🧩</span> Addons <span style="font-size:9px;background:rgba(255,255,255,0.08);border-radius:3px;padding:1px 5px;margin-left:4px;color:#555">Soon</span></div>
         <div id="sidebar-footer"><kbd>Esc</kbd> to close<br><span id="konami-hint" style="display:none;color:#ff6b00;font-size:9px">✦ secret unlocked</span></div>
       </div>
 
@@ -610,20 +706,33 @@ body { background: #0a0a0a !important; }"></textarea>
           <div class="slider-row"><label>Background opacity</label><input type="range" id="modal-opacity-slider" min="10" max="98" value="92"><span id="modal-opacity-val">92%</span></div>
           <div class="slider-row"><label>Blur intensity</label><input type="range" id="modal-blur-slider" min="0" max="40" value="20"><span id="modal-blur-val">20px</span></div>
 
-          <div class="section-title">Custom CSS Theme</div>
+          <div class="section-title">Paste CSS Theme</div>
           <textarea class="code-input" id="custom-css-input" style="height:80px" placeholder="body { background: #0a0a0a !important; }"></textarea>
-          <button class="act-btn btn-blue" id="apply-custom-theme" style="margin-top:8px">▶ Apply Custom Theme</button>
+          <button class="act-btn btn-blue" id="apply-custom-theme" style="margin-top:8px">▶ Apply Pasted Theme</button>
         </div>
 
-        <!-- Bookmarks -->
+        <!-- Starred Channels -->
         <div class="tab-pane" id="pane-bookmarks">
-          <div class="section-title">Saved Bookmarks</div>
+
+          <!-- ── Starred Channels section (mirrors star popup) ── -->
+          <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>⭐ Starred Channels</span>
+            <button id="modal-fav-add-current" style="padding:3px 10px;border:1px solid #333;border-radius:5px;background:transparent;color:#aaa;font-size:10px;cursor:pointer;font-family:inherit;transition:all 0.15s" onmouseover="this.style.borderColor='#febc2e';this.style.color='#febc2e'" onmouseout="this.style.borderColor='#333';this.style.color='#aaa'">★ Star current page</button>
+          </div>
+          <div style="font-size:11px;color:#555;margin-bottom:10px">Servers and channels you've starred from the titlebar.</div>
+          <div id="modal-fav-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:4px"></div>
+          <div id="modal-fav-empty" style="text-align:center;padding:24px 0;color:#444;font-size:11px;display:none">
+            <div style="font-size:26px;margin-bottom:8px">☆</div>
+            No starred channels yet.<br>
+            <span style="color:#333">Navigate to a channel and click the ★ star in the titlebar.</span>
+          </div>
+
+          <div class="section-title" style="margin-top:20px">🔖 URL Bookmarks</div>
           <div id="bookmark-list"></div>
-          <div class="section-title">Add Bookmark</div>
-          <div class="add-bm-row">
-            <input class="mini-input" id="bm-name" placeholder="Name">
-            <input class="mini-input" id="bm-url"  placeholder="https://...">
-            <button class="act-btn btn-green" id="bm-add" style="white-space:nowrap">+ Add</button>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input class="mini-input" id="bm-name" placeholder="Name" style="flex:1">
+            <input class="mini-input" id="bm-url"  placeholder="https://..." style="flex:2">
+            <button class="act-btn btn-green" id="bm-add" style="white-space:nowrap;flex-shrink:0">+ Add</button>
           </div>
           <div class="status-line" id="bm-status"></div>
         </div>
@@ -746,6 +855,17 @@ body { background: #0a0a0a !important; }"></textarea>
                 <button class="fun-btn" id="screenshot-btn">📸 Capture</button>
               </div>
             </div>
+          </div>
+        </div>
+
+
+        <!-- Addons (coming soon) -->
+        <div class="tab-pane" id="pane-addons">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:320px;gap:16px;opacity:0.45;pointer-events:none;user-select:none">
+            <div style="font-size:52px">🧩</div>
+            <div style="font-size:16px;font-weight:700;color:#ccc">Addons</div>
+            <div style="font-size:12px;color:#666;text-align:center;max-width:260px;line-height:1.7">Install community-built addons to extend Entropy Client with new features, integrations, and UI tweaks.</div>
+            <div style="padding:6px 16px;border:1px solid #2a2a2a;border-radius:6px;font-size:11px;color:#555;background:rgba(255,255,255,0.03)">Coming soon</div>
           </div>
         </div>
 
@@ -1045,23 +1165,34 @@ webview.addEventListener('did-navigate',async()=>{
   injectedKey=null;
   const css=document.getElementById('css-input').value.trim();
   if(css){try{injectedKey=await webview.insertCSS(css);setStatus('✔ Re-applied.','ok');}catch{}}
-  if(activeTheme!=='default'){const t=THEMES.find(t=>t.id===activeTheme);if(t&&t.css){try{themeKey=await webview.insertCSS(t.css);}catch{}}}
+  if(activeTheme&&activeTheme!=='default'){const t=THEMES.find(t=>t.id===activeTheme);const css=t?t.css:null;if(css){try{themeKey=await webview.insertCSS(css);}catch{}}}
   applyBlockRules();
 });
 function setStatus(msg,type){const s=document.getElementById('css-status');s.textContent=msg;s.className='status-line '+type;}
 
 // ── Themes ───────────────────────────────────────
+function makeThemeCss(bg,accent,text='#e2e8f0',surface='rgba(255,255,255,0.06)',border='rgba(255,255,255,0.1)'){
+  return `*{--ec-bg:${bg};--ec-accent:${accent};--ec-text:${text};--ec-surface:${surface};--ec-border:${border}}
+html,body,#root,#app,[class*="layout"],[class*="main"],[class*="wrapper"],[class*="container"],[class*="page"]{background:${bg}!important;color:${text}!important}
+[class*="sidebar"],[class*="panel"],[class*="drawer"]{background:color-mix(in srgb,${bg} 85%,#000)!important}
+[class*="card"],[class*="message"],[class*="item"],[class*="row"]:not(tr){background:${surface}!important}
+[class*="input"],[class*="textarea"],[class*="select"]{background:rgba(0,0,0,0.3)!important;color:${text}!important;border-color:${border}!important}
+a,[class*="link"]{color:${accent}!important}
+[class*="button"],[class*="btn"]:not([class*="icon"]){background:${accent}!important;color:#fff!important}
+[class*="header"],[class*="topbar"],[class*="navbar"]{background:color-mix(in srgb,${bg} 90%,#000)!important;border-color:${border}!important}
+::-webkit-scrollbar-track{background:${bg}!important}::-webkit-scrollbar-thumb{background:${accent}!important}`;
+}
 const THEMES=[
   {id:'default',   name:'Default',   preview:{bg:'#1e2124',accent:'#94a3b8'},css:''},
-  {id:'entropy',   name:'Entropy',   preview:{bg:'#0d0800',accent:'#ff6b00'},css:'body,html{background:#0d0800!important}'},
-  {id:'midnight',  name:'Midnight',  preview:{bg:'#0a0a18',accent:'#818cf8'},css:'body,html{background:#0a0a18!important}'},
-  {id:'forest',    name:'Forest',    preview:{bg:'#0a1a0a',accent:'#4ade80'},css:'body,html{background:#0a1a0a!important}'},
-  {id:'ocean',     name:'Ocean',     preview:{bg:'#071428',accent:'#38bdf8'},css:'body,html{background:#071428!important}'},
-  {id:'rose',      name:'Rose',      preview:{bg:'#180a0f',accent:'#fb7185'},css:'body,html{background:#180a0f!important}'},
-  {id:'amoled',    name:'AMOLED',    preview:{bg:'#000',accent:'#444'},      css:'body,html{background:#000!important}'},
-  {id:'solarized', name:'Solarized', preview:{bg:'#002b36',accent:'#268bd2'},css:'body,html{background:#002b36!important}'},
-  {id:'synthwave', name:'Synthwave', preview:{bg:'#1a0533',accent:'#f72585'},css:'body,html{background:#1a0533!important}'},
-  {id:'mocha',     name:'Mocha',     preview:{bg:'#181310',accent:'#cba6f7'},css:'body,html{background:#181310!important}'},
+  {id:'entropy',   name:'Entropy',   preview:{bg:'#0d0800',accent:'#ff6b00'},css:makeThemeCss('#0d0800','#ff6b00','#ffd4a8','rgba(255,107,0,0.08)','rgba(255,107,0,0.2)')},
+  {id:'midnight',  name:'Midnight',  preview:{bg:'#0a0a18',accent:'#818cf8'},css:makeThemeCss('#0a0a18','#818cf8','#c7d2fe','rgba(129,140,248,0.08)','rgba(129,140,248,0.2)')},
+  {id:'forest',    name:'Forest',    preview:{bg:'#071a07',accent:'#4ade80'},css:makeThemeCss('#071a07','#4ade80','#bbf7d0','rgba(74,222,128,0.08)','rgba(74,222,128,0.2)')},
+  {id:'ocean',     name:'Ocean',     preview:{bg:'#040e1e',accent:'#38bdf8'},css:makeThemeCss('#040e1e','#38bdf8','#bae6fd','rgba(56,189,248,0.08)','rgba(56,189,248,0.2)')},
+  {id:'rose',      name:'Rose',      preview:{bg:'#180a0f',accent:'#fb7185'},css:makeThemeCss('#180a0f','#fb7185','#fecdd3','rgba(251,113,133,0.08)','rgba(251,113,133,0.2)')},
+  {id:'amoled',    name:'AMOLED',    preview:{bg:'#000000',accent:'#ffffff'},css:makeThemeCss('#000000','#ffffff','#e5e5e5','rgba(255,255,255,0.05)','rgba(255,255,255,0.12)')},
+  {id:'solarized', name:'Solarized', preview:{bg:'#002b36',accent:'#268bd2'},css:makeThemeCss('#002b36','#268bd2','#93a1a1','rgba(38,139,210,0.1)','rgba(38,139,210,0.25)')},
+  {id:'synthwave', name:'Synthwave', preview:{bg:'#1a0533',accent:'#f72585'},css:makeThemeCss('#1a0533','#f72585','#f8c8ff','rgba(247,37,133,0.1)','rgba(247,37,133,0.25)')},
+  {id:'mocha',     name:'Mocha',     preview:{bg:'#181310',accent:'#cba6f7'},css:makeThemeCss('#181310','#cba6f7','#cdd6f4','rgba(203,166,247,0.08)','rgba(203,166,247,0.2)')},
 ];
 
 // Populate scheduler dropdowns
@@ -1072,27 +1203,43 @@ const THEMES=[
 document.getElementById('sched-night').value='midnight';
 
 const grid=document.getElementById('theme-grid');
-THEMES.forEach(theme=>{
-  const card=document.createElement('div');
-  card.className='theme-card'+(theme.id==='default'?' active':'');
-  card.innerHTML=`<div class="theme-preview" style="background:${theme.preview.bg};color:${theme.preview.accent}">${theme.name}</div><div class="theme-name">${theme.name}</div>`;
-  card.onclick=()=>applyTheme(theme.id);
-  grid.appendChild(card);
-});
-async function applyTheme(id){
-  if(themeKey){try{await webview.removeInsertedCSS(themeKey);themeKey=null;}catch{}}
+function buildThemeCards(){
+  grid.innerHTML='';
+  THEMES.forEach(theme=>{
+    const card=document.createElement('div');
+    card.className='theme-card'+(theme.id===activeTheme?' active':'');
+    card.dataset.id=theme.id;
+    card.innerHTML=`<div class="theme-preview" style="background:${theme.preview.bg};color:${theme.preview.accent}"><span style="font-size:9px;opacity:0.7">Aa</span></div><div class="theme-name">${theme.name}</div>`;
+    card.onclick=()=>applyTheme(theme.id);
+    grid.appendChild(card);
+  });
+}
+buildThemeCards();
+// Restore saved theme on startup
+(async()=>{const saved=localStorage.getItem('ec_active_theme');if(saved&&saved!=='default')await applyTheme(saved);})();
+async function applyTheme(id, css=null){
+  // Remove previous theme CSS
+  if(themeKey){
+    try{await webview.removeInsertedCSS(themeKey);}catch{}
+    themeKey=null;
+  }
   activeTheme=id;
-  document.querySelectorAll('.theme-card').forEach((c,i)=>c.classList.toggle('active',THEMES[i].id===id));
-  const t=THEMES.find(t=>t.id===id);
-  if(t&&t.css){try{themeKey=await webview.insertCSS(t.css);}catch{}}
+  localStorage.setItem('ec_active_theme', id);
+  // Update active card highlight — works for both built-in and custom cards
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('active'));
+  const match=document.querySelector(`.theme-card[data-id="${id}"]`);
+  if(match)match.classList.add('active');
+  // Apply CSS
+  const themeCss = css || (THEMES.find(t=>t.id===id)||{}).css || '';
+  if(themeCss){
+    try{themeKey=await webview.insertCSS(themeCss);}
+    catch(e){console.warn('Theme apply failed:',e);}
+  }
 }
 document.getElementById('apply-custom-theme').onclick=async()=>{
   const css=document.getElementById('custom-css-input').value.trim();
   if(!css)return;
-  if(themeKey){try{await webview.removeInsertedCSS(themeKey);themeKey=null;}catch{}}
-  activeTheme='custom';
-  document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('active'));
-  try{themeKey=await webview.insertCSS(css);}catch{}
+  await applyTheme('custom', css);
 };
 
 // Theme scheduler
@@ -1112,13 +1259,29 @@ function updateTbGradient(){
   const a=document.getElementById('tb-color-a').value;
   const b=document.getElementById('tb-color-b').value;
   const angle=document.getElementById('tb-angle').value;
+  const grad=`linear-gradient(${angle}deg,${a},${b})`;
   const tb=document.getElementById('titlebar');
-  if(on){tb.style.background=`linear-gradient(${angle}deg,${a},${b})`;tb.classList.add('gradient-tb');}
-  else{tb.style.background='';tb.classList.remove('gradient-tb');}
-  document.getElementById('tb-preview').style.background=`linear-gradient(${angle}deg,${a},${b})`;
+  // Set inline style directly — no class, no CSS variable conflict
+  tb.style.background = on ? grad : '#111';
+  const prev=document.getElementById('tb-preview');
+  if(prev) prev.style.background=grad;
+  // Persist
+  localStorage.setItem('ec_tb_gradient', JSON.stringify({on,a,b,angle}));
+}
+function loadTbGradient(){
+  try{
+    const s=JSON.parse(localStorage.getItem('ec_tb_gradient')||'null');
+    if(!s)return;
+    document.getElementById('tb-gradient-toggle').checked=s.on;
+    document.getElementById('tb-color-a').value=s.a;
+    document.getElementById('tb-color-b').value=s.b;
+    document.getElementById('tb-angle').value=s.angle;
+    document.getElementById('tb-angle-val').textContent=s.angle+'°';
+    updateTbGradient();
+  }catch{}
 }
 ['tb-gradient-toggle','tb-color-a','tb-color-b','tb-angle'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{document.getElementById('tb-angle-val').textContent=document.getElementById('tb-angle').value+'°';updateTbGradient();}));
-updateTbGradient();
+loadTbGradient();  // restore persisted gradient on startup
 
 // Modal appearance
 document.getElementById('modal-opacity-slider').oninput=e=>{document.getElementById('modal-opacity-val').textContent=e.target.value+'%';document.getElementById('modal').style.background=`rgba(15,15,20,${e.target.value/100})`;};
@@ -1431,7 +1594,7 @@ document.getElementById('crash-reload').onclick = () => {
 const OB_STEPS = [
   {
     icon: '⚡', title: 'Welcome to Entropy Client',
-    desc: 'A supercharged desktop wrapper for kloak.app. Lets take a quick tour of whats available.',
+    desc: 'A supercharged desktop wrapper for kloak.app. Let\'s take a quick tour of what\'s available.',
     features: [
       ['🎨', 'Full theme system with 10 built-in themes'],
       ['⚡', 'CSS injector to customise any element'],
@@ -1466,7 +1629,16 @@ const OB_STEPS = [
     ]
   },
   {
-    icon: '🚀', title: 'You are all set!',
+    icon: '⭐', title: 'Favourite Channels',
+    desc: 'Star any server channel to save it instantly. Left-click the star (☆) in the titlebar to favourite the current page — right-click it to open your saved channels list.',
+    features: [
+      ['☆', 'Left-click the star to save the current channel'],
+      ['🖱️', 'Right-click the star to open your favourites list'],
+      ['✕', 'Remove individual channels from inside the popup'],
+    ]
+  },
+  {
+    icon: '🚀', title: 'You\'re all set!',
     desc: 'Entropy Client is ready to use. You can revisit this tour anytime from Main Settings.',
     features: [
       ['✦', 'Try the Konami code for a secret surprise'],
@@ -1676,9 +1848,522 @@ setInterval(() => { if (ambientEnabled) sampleWebviewColors(); }, 8000);
 // Restore state
 if (localStorage.getItem('ec_ambient') === '1') setAmbientEnabled(true);
 
+
+// ══════════════════════════════════════════════════
+// CUSTOM THEMES — CSS PARSER + POPUP
+// ══════════════════════════════════════════════════
+
+// ── CSS Section Parser ───────────────────────────
+// Parses a .css file into named sections using /* SectionName */ markers.
+// Supported top-level sections: Root, Themes
+// Root sub-sections: Root-Background, Root-DMBackground, Root-Colors, Root-Channels, Root-ChannelsBG, Root-ChannelText, Root-ChannelText-BG, Root-AccountText, Root-UsernameColor, Root-MembersBG
+// Themes sub-sections: Theme-Light, Theme-Dark, Theme-Darker, Theme-Midnight
+function parseCssThemeFile(raw) {
+  const result = {
+    meta: { name: '', description: '' },
+    root: { background: '', colors: '', channels: '', channelsBG: '', channelText: '', channelTextBG: '', accountText: '', membersBG: '', dmBackground: '', usernameColor: '', other: '' },
+    themes: { light: '', dark: '', darker: '', midnight: '' },
+    raw
+  };
+
+  // Extract @meta block if present: /* @name My Theme \n @description ... */
+  const metaMatch = raw.match(/@name\s+([^\n\r*]+)/i);
+  if (metaMatch) result.meta.name = metaMatch[1].trim();
+  const descMatch = raw.match(/@description\s+([^\n\r*]+)/i);
+  if (descMatch) result.meta.description = descMatch[1].trim();
+
+  // Split into sections by /* SectionName */ markers (case-insensitive)
+  const sectionRegex = /\/\*\s*(Root(?:-\w+)?|Themes?(?:-\w+)?|Theme-(?:Light|Dark(?:er)?|Midnight))\s*\*\/([\s\S]*?)(?=\/\*\s*(?:Root|Theme)|$)/gi;
+  let m;
+  while ((m = sectionRegex.exec(raw)) !== null) {
+    const sectionName = m[1].trim().toLowerCase().replace(/^theme-/, '');
+    const sectionCss  = m[2].trim();
+    if (!sectionCss) continue;
+    switch (sectionName) {
+      case 'root':               result.root.other       += sectionCss + ''; break;
+      case 'root-background':    result.root.background   = sectionCss; break;
+      case 'root-dmbackground':  result.root.dmBackground = sectionCss; break;
+      case 'root-colors':       result.root.colors      = sectionCss; break;
+      case 'root-channels':     result.root.channels    = sectionCss; break;
+      case 'root-channelsbg':   result.root.channelsBG  = sectionCss; break;
+      case 'root-channeltext':   result.root.channelText   = sectionCss; break;
+      case 'root-channeltext-bg': result.root.channelTextBG = sectionCss; break;
+      case 'root-accounttext':  result.root.accountText  = sectionCss; break;
+      case 'root-usernamecolor': result.root.usernameColor = sectionCss; break;
+      case 'root-membersbg':    result.root.membersBG   = sectionCss; break;
+      case 'themes':            /* container, skip */ break;
+      case 'light':             result.themes.light     = sectionCss; break;
+      case 'dark':              result.themes.dark      = sectionCss; break;
+      case 'darker':            result.themes.darker    = sectionCss; break;
+      case 'midnight':          result.themes.midnight  = sectionCss; break;
+    }
+  }
+
+  return result;
+}
+
+// Build the combined CSS for a parsed theme given a selected variation
+function buildCssFromParsed(parsed, variation = 'dark') {
+  const r = parsed.root;
+  const t = parsed.themes;
+  const variationCss = t[variation] || t.dark || '';
+  // Order: colors (variables) → background → channels → channelText → variation → other root
+  return [r.colors, r.background, r.dmBackground, r.membersBG, r.channelsBG, r.channels, r.channelText, r.channelTextBG, r.accountText, r.usernameColor, variationCss, r.other]
+    .filter(Boolean).join('\n\n');
+}
+
+// ── Popup state ──────────────────────────────────
+let ctParsedThemes = []; // [{name, file, parsed}]
+
+function openCtPopup() {
+  const bd = document.getElementById('ct-backdrop');
+  bd.style.display = 'flex';
+  requestAnimationFrame(() => {
+    document.getElementById('ct-popup').style.transform = 'scale(1)';
+  });
+  refreshCtPopup();
+}
+
+function closeCtPopup() {
+  document.getElementById('ct-popup').style.transform = 'scale(0.96)';
+  setTimeout(() => { document.getElementById('ct-backdrop').style.display = 'none'; }, 220);
+}
+
+async function refreshCtPopup() {
+  const list  = document.getElementById('ct-list');
+  const empty = document.getElementById('ct-empty');
+  if (!window.electronAPI?.themesList) return;
+
+  list.querySelectorAll('.ct-theme-card').forEach(el => el.remove());
+
+  let files = [];
+  try { files = await window.electronAPI.themesList(); } catch {}
+  ctParsedThemes = [];
+  empty.style.display = files.length ? 'none' : '';
+
+  for (const {name, file} of files) {
+    const raw = await window.electronAPI.themesRead(file).catch(() => null);
+    if (!raw) continue;
+    const parsed = parseCssThemeFile(raw);
+    if (!parsed.meta.name) parsed.meta.name = name;
+    ctParsedThemes.push({ name: parsed.meta.name, file, parsed });
+
+    // Determine available variations
+    const variations = [];
+    if (parsed.themes.light)    variations.push({ key:'light',    label:'Light'    });
+    if (parsed.themes.dark)     variations.push({ key:'dark',     label:'Dark'     });
+    if (parsed.themes.darker)   variations.push({ key:'darker',   label:'Darker'   });
+    if (parsed.themes.midnight) variations.push({ key:'midnight', label:'Midnight' });
+    const hasVariations = variations.length > 0;
+    // If no named variations, treat the whole file as one theme
+    if (!hasVariations) variations.push({ key: '_raw', label: 'Apply' });
+
+    // Detect section presence for badges
+    const sectionBadges = [];
+    if (parsed.root.background)   sectionBadges.push('Background');
+    if (parsed.root.dmBackground)  sectionBadges.push('DMBackground');
+    if (parsed.root.usernameColor) sectionBadges.push('UsernameColor');
+    if (parsed.root.colors)       sectionBadges.push('Colors');
+    if (parsed.root.channels)     sectionBadges.push('Channels');
+    if (parsed.root.channelsBG)    sectionBadges.push('ChannelsBG');
+    if (parsed.root.channelTextBG) sectionBadges.push('ChannelTextBG');
+    if (parsed.root.channelText)  sectionBadges.push('ChannelText');
+    if (parsed.root.accountText)  sectionBadges.push('AccountText');
+    if (parsed.root.membersBG)    sectionBadges.push('MembersBG');
+
+    const card = document.createElement('div');
+    card.className = 'ct-theme-card';
+    card.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid #252525;border-radius:10px;padding:14px 16px;transition:border-color 0.15s;';
+
+    const badgesHtml = sectionBadges.map(b =>
+      `<span style="font-size:9px;padding:2px 6px;border-radius:3px;background:rgba(255,107,0,0.12);color:#ff9955;border:1px solid rgba(255,107,0,0.2)">${b}</span>`
+    ).join('');
+
+    const varBtnsHtml = variations.map(v =>
+      `<button class="ct-var-btn" data-file="${file}" data-var="${v.key}"
+        style="padding:5px 14px;border:1px solid #333;border-radius:6px;background:transparent;color:#aaa;font-size:11px;cursor:pointer;font-family:inherit;transition:all 0.15s;"
+        onmouseover="this.style.background='rgba(255,107,0,0.15)';this.style.borderColor='#ff6b00';this.style.color='#ff9955'"
+        onmouseout="if(!this.classList.contains('active-var')){this.style.background='transparent';this.style.borderColor='#333';this.style.color='#aaa'}"
+      >${v.label}</button>`
+    ).join('');
+
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+        <div style="font-size:22px;margin-top:2px">🎨</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:3px">${parsed.meta.name}</div>
+          ${parsed.meta.description ? `<div style="font-size:11px;color:#666;margin-bottom:6px">${parsed.meta.description}</div>` : ''}
+          <div style="display:flex;flex-wrap:wrap;gap:4px">${badgesHtml}</div>
+        </div>
+        <div style="font-size:10px;color:#444">${file}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${varBtnsHtml}</div>
+    `;
+    list.appendChild(card);
+  }
+
+  // Wire variation buttons
+  list.querySelectorAll('.ct-var-btn').forEach(btn => {
+    btn.onclick = async () => {
+      const file = btn.dataset.file;
+      const varKey = btn.dataset.var;
+      const entry = ctParsedThemes.find(t => t.file === file);
+      if (!entry) return;
+
+      let css;
+      if (varKey === '_raw') {
+        css = entry.parsed.raw;
+      } else {
+        css = buildCssFromParsed(entry.parsed, varKey);
+      }
+      if (!css) return;
+
+      // Visual feedback
+      document.querySelectorAll('.ct-var-btn').forEach(b => {
+        b.classList.remove('active-var');
+        b.style.background = 'transparent';
+        b.style.borderColor = '#333';
+        b.style.color = '#aaa';
+      });
+      btn.classList.add('active-var');
+      btn.style.background = 'rgba(255,107,0,0.2)';
+      btn.style.borderColor = '#ff6b00';
+      btn.style.color = '#ff9955';
+      btn.textContent = '✓ Applied';
+      setTimeout(() => { btn.textContent = btn.dataset.var === '_raw' ? 'Apply' : btn.dataset.var.charAt(0).toUpperCase() + btn.dataset.var.slice(1); }, 1800);
+
+      await applyTheme('file:'+file+':'+varKey, css);
+      // Clear built-in card highlights, then mark custom tile as active with theme name
+      document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+      const customTile = document.querySelector('.theme-card[data-id="_custom_folder"]');
+      if(customTile){
+        const varLabel = varKey === '_raw' ? '' : (' · ' + varKey.charAt(0).toUpperCase() + varKey.slice(1));
+        customTile.querySelector('.theme-name').textContent = entry.parsed.meta.name + varLabel;
+        customTile.querySelector('.theme-name').style.color = '#ff5f57';
+        customTile.querySelector('.theme-preview').textContent = '🎨';
+        customTile.classList.add('active');
+      }
+      closeCtPopup();
+    };
+  });
+}
+
+// Add "Custom Themes" tile to the theme grid
+(function addCustomTile(){
+  const g = document.getElementById('theme-grid');
+  if(!g) return;
+  const card = document.createElement('div');
+  card.className = 'theme-card';
+  card.dataset.id = '_custom_folder';
+  card.innerHTML = `<div class="theme-preview" style="background:linear-gradient(135deg,#1a0a00,#0a001a);color:#ff6b00;display:flex;align-items:center;justify-content:center;font-size:18px">📁</div><div class="theme-name">Custom</div>`;
+  card.onclick = openCtPopup;
+  g.appendChild(card);
+})();
+
+// Popup close handlers
+function initCtPopup(){
+  document.getElementById('ct-close').onclick        = closeCtPopup;
+  document.getElementById('ct-backdrop').onclick     = e => { if(e.target.id==='ct-backdrop') closeCtPopup(); };
+  document.getElementById('ct-refresh').onclick      = refreshCtPopup;
+  document.getElementById('ct-open-folder').onclick  = () => window.electronAPI?.themesOpenFolder();
+}
+// Wire after DOM is fully parsed
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', initCtPopup);
+} else {
+  initCtPopup();
+}
+
+
+// ══════════════════════════════════════════════════
+// FAVOURITE CHANNELS
+// ══════════════════════════════════════════════════
+// Data structure: { serverName: str, serverIcon: str, channels: [{name, url}] }[]
+let favData = [];
+try { favData = JSON.parse(localStorage.getItem('ec_favourites') || '[]'); } catch {}
+
+function saveFavs() {
+  localStorage.setItem('ec_favourites', JSON.stringify(favData));
+}
+
+function getCurrentPageInfo() {
+  let url = '';
+  let title = '';
+  try { url = webview.getURL(); title = webview.getTitle() || url; } catch {}
+  return { url, title };
+}
+
+function isCurrentUrlFavourited() {
+  const { url } = getCurrentPageInfo();
+  return favData.some(s => s.channels.some(ch => ch.url === url));
+}
+
+function updateStarAppearance() {
+  const btn = document.getElementById('btn-star');
+  if (!btn) return;
+  if (isCurrentUrlFavourited()) {
+    btn.textContent = '★';
+    btn.classList.add('starred');
+    btn.title = 'Left-click to unfave · Right-click to view favourites';
+  } else {
+    btn.textContent = '☆';
+    btn.classList.remove('starred');
+    btn.title = 'Left-click to star this page · Right-click to view favourites';
+  }
+}
+
+function toggleFavourite() {
+  const { url, title } = getCurrentPageInfo();
+  if (!url || url === 'about:blank') return;
+
+  const btn = document.getElementById('btn-star');
+
+  // Spin animation
+  btn.classList.remove('spin');
+  void btn.offsetWidth; // reflow to restart
+  btn.classList.add('spin');
+  btn.addEventListener('animationend', () => btn.classList.remove('spin'), { once: true });
+
+  if (isCurrentUrlFavourited()) {
+    // Remove it
+    favData.forEach(s => {
+      s.channels = s.channels.filter(ch => ch.url !== url);
+    });
+    favData = favData.filter(s => s.channels.length > 0);
+  } else {
+    // Parse server name from URL or title
+    // kloak URLs look like: /server/ServerName/channel/channel-name
+    let serverName = 'Favourites';
+    let channelName = title;
+    try {
+      const parts = new URL(url).pathname.split('/').filter(Boolean);
+      const sIdx = parts.indexOf('server');
+      const cIdx = parts.indexOf('channel');
+      if (sIdx !== -1 && parts[sIdx + 1]) serverName = decodeURIComponent(parts[sIdx + 1]).replace(/-/g, ' ');
+      if (cIdx !== -1 && parts[cIdx + 1]) channelName = '#' + decodeURIComponent(parts[cIdx + 1]).replace(/-/g, ' ');
+    } catch {}
+
+    let server = favData.find(s => s.serverName === serverName);
+    if (!server) {
+      server = { serverName, serverIcon: '🌐', channels: [] };
+      favData.push(server);
+    }
+    if (!server.channels.find(ch => ch.url === url)) {
+      server.channels.push({ name: channelName, url });
+    }
+  }
+
+  saveFavs();
+  updateStarAppearance();
+  renderFavPopup();
+  if(document.getElementById("pane-bookmarks").classList.contains("active")) renderModalFavs();
+}
+
+function renderFavPopup() {
+  const list = document.getElementById('fav-list');
+  const empty = document.getElementById('fav-empty');
+  if (!list) return;
+
+  // Remove old server cards
+  list.querySelectorAll('.fav-server').forEach(el => el.remove());
+
+  if (favData.length === 0) {
+    if (empty) empty.style.display = '';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  favData.forEach((server, si) => {
+    const card = document.createElement('div');
+    card.className = 'fav-server';
+
+    const header = document.createElement('div');
+    header.className = 'fav-server-header';
+    header.innerHTML = `
+      <span class="fav-server-icon">${server.serverIcon || '🌐'}</span>
+      <span class="fav-server-name">${server.serverName}</span>
+      <span class="fav-server-count">${server.channels.length} ch</span>
+      <span class="fav-chevron">›</span>`;
+    header.onclick = () => card.classList.toggle('expanded');
+
+    const channels = document.createElement('div');
+    channels.className = 'fav-channels';
+    server.channels.forEach((ch, ci) => {
+      const row = document.createElement('div');
+      row.className = 'fav-channel';
+      row.innerHTML = `<span>${ch.name}</span><button class="fav-channel-remove" title="Remove">✕</button>`;
+      row.onclick = (e) => {
+        if (e.target.classList.contains('fav-channel-remove')) return;
+        webview.loadURL(ch.url);
+        closeFavPopup();
+      };
+      row.querySelector('.fav-channel-remove').onclick = (e) => {
+        e.stopPropagation();
+        server.channels.splice(ci, 1);
+        if (server.channels.length === 0) favData.splice(si, 1);
+        saveFavs();
+        renderFavPopup();
+        updateStarAppearance();
+      };
+      channels.appendChild(row);
+    });
+
+    card.appendChild(header);
+    card.appendChild(channels);
+    list.appendChild(card);
+
+    // Auto-expand if only one server
+    if (favData.length === 1) card.classList.add('expanded');
+  });
+}
+
+
+// Render starred channels inside the modal Starred Channels pane
+function renderModalFavs() {
+  const list  = document.getElementById('modal-fav-list');
+  const empty = document.getElementById('modal-fav-empty');
+  if (!list) return;
+
+  list.innerHTML = '';
+
+  if (favData.length === 0) {
+    if (empty) empty.style.display = '';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  favData.forEach((server, si) => {
+    // Server header
+    const serverEl = document.createElement('div');
+    serverEl.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid #222;border-radius:8px;overflow:hidden;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;user-select:none;transition:background 0.12s;';
+    hdr.onmouseover = () => hdr.style.background = 'rgba(255,255,255,0.05)';
+    hdr.onmouseout  = () => hdr.style.background = '';
+    hdr.innerHTML = `
+      <span style="font-size:16px">${server.serverIcon || '🌐'}</span>
+      <span style="flex:1;font-size:12px;font-weight:700;color:#ddd">${server.serverName}</span>
+      <span style="font-size:10px;color:#555;margin-right:4px">${server.channels.length} channel${server.channels.length !== 1 ? 's' : ''}</span>
+      <span class="modal-fav-chevron" style="font-size:10px;color:#555;transition:transform 0.2s">›</span>`;
+
+    const chList = document.createElement('div');
+    chList.style.cssText = 'display:none;flex-direction:column;gap:2px;padding:4px 10px 8px 36px;';
+
+    let expanded = true; // open by default in modal
+    chList.style.display = 'flex';
+    hdr.querySelector('.modal-fav-chevron').style.transform = 'rotate(90deg)';
+
+    hdr.onclick = () => {
+      expanded = !expanded;
+      chList.style.display = expanded ? 'flex' : 'none';
+      hdr.querySelector('.modal-fav-chevron').style.transform = expanded ? 'rotate(90deg)' : '';
+    };
+
+    server.channels.forEach((ch, ci) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:background 0.1s;';
+      row.onmouseover = () => row.style.background = 'rgba(255,107,0,0.1)';
+      row.onmouseout  = () => row.style.background = '';
+      row.innerHTML = `
+        <span style="font-size:12px;color:#888;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ch.name}</span>
+        <button class="act-btn btn-blue" style="padding:3px 10px;font-size:10px;flex-shrink:0">Go →</button>
+        <button style="padding:3px 8px;border:1px solid #2a2a2a;border-radius:5px;background:transparent;color:#555;font-size:10px;cursor:pointer;font-family:inherit;flex-shrink:0;transition:all 0.15s" onmouseover="this.style.borderColor='#ff5f57';this.style.color='#ff5f57'" onmouseout="this.style.borderColor='#2a2a2a';this.style.color='#555'">✕</button>`;
+
+      row.querySelectorAll('button')[0].onclick = (e) => {
+        e.stopPropagation();
+        webview.loadURL(ch.url);
+        closeModal();
+      };
+      row.querySelectorAll('button')[1].onclick = (e) => {
+        e.stopPropagation();
+        server.channels.splice(ci, 1);
+        if (server.channels.length === 0) favData.splice(si, 1);
+        saveFavs();
+        renderModalFavs();
+        renderFavPopup();
+        updateStarAppearance();
+      };
+      chList.appendChild(row);
+    });
+
+    serverEl.appendChild(hdr);
+    serverEl.appendChild(chList);
+    list.appendChild(serverEl);
+  });
+}
+
+// "Star current page" button in modal
+document.getElementById('modal-fav-add-current').onclick = () => {
+  toggleFavourite();
+  renderModalFavs();
+};
+
+// Re-render modal fav list whenever the bookmarks tab is opened
+document.querySelectorAll('.sidebar-tab[data-tab="bookmarks"]').forEach(tab => {
+  tab.addEventListener('click', () => setTimeout(renderModalFavs, 50));
+});
+
+function openFavPopup() {
+  renderFavPopup();
+  document.getElementById('fav-popup').classList.add('open');
+}
+
+function closeFavPopup() {
+  document.getElementById('fav-popup').classList.remove('open');
+}
+
+// Wire star button
+const starBtn = document.getElementById('btn-star');
+starBtn.addEventListener('click', toggleFavourite);
+starBtn.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  const popup = document.getElementById('fav-popup');
+  if (popup.classList.contains('open')) { closeFavPopup(); return; }
+  openFavPopup();
+});
+
+// Close popup when clicking outside
+document.addEventListener('click', (e) => {
+  const popup = document.getElementById('fav-popup');
+  if (!popup.classList.contains('open')) return;
+  if (!popup.contains(e.target) && e.target !== starBtn) closeFavPopup();
+});
+
+// Update star on every navigation
+webview.addEventListener('did-navigate', updateStarAppearance);
+webview.addEventListener('did-navigate-in-page', updateStarAppearance);
+webview.addEventListener('did-finish-load', updateStarAppearance);
+
 // ── Init ──────────────────────────────────────────
 renderWidgetBar();
 document.querySelector('[data-tab="main"]').addEventListener('click', renderWidgetConfig);
 </script>
+
+<!-- ══ CUSTOM THEMES POPUP ══ -->
+<div id="ct-backdrop" style="display:none;position:fixed;inset:0;z-index:999990;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+  <div id="ct-popup" style="width:620px;max-height:80vh;background:#141414;border:1px solid #333;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,0.9);transform:scale(0.96);transition:transform 0.25s cubic-bezier(0.34,1.4,0.64,1);">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid #222;">
+      <span style="font-size:18px">🎨</span>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;color:#fff">Custom Themes</div>
+        <div style="font-size:11px;color:#555;margin-top:1px">Themes loaded from your themes folder</div>
+      </div>
+      <button id="ct-open-folder" style="padding:5px 12px;border:1px solid #333;border-radius:6px;background:transparent;color:#888;font-size:11px;cursor:pointer;font-family:inherit;">📁 Open Folder</button>
+      <button id="ct-refresh" style="padding:5px 12px;border:1px solid #333;border-radius:6px;background:transparent;color:#888;font-size:11px;cursor:pointer;font-family:inherit;">↺ Refresh</button>
+      <button id="ct-close" style="width:28px;height:28px;border-radius:50%;border:1px solid #333;background:transparent;color:#666;font-size:14px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <!-- Theme list -->
+    <div id="ct-list" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;scrollbar-color:#333 transparent;">
+      <div id="ct-empty" style="text-align:center;padding:40px 0;color:#444;font-size:13px;">No .css files found in themes folder.<br><span style="font-size:11px;color:#333;margin-top:6px;display:block">Drop .css files in the themes folder and click Refresh.</span></div>
+    </div>
+    <!-- Footer -->
+    <div style="padding:10px 20px;border-top:1px solid #222;">
+      <div style="font-size:11px;color:#444">CSS sections: <code style="color:#666;background:#1a1a1a;padding:1px 4px;border-radius:3px">Root</code> <code style="color:#666;background:#1a1a1a;padding:1px 4px;border-radius:3px">Themes</code> and sub-sections are parsed automatically.</div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

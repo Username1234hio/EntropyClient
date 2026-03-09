@@ -1,0 +1,563 @@
+================================================================================
+  ENTROPY CLIENT — HOW TO MAKE YOUR OWN THEMES
+  A complete guide to writing .css theme files
+================================================================================
+
+  Themes live in a folder on your computer that Entropy Client watches.
+  Click the 📁 Custom tile in the Themes tab, then "Open Folder" to find it.
+  Drop any .css file in there, hit Refresh, and your theme appears instantly.
+
+================================================================================
+  PART 1 — THE BASICS
+================================================================================
+
+A theme file is just a plain text file saved with the .css extension.
+You can write it in Notepad, VS Code, or any text editor.
+
+Every theme file follows this structure:
+
+  ┌─────────────────────────────────────────────────────┐
+  │  /* @name   My Theme Name                           │
+  │     @description A one-line description */          │
+  │                                                     │
+  │  /* Root-Colors */                                  │
+  │  ... colour variables ...                           │
+  │                                                     │
+  │  /* Root-Background */                              │
+  │  ... background rules ...                           │
+  │                                                     │
+  │  /* Theme-Dark */                                   │
+  │  ... dark variation overrides ...                   │
+  │                                                     │
+  │  /* Theme-Light */                                  │
+  │  ... light variation overrides ...                  │
+  └─────────────────────────────────────────────────────┘
+
+The /* Section Name */ comments are MARKERS — Entropy Client reads them
+to split your file into named sections, then applies them in the right order.
+Section names are NOT case-sensitive.
+
+You do not need to include every section. Only include what you want to change.
+
+
+================================================================================
+  PART 2 — METADATA (optional but recommended)
+================================================================================
+
+Put this at the very top of your file:
+
+  /* @name   Ocean Breeze
+     @description A calm teal and seafoam theme */
+
+  @name        — shown as the theme's display name in the popup
+  @description — shown as a subtitle under the name
+
+If you skip @name, the filename is used instead (e.g. "ocean-breeze").
+
+
+================================================================================
+  PART 3 — ROOT SECTIONS (base styles, applied to every variation)
+================================================================================
+
+These sections define the core look of your theme.
+They are always applied first, before any Theme- variation.
+
+────────────────────────────────────────────────────────────────────────────────
+  /* Root-Colors */
+────────────────────────────────────────────────────────────────────────────────
+
+Define colour variables here using CSS custom properties (:root).
+These variables can then be referenced anywhere else in your file
+using var(--variable-name).
+
+Supported variables:
+
+  :root {
+    --primary:   #ff4400;   /* Main accent colour (buttons, highlights) */
+    --secondary: #ff8800;   /* Secondary accent (hover states, icons)   */
+    --hover:     #ff6622;   /* Hover colour for interactive elements     */
+    --green:     #44cc66;   /* Online / success indicators               */
+    --yellow:    #ffcc00;   /* Warning / away indicators                 */
+    --red:       #ff3333;   /* Error / danger indicators                 */
+    --link:      #ff6600;   /* Hyperlink colour                          */
+    --live:      #ff4400;   /* Live stream indicator colour              */
+    --offline:   #884400;   /* Offline / disconnected colour             */
+  }
+
+You can use any valid CSS colour: hex (#ff4400), rgb(), hsl(), etc.
+
+TIP: Define your palette here first, then reference it in later sections
+     with var(--primary) instead of repeating the hex code everywhere.
+
+
+────────────────────────────────────────────────────────────────────────────────
+  /* Root-Background */
+────────────────────────────────────────────────────────────────────────────────
+
+Controls the main page/chat area background.
+This targets the outermost containers and the primary chat panel.
+
+  /* Root-Background */
+  html, body, #root,
+  .flex-1.h-full.bg-layout-chat.overflow-y-auto.w-full.flex.items-center.justify-center.relative.min-h-0.py-3 {
+    background: #0a0a1a !important;
+  }
+
+You can also use images here:
+
+  /* Root-Background */
+  html, body, #root,
+  .flex-1.h-full.bg-layout-chat.overflow-y-auto.w-full.flex.items-center.justify-center.relative.min-h-0.py-3 {
+    background: url('https://example.com/my-background.jpg') center/cover no-repeat !important;
+  }
+
+  Images can be hosted anywhere — GitHub, Imgur, or a direct URL.
+  Use GitHub raw links (raw.githubusercontent.com) for reliable hosting.
+
+
+────────────────────────────────────────────────────────────────────────────────
+  /* Root-DMBackground */
+────────────────────────────────────────────────────────────────────────────────
+
+The background of the Direct Messages area.
+By default this is set to the same colour as Root-Background so DMs and
+server channels match. Change it to give DMs their own distinct look.
+
+  /* Root-DMBackground */
+  [class*="bg-layout-chat"] {
+    background: #0a0a1a !important;
+  }
+
+To make DMs look different from server channels:
+
+  /* Root-Background */        ← server channel background
+  html, body, #root, ... { background: #0e0a1a !important; }
+
+  /* Root-DMBackground */      ← DM background, different colour
+  [class*="bg-layout-chat"] { background: #0a0e1a !important; }
+
+If Root-DMBackground is not present in your file, the parser will simply
+not output any rule for it — which means the site's default DM background
+will show. So always include it if you want consistent theming.
+
+
+────────────────────────────────────────────────────────────────────────────────
+
+The sidebar panel that shows the list of channels inside a server.
+
+  /* Root-ChannelsBG */
+  [class*="bg-layout-sidebar-secondary"] {
+    background: #06060f !important;
+  }
+
+
+────────────────────────────────────────────────────────────────────────────────
+  /* Root-Channels */
+────────────────────────────────────────────────────────────────────────────────
+
+The text colour and style of channel names in the channel list.
+
+  /* Root-Channels */
+  [class*="channel"] { color: var(--secondary) !important; }
+  [class*="channel"]:hover { color: var(--primary) !important; }
+
+You can also add font weight, letter-spacing, etc:
+
+  [class*="channel"] {
+    color: var(--secondary) !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.02em !important;
+  }
+
+
+────────────────────────────────────────────────────────────────────────────────
+  /* Root-ChannelText */
+────────────────────────────────────────────────────────────────────────────────
+
+The text inside channels — messages, content, headings, and links.
+
+  /* Root-ChannelText */
+  [class*="message"], [class*="content"] {
+    color: #c8d3f5 !important;
+    font-weight: 400;
+    font-size: 14px;
+  }
+  h1, h2, h3 { color: var(--primary) !important; }
+  a           { color: var(--link)    !important; }
+
+You can customise font family too:
+
+  [class*="message"] {
+    font-family: 'Georgia', serif !important;
+  }
+
+
+────────────────────────────────────────────────────────────────────────────────
+  /* Root-ChannelText-BG */
+────────────────────────────────────────────────────────────────────────────────
+
+The top header bar above the message area (channel name, search button, etc).
+
+  /* Root-ChannelText-BG */
+  [class*="bg-background"] {
+    background: #0d0d1f !important;
+  }
+
+
+────────────────────────────────────────────────────────────────────────────────
+  /* Root-AccountText */
+────────────────────────────────────────────────────────────────────────────────
+
+The account/username display text shown in the interface.
+
+  /* Root-AccountText */
+  .text-sm.font-medium.text-foreground.truncate {
+    color: #c8d3f5 !important;
+    font-weight: 500;
+  }
+
+  IMPORTANT: If you use a light Theme- variation, override this inside that
+  section so the text stays readable on a light background. See Part 4.
+
+
+────────────────────────────────────────────────────────────────────────────────
+  /* Root-UsernameColor */
+────────────────────────────────────────────────────────────────────────────────
+
+A gradient (or solid) colour effect applied directly to the username text.
+This uses CSS background-clip to "clip" a gradient to the shape of the text,
+making the letters themselves appear to be filled with the gradient.
+
+  /* Root-UsernameColor */
+  .text-sm.font-medium.text-foreground.truncate {
+    background: linear-gradient(135deg, #a8edea, #fed6e3) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    display: inline-block !important;
+  }
+
+All four lines are required for the effect to work:
+  background             — the gradient that fills the text
+  -webkit-background-clip: text — clips the gradient to the text shape only
+  -webkit-text-fill-color: transparent — makes the actual text colour invisible
+  color: transparent     — fallback for non-webkit browsers
+  display: inline-block  — required for background-clip to work correctly
+
+You can customise the gradient direction and colours:
+
+  /* Horizontal left to right */
+  background: linear-gradient(90deg, #ff4400, #ff8800) !important;
+
+  /* Top to bottom */
+  background: linear-gradient(180deg, #7c3aed, #a78bfa) !important;
+
+  /* Diagonal with three colour stops */
+  background: linear-gradient(135deg, #ff0080, #7c3aed, #00d4ff) !important;
+
+  /* Solid colour (no gradient) — just use Root-AccountText instead */
+
+NOTE: Root-UsernameColor targets the same element as Root-AccountText and
+comes after it in the build order, so if you include both, the gradient
+effect from Root-UsernameColor will win. Use Root-AccountText for a plain
+flat colour, or Root-UsernameColor for a gradient effect — not both.
+
+LIGHT MODE: The gradient effect still works fine in light mode since it
+doesn't rely on background colour. You do not need to override it in
+Theme-Light unless you want a different gradient for the light variation.
+
+
+────────────────────────────────────────────────────────────────────────────────
+  /* Root-MembersBG */
+────────────────────────────────────────────────────────────────────────────────
+
+The members panel / sidebar area background.
+
+  /* Root-MembersBG */
+  [class*="bg-layout-members"] {
+    background: #06060f !important;
+  }
+
+
+================================================================================
+  PART 4 — THEME VARIATIONS (selectable in the popup)
+================================================================================
+
+Variations are overrides that the user can pick from the Custom Themes popup.
+They are applied ON TOP of all the Root- sections above.
+
+You can define up to four variations:
+
+  /* Theme-Dark */      ← default, applied when user picks "Dark"
+  /* Theme-Light */     ← light mode
+  /* Theme-Darker */    ← extra dark
+  /* Theme-Midnight */  ← full black
+
+You do not have to include all four. If you only write /* Theme-Dark */,
+only one button appears in the popup.
+
+────────────────────────────────────────────────────────────────────────────────
+
+EXAMPLE — a theme with all four variations:
+
+  /* Theme-Light */
+  html, body { background: #f0f4ff !important; color: #1a1a2e !important; }
+  [class*="sidebar"]   { background: #dde4f5 !important; }
+  [class*="bg-layout-sidebar-secondary"] { background: #cdd6f0 !important; }
+  [class*="bg-layout-members"]           { background: #cdd6f0 !important; }
+  [class*="bg-background"]               { background: #f0f4ff !important; }
+  /* IMPORTANT: use dark text in light mode */
+  .text-sm.font-medium.text-foreground.truncate { color: #1a1a2e !important; }
+
+  /* Theme-Dark */
+  html, body { background: #0d0d1f !important; color: #c8d3f5 !important; }
+  [class*="sidebar"] { background: #06060f !important; }
+
+  /* Theme-Darker */
+  html, body { background: #07070f !important; color: #a0b0e0 !important; }
+  [class*="sidebar"] { background: #030308 !important; }
+
+  /* Theme-Midnight */
+  html, body { background: #000000 !important; color: #8899cc !important; }
+  [class*="sidebar"] { background: #020209 !important; }
+
+────────────────────────────────────────────────────────────────────────────────
+
+RULE: Always override .text-sm.font-medium.text-foreground.truncate inside
+      Theme-Light to a dark colour. The Root-AccountText section sets a light
+      colour for dark modes — Light mode needs its own override or the text
+      will be invisible on the white background.
+
+
+================================================================================
+  PART 5 — A COMPLETE WORKING EXAMPLE
+================================================================================
+
+Here is a full theme file you can copy, paste, and modify:
+
+────────────────────────────────────────────────────────────────────────────────
+
+/* @name   Violet Dusk
+   @description A deep purple theme with soft lavender text */
+
+/* Root-Colors */
+:root {
+  --primary:   #7c3aed;
+  --secondary: #a78bfa;
+  --hover:     #8b5cf6;
+  --green:     #34d399;
+  --yellow:    #fbbf24;
+  --red:       #f87171;
+  --link:      #a78bfa;
+  --live:      #7c3aed;
+  --offline:   #4c1d95;
+}
+
+/* Root-Background */
+html, body, #root,
+.flex-1.h-full.bg-layout-chat.overflow-y-auto.w-full.flex.items-center.justify-center.relative.min-h-0.py-3 {
+  background: #0e0a1a !important;
+}
+
+/* Root-ChannelsBG */
+[class*="bg-layout-sidebar-secondary"] {
+  background: #0a0814 !important;
+}
+
+/* Root-Channels */
+[class*="channel"] { color: var(--secondary) !important; }
+[class*="channel"]:hover { color: var(--primary) !important; }
+
+/* Root-ChannelText */
+[class*="message"], [class*="content"] {
+  color: #c4b5fd !important;
+  font-weight: 400;
+}
+h1, h2, h3 { color: var(--primary) !important; }
+a { color: var(--link) !important; }
+
+/* Root-ChannelText-BG */
+[class*="bg-background"] {
+  background: #0e0a1a !important;
+}
+
+/* Root-AccountText */
+.text-sm.font-medium.text-foreground.truncate {
+  color: #c4b5fd !important;
+  font-weight: 500;
+}
+
+/* Root-MembersBG */
+[class*="bg-layout-members"] {
+  background: #0a0814 !important;
+}
+
+/* Theme-Light */
+html, body { background: #f5f0ff !important; color: #2e1065 !important; }
+[class*="sidebar"] { background: #ede9fe !important; }
+[class*="bg-layout-sidebar-secondary"] { background: #ddd6fe !important; }
+[class*="bg-layout-members"]           { background: #ddd6fe !important; }
+[class*="bg-background"]               { background: #f5f0ff !important; }
+.text-sm.font-medium.text-foreground.truncate { color: #2e1065 !important; }
+
+/* Theme-Dark */
+html, body { background: #0e0a1a !important; color: #c4b5fd !important; }
+[class*="sidebar"] { background: #0a0814 !important; }
+
+/* Theme-Darker */
+html, body { background: #080612 !important; color: #a78bfa !important; }
+[class*="sidebar"] { background: #05040d !important; }
+
+/* Theme-Midnight */
+html, body { background: #000000 !important; color: #7c3aed !important; }
+[class*="sidebar"] { background: #030108 !important; }
+
+────────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+  PART 6 — TIPS AND TRICKS
+================================================================================
+
+── USING !important ────────────────────────────────────────────────────────────
+
+  Add !important to most colour and background rules. Kloak uses Tailwind CSS
+  which generates highly specific class selectors — without !important your
+  styles may be silently ignored.
+
+  ✓  background: #0e0a1a !important;
+  ✗  background: #0e0a1a;            ← may not apply
+
+
+── BACKGROUND IMAGES ───────────────────────────────────────────────────────────
+
+  You can use any image URL in Root-Background:
+
+  background: url('https://raw.githubusercontent.com/you/repo/main/bg.jpg')
+              center / cover no-repeat fixed !important;
+
+  "fixed" makes the background stay still when you scroll.
+  "cover" makes it fill the whole area without stretching.
+  "center" centres it.
+
+
+── TRANSPARENCY / BLUR EFFECTS ─────────────────────────────────────────────────
+
+  Make panels semi-transparent with rgba():
+
+  [class*="bg-layout-sidebar-secondary"] {
+    background: rgba(10, 8, 20, 0.7) !important;
+    backdrop-filter: blur(12px) !important;
+  }
+
+  This gives a frosted-glass look if you have a background image set.
+
+
+── USING CSS VARIABLES ──────────────────────────────────────────────────────────
+
+  Once you define --primary in Root-Colors, use it everywhere:
+
+  [class*="channel"]:hover { color: var(--primary) !important; }
+  a { color: var(--link) !important; }
+
+  This makes it easy to change your whole colour scheme by only editing
+  the Root-Colors section.
+
+
+── COLOUR FORMATS ───────────────────────────────────────────────────────────────
+
+  All these are valid:
+
+  #7c3aed            ← hex (most common)
+  rgb(124, 58, 237)  ← red green blue
+  rgba(124,58,237,0.5) ← with 50% opacity
+  hsl(263, 70%, 58%) ← hue saturation lightness
+
+  Good colour tools:
+  • coolors.co          — generate palettes
+  • oklch.com           — perceptually uniform colours
+  • developer.chrome.com/docs/devtools — inspect kloak's actual elements
+
+
+── ORDER OF SECTIONS ───────────────────────────────────────────────────────────
+
+  Entropy Client always applies sections in this order regardless of how
+  you arrange them in the file:
+
+    1. Root-Colors        (variables, no visual change by itself)
+    2. Root-Background
+    3. Root-DMBackground
+    4. Root-MembersBG
+    5. Root-ChannelsBG
+    6. Root-Channels
+    7. Root-ChannelText
+    8. Root-ChannelText-BG
+    9. Root-AccountText
+    10. Root-UsernameColor  (wins over Root-AccountText if both present)
+    11. Theme-[variation]  (the one the user selected)
+    12. Root (bare, anything inside /* Root */ with no sub-name)
+
+  Theme- variations come last so they can override anything from the
+  Root sections above — this is how light mode gets its overrides to win.
+
+
+── DEBUGGING ───────────────────────────────────────────────────────────────────
+
+  If a style isn't applying:
+
+  1. Make sure you added !important
+  2. Open Entropy's CSS Injector tab and paste the rule there to test it
+     live before putting it in your file
+  3. Right-click the element in kloak → Inspect → copy the exact class
+     names and use them as a more specific selector
+
+
+================================================================================
+  PART 7 — QUICK SECTION REFERENCE
+================================================================================
+
+  Section name          What it targets
+  ─────────────────────────────────────────────────────────────────────────────
+  Root-Colors           :root variables (--primary, --secondary, etc.)
+  Root-Background       Main chat area and html/body background
+  Root-DMBackground     DM area background (defaults to Root-Background)
+  Root-ChannelsBG       Channel list sidebar background
+  Root-Channels         Channel list text colour and style
+  Root-ChannelText      Message/content area text, headings, links
+  Root-ChannelText-BG   Top header bar background (channel name bar)
+  Root-AccountText      Account/username display text (flat colour)
+  Root-UsernameColor    Gradient text effect clipped to username
+  Root-MembersBG        Members panel background
+  ─────────────────────────────────────────────────────────────────────────────
+  Theme-Light           Light mode variation overrides
+  Theme-Dark            Dark mode variation (recommended default)
+  Theme-Darker          Darker variant
+  Theme-Midnight        Full black variant
+  ─────────────────────────────────────────────────────────────────────────────
+
+  You can also write plain /* Root */ (no sub-name) for any CSS that
+  doesn't fit into the named sections — it gets appended at the end.
+
+
+================================================================================
+  PART 8 — FILE CHECKLIST
+================================================================================
+
+  Before saving your .css file, check:
+
+  [ ] File is saved with the .css extension
+  [ ] @name is set at the top so it has a nice display name
+  [ ] Root-Colors has your main palette defined
+  [ ] Root-Background sets your main background colour or image
+  [ ] Root-ChannelText and Root-AccountText set readable text colours
+  [ ] If you have Theme-Light — the account text override is dark coloured
+  [ ] All colour/background rules end with !important
+  [ ] File is in the Entropy Client themes folder
+  [ ] You clicked Refresh in the Custom Themes popup
+
+  Then click your theme in the popup, pick a variation, and enjoy!
+
+================================================================================
+  Entropy Client — Unofficial desktop wrapper for kloak.app
+  Not affiliated with or endorsed by Kloak.
+================================================================================

@@ -33,4 +33,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // External links
   openExternal: (url) => ipcRenderer.send('open-external', url),
+
+  // Custom themes folder
+  themesList:       ()       => ipcRenderer.invoke('themes-list'),
+  themesRead:       (file)   => ipcRenderer.invoke('themes-read', file),
+  themesOpenFolder: ()       => ipcRenderer.invoke('themes-open-folder'),
 });
