@@ -1,6 +1,6 @@
 {
   "name": "kloak-desktop-app",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "Entropy Client - Unofficial desktop wrapper for kloak.app",
   "main": "main.js",
   "author": {
@@ -31,7 +31,6 @@
       "splash.png",
       "icon.ico",
       "icon.png",
-      "icon.icns",
       "build/**",
       "node_modules/**",
       "addons/**"
@@ -61,7 +60,7 @@
           ]
         }
       ],
-      "icon": "icon.icns",
+      "icon": "build/icons/icon.icns",
       "category": "public.app-category.social-networking",
       "identity": null
     },

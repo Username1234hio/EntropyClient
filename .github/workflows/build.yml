@@ -31,55 +31,13 @@ jobs:
 
       - run: npm install
 
-      - name: Generate icon.icns from icon.png
-        run: |
-          # Install Pillow for reliable PNG resizing
-          pip3 install Pillow --quiet
-
-          python3 << 'PYEOF'
-          from PIL import Image
-          import os, struct, zlib
-
-          img = Image.open("icon.png").convert("RGBA")
-          print(f"Original size: {img.size}")
-
-          # Make it square by padding
-          w, h = img.size
-          size = max(w, h)
-          square = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-          square.paste(img, ((size - w) // 2, (size - h) // 2))
-
-          os.makedirs("AppIcon.iconset", exist_ok=True)
-          sizes = [16, 32, 64, 128, 256, 512, 1024]
-          for s in sizes:
-              resized = square.resize((s, s), Image.LANCZOS)
-              resized.save(f"AppIcon.iconset/icon_{s}x{s}.png")
-              print(f"  Wrote {s}x{s}")
-
-          # Copy standard iconset names
-          import shutil
-          mapping = {
-            "icon_16x16.png":    "icon_16x16.png",
-            "icon_16x16@2x.png": "icon_32x32.png",
-            "icon_32x32.png":    "icon_32x32.png",
-            "icon_32x32@2x.png": "icon_64x64.png",
-            "icon_128x128.png":  "icon_128x128.png",
-            "icon_128x128@2x.png":"icon_256x256.png",
-            "icon_256x256.png":  "icon_256x256.png",
-            "icon_256x256@2x.png":"icon_512x512.png",
-            "icon_512x512.png":  "icon_512x512.png",
-            "icon_512x512@2x.png":"icon_1024x1024.png",
-          }
-          for dst, src in mapping.items():
-              shutil.copy(f"AppIcon.iconset/{src}", f"AppIcon.iconset/{dst}")
-
-          print("Iconset ready")
-          PYEOF
-
-          iconutil -c icns AppIcon.iconset -o icon.icns
-          ls -lh icon.icns
-
       - name: Build macOS (unsigned)
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          CSC_LINK: ""
+          CSC_KEY_PASSWORD: ""
+        run: npm run dist:mac
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
