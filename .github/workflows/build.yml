@@ -31,7 +31,7 @@ jobs:
 
       - run: npm install
 
-      - name: Generate valid icon.icns from icon.png
+      - name: Generate icon.icns from icon.png
         run: |
           mkdir -p AppIcon.iconset
           sips -z 16   16   icon.png --out AppIcon.iconset/icon_16x16.png
@@ -45,41 +45,14 @@ jobs:
           sips -z 512  512  icon.png --out AppIcon.iconset/icon_512x512.png
           sips -z 1024 1024 icon.png --out AppIcon.iconset/icon_512x512@2x.png
           iconutil -c icns AppIcon.iconset -o icon.icns
-          echo "Generated: $(ls -lh icon.icns)"
+          ls -lh icon.icns
 
-      - name: Patch electron-builder to skip icon conversion
-        run: |
-          node -e "$(cat << 'JSEOF'
-          const fs = require('fs');
-          const { execSync } = require('child_process');
-          const dirs = [
-            'node_modules/app-builder-lib/out',
-            'node_modules/electron-builder-lib/out',
-            'node_modules/electron-builder/out',
-          ];
-          let n = 0;
-          for (const dir of dirs) {
-            if (!fs.existsSync(dir)) continue;
-            let files;
-            try { files = execSync('find ' + dir + ' -name "*.js"', {encoding:'utf8'}).trim().split('\n').filter(Boolean); }
-            catch(e) { continue; }
-            for (const f of files) {
-              let s; try { s = fs.readFileSync(f,'utf8'); } catch(e) { continue; }
-              const o = s;
-              s = s.replace(/\"icon-convert\"/g, '"icon-convert-disabled"');
-              s = s.replace(/'icon-convert'/g, "'icon-convert-disabled'");
-              s = s.replace(/await [\w.]+\.convertIcon\([^)]*\)/g, 'null');
-              s = s.replace(/await [\w.]+\.checkAndResolveIcons\([^)]*\)/g, 'null');
-              if (s !== o) { fs.writeFileSync(f,s); console.log('patched:',f); n++; }
-            }
-          }
-          console.log('total patched:',n);
-          JSEOF
-          )"
-
-      - name: Build macOS
+      - name: Build macOS (unsigned)
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          CSC_LINK: ""
+          CSC_KEY_PASSWORD: ""
         run: npm run dist:mac
 
   build-linux:
