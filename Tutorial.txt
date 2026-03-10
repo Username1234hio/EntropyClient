@@ -14,6 +14,20 @@
 A theme file is just a plain text file saved with the .css extension.
 You can write it in Notepad, VS Code, or any text editor.
 
+There are two approaches to writing a theme — you can use either or both:
+
+  APPROACH A — Selector-based (ember, sapphire style)
+  Target Tailwind class substrings with [class*="..."] selectors.
+  Good for quick themes and partial overrides.
+
+  APPROACH B — Token-based (cyberpunk style) ★ recommended
+  Set :root CSS design variables that kloak reads natively with Root-Tokens.
+  More complete coverage, fewer rules needed.
+
+Most themes use a combination: Root-Tokens for the colour system,
+Root-Layout for specific elements, and selector sections for anything
+that needs a fine-tuned override.
+
 Every theme file follows this structure:
 
   ┌─────────────────────────────────────────────────────┐
@@ -279,6 +293,124 @@ The members panel / sidebar area background.
   }
 
 
+────────────────────────────────────────────────────────────────────────────────
+  /* Root-Tokens */   ★ RECOMMENDED for complete themes
+────────────────────────────────────────────────────────────────────────────────
+
+This is the most powerful section. Instead of targeting individual Tailwind
+class selectors, it sets the CSS design tokens that kloak reads natively.
+Every component in the app that uses these variables will be themed
+automatically — including elements that selector-based sections might miss.
+
+Use HSL format WITHOUT hsl() wrapper, just the three values separated by
+spaces. Kloak constructs hsl(var(--variable)) internally:
+
+  /* Root-Tokens */
+  :root, .dark, [data-theme="dark"], body {
+    /* Backgrounds */
+    --background:                 240 11% 7%  !important;
+    --layout-chat:                240 11% 7%  !important;
+    --layout-sidebar:             240 11% 5%  !important;
+    --layout-members:             240 11% 5%  !important;
+    --layout-sidebar-secondary:   240 11% 5%  !important;
+
+    /* Surfaces & Containers */
+    --card:                       240 11% 10% !important;
+    --popover:                    240 11% 10% !important;
+    --secondary:                  320 30% 15% !important;
+    --muted:                      240 11% 12% !important;
+
+    /* Borders & Inputs */
+    --border:                     185 50% 20% !important;
+    --input:                      185 50% 20% !important;
+    --ring:                       320 100% 50% !important;
+
+    /* Text */
+    --foreground:                 185 20% 90% !important;
+    --card-foreground:            185 20% 90% !important;
+    --popover-foreground:         185 20% 90% !important;
+    --secondary-foreground:       320 100% 75% !important;
+    --muted-foreground:           185 30% 50% !important;
+
+    /* Primary & Accent */
+    --primary:                    55 100% 50% !important;
+    --primary-foreground:         240 11% 5%  !important;
+    --accent:                     185 100% 15% !important;
+    --accent-foreground:          185 100% 50% !important;
+  }
+
+UNDERSTANDING HSL:
+  hsl(Hue, Saturation%, Lightness%)
+  Hue is 0–360 (the colour wheel: 0=red, 120=green, 185=cyan, 240=blue, 320=pink)
+  Saturation is 0–100% (0=grey, 100=vivid)
+  Lightness is 0–100% (0=black, 50=normal, 100=white)
+
+  Example — a deep navy blue:  220 60% 8%
+  Example — bright orange:     30 100% 55%
+  Example — muted grey-green:  150 10% 40%
+
+Root-Tokens is applied FIRST in the build order so all variables are defined
+before any selector rules run. You can use Root-Tokens alongside the other
+selector-based sections — they work together, not instead of each other.
+
+This approach is used by the built-in Cyberpunk theme and is the recommended
+method when building a complete, polished theme from scratch.
+
+
+────────────────────────────────────────────────────────────────────────────────
+  /* Root-Layout */
+────────────────────────────────────────────────────────────────────────────────
+
+For CSS rules that use precise class selectors rather than substring matches.
+This includes direct layout classes, opacity variants, resize handles,
+scrollbars, sliders, and any other element that needs an exact selector.
+
+Applied just before Theme- variations so variations can still override it.
+
+  /* Root-Layout */
+  .bg-layout-sidebar, .bg-layout-members {
+    background-color: hsl(240, 11%, 5%) !important;
+  }
+  .bg-layout-chat, .bg-background {
+    background-color: hsl(240, 11%, 7%) !important;
+  }
+  .bg-layout-sidebar-secondary {
+    background-color: hsl(240, 11%, 5%) !important;
+  }
+
+  /* Opacity variants — Tailwind generates these as separate classes */
+  .bg-background\/20,
+  .bg-muted\/60,
+  .bg-background\/50,
+  .bg-background\/70 {
+    background-color: hsl(240, 11%, 5%) !important;
+    border-color: hsl(185, 50%, 20%) !important;
+  }
+
+  /* Scrollbars */
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(320, 50%, 30%) !important;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(320, 100%, 50%) !important;
+  }
+  ::-webkit-scrollbar-track {
+    background-color: transparent !important;
+  }
+
+  /* Resize handles between panels */
+  [data-resize-handle]::after {
+    background-color: hsl(185, 50%, 20%) !important;
+  }
+  [data-resize-handle]:hover {
+    background-color: hsla(320, 100%, 50%, 0.5) !important;
+  }
+
+TIP: Use Root-Layout for anything that Root-ChannelsBG, Root-Background, etc.
+don't cover. Think of it as the "everything else" bucket for precise targeting.
+
+
 ================================================================================
   PART 4 — THEME VARIATIONS (selectable in the popup)
 ================================================================================
@@ -484,18 +616,20 @@ html, body { background: #000000 !important; color: #7c3aed !important; }
   Entropy Client always applies sections in this order regardless of how
   you arrange them in the file:
 
-    1. Root-Colors        (variables, no visual change by itself)
-    2. Root-Background
-    3. Root-DMBackground
-    4. Root-MembersBG
-    5. Root-ChannelsBG
-    6. Root-Channels
-    7. Root-ChannelText
-    8. Root-ChannelText-BG
-    9. Root-AccountText
-    10. Root-UsernameColor  (wins over Root-AccountText if both present)
-    11. Theme-[variation]  (the one the user selected)
-    12. Root (bare, anything inside /* Root */ with no sub-name)
+    1. Root-Tokens       (full :root design tokens — applied first so vars exist)
+    2. Root-Colors       (shorthand :root variables — --primary, --secondary, etc.)
+    3. Root-Background
+    4. Root-DMBackground
+    5. Root-MembersBG
+    6. Root-ChannelsBG
+    7. Root-Channels
+    8. Root-ChannelText
+    9. Root-ChannelText-BG
+    10. Root-AccountText
+    11. Root-UsernameColor  (wins over Root-AccountText if both present)
+    12. Root-Layout         (precise selectors, scrollbars, resize handles, etc.)
+    13. Theme-[variation]   (the one the user selected)
+    14. Root (bare, anything inside /* Root */ with no sub-name)
 
   Theme- variations come last so they can override anything from the
   Root sections above — this is how light mode gets its overrides to win.
@@ -518,7 +652,8 @@ html, body { background: #000000 !important; color: #7c3aed !important; }
 
   Section name          What it targets
   ─────────────────────────────────────────────────────────────────────────────
-  Root-Colors           :root variables (--primary, --secondary, etc.)
+  Root-Tokens           Full :root design token block (recommended for new themes)
+  Root-Colors           Shorthand :root variables (--primary, --secondary, etc.)
   Root-Background       Main chat area and html/body background
   Root-DMBackground     DM area background (defaults to Root-Background)
   Root-ChannelsBG       Channel list sidebar background
@@ -528,6 +663,7 @@ html, body { background: #000000 !important; color: #7c3aed !important; }
   Root-AccountText      Account/username display text (flat colour)
   Root-UsernameColor    Gradient text effect clipped to username
   Root-MembersBG        Members panel background
+  Root-Layout           Precise class selectors, scrollbars, resize handles, etc.
   ─────────────────────────────────────────────────────────────────────────────
   Theme-Light           Light mode variation overrides
   Theme-Dark            Dark mode variation (recommended default)

@@ -1,6 +1,6 @@
 {
   "name": "kloak-desktop-app",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Entropy Client - Unofficial desktop wrapper for kloak.app",
   "main": "main.js",
   "author": {
@@ -33,7 +33,8 @@
       "icon.png",
       "icon.icns",
       "build/**",
-      "node_modules/**"
+      "node_modules/**",
+      "addons/**"
     ],
     "win": {
       "target": "nsis",
@@ -45,16 +46,38 @@
     },
     "mac": {
       "target": [
-        { "target": "dmg", "arch": "x64" },
-        { "target": "dmg", "arch": "arm64" }
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
-      "icon": "icon.png",
+      "icon": "icon.icns",
       "category": "public.app-category.social-networking"
     },
     "linux": {
       "target": [
-        { "target": "deb", "arch": ["x64"] },
-        { "target": "rpm", "arch": ["x64"] }
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "rpm",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "icon": "build/icons",
       "category": "Network",
@@ -65,6 +88,15 @@
       "owner": "Username1234hio",
       "repo": "KloakDesktopAppBeta-Unoffical-",
       "releaseType": "release"
-    }
+    },
+    "extraResources": [
+      {
+        "from": "addons",
+        "to": "addons",
+        "filter": [
+          "**/*.js"
+        ]
+      }
+    ]
   }
 }

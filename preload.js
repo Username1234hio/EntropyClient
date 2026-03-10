@@ -38,4 +38,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
   themesList:       ()       => ipcRenderer.invoke('themes-list'),
   themesRead:       (file)   => ipcRenderer.invoke('themes-read', file),
   themesOpenFolder: ()       => ipcRenderer.invoke('themes-open-folder'),
+
+  // Emoji stash
+  emojiSave:       (data)   => ipcRenderer.invoke('emoji-save', data),
+  emojiList:       ()       => ipcRenderer.invoke('emoji-list'),
+  emojiDelete:     (id)     => ipcRenderer.invoke('emoji-delete', id),
+  emojiRename:     (id, n)  => ipcRenderer.invoke('emoji-rename', { id, newName: n }),
+  emojiOpenFolder: ()       => ipcRenderer.invoke('emoji-open-folder'),
+
+
+  // Addons
+  addonsList:       ()     => ipcRenderer.invoke('addons-list'),
+  addonsOpenFolder: ()     => ipcRenderer.invoke('addons-open-folder'),
 });

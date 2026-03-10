@@ -203,6 +203,106 @@
       font-size: 10px; color: #444; text-align: center;
     }
 
+
+    /* ── Search bar ── */
+    #search-wrap { display:flex; align-items:center; gap:0; -webkit-app-region:no-drag; overflow:hidden; max-width:0; transition:max-width 0.3s ease, opacity 0.3s ease; opacity:0; }
+    #search-wrap.open { max-width:200px; opacity:1; }
+    #search-input { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:4px 0 0 4px; color:#fff; font-size:11px; font-family:'Segoe UI',sans-serif; padding:2px 8px; height:22px; outline:none; width:160px; }
+    #search-input::placeholder { color:rgba(255,255,255,0.3); }
+    #btn-search-submit { height:22px; padding:0 7px; border:1px solid rgba(255,255,255,0.12); border-left:none; border-radius:0 4px 4px 0; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.6); font-size:10px; cursor:pointer; }
+    #btn-search-submit:hover { background:rgba(255,255,255,0.18); color:#fff; }
+
+    /* ── Copy URL / Mute / Screenshot / PiP buttons ── */
+    #btn-copy-url { font-size:12px; }
+    #btn-mute { font-size:12px; }
+    #btn-mute.muted { color:#ff5f57 !important; }
+    #btn-pip { font-size:11px; }
+    #btn-screenshot-tb { font-size:12px; }
+
+    /* ── Last Visited dropdown ── */
+    #last-visited-wrap { position:relative; -webkit-app-region:no-drag; }
+    #btn-last-visited { font-size:11px; }
+    #last-visited-menu { position:fixed; top:36px; width:280px; background:#141414; border:1px solid #2a2a2a; border-radius:8px; box-shadow:0 8px 32px rgba(0,0,0,0.8); z-index:9999; display:none; flex-direction:column; overflow:hidden; }
+    #last-visited-menu.open { display:flex; }
+    .lv-header { padding:8px 12px; font-size:10px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.8px; border-bottom:1px solid #1a1a1a; }
+    .lv-item { display:flex; align-items:center; gap:8px; padding:7px 12px; cursor:pointer; transition:background 0.1s; border-bottom:1px solid rgba(255,255,255,0.03); }
+    .lv-item:hover { background:rgba(255,107,0,0.1); }
+    .lv-item:last-child { border-bottom:none; }
+    .lv-item-url { flex:1; font-size:11px; color:#aaa; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .lv-item-time { font-size:10px; color:#444; flex-shrink:0; }
+    .lv-empty { padding:16px; text-align:center; font-size:11px; color:#444; }
+
+    /* ── Reconnecting banner ── */
+    #reconnect-banner { position:fixed; top:32px; left:0; right:0; z-index:9997; background:rgba(255,95,87,0.92); backdrop-filter:blur(8px); color:#fff; font-size:12px; font-weight:600; text-align:center; padding:6px; display:none; gap:10px; align-items:center; justify-content:center; }
+    #reconnect-banner.show { display:flex; }
+    #reconnect-banner.checking { background:rgba(254,188,46,0.92); color:#000; }
+
+    /* ── Command palette ── */
+    #cmd-backdrop { position:fixed; inset:0; z-index:999992; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); display:none; align-items:flex-start; justify-content:center; padding-top:120px; }
+    #cmd-backdrop.open { display:flex; }
+    #cmd-palette { width:520px; background:#141414; border:1px solid #333; border-radius:12px; overflow:hidden; box-shadow:0 24px 80px rgba(0,0,0,0.9); }
+    #cmd-input-wrap { display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid #222; }
+    #cmd-input-wrap span { font-size:14px; opacity:0.5; }
+    #cmd-input { flex:1; background:transparent; border:none; outline:none; color:#fff; font-size:14px; font-family:'Segoe UI',sans-serif; }
+    #cmd-input::placeholder { color:#444; }
+    #cmd-results { max-height:320px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:#333 transparent; }
+    .cmd-section { padding:6px 16px 2px; font-size:10px; font-weight:700; color:#444; text-transform:uppercase; letter-spacing:0.8px; }
+    .cmd-item { display:flex; align-items:center; gap:10px; padding:8px 16px; cursor:pointer; transition:background 0.1s; }
+    .cmd-item:hover, .cmd-item.selected { background:rgba(255,107,0,0.12); }
+    .cmd-item-icon { font-size:14px; width:20px; text-align:center; flex-shrink:0; }
+    .cmd-item-label { flex:1; font-size:13px; color:#ccc; }
+    .cmd-item-sub { font-size:11px; color:#555; }
+    #cmd-empty { padding:24px; text-align:center; font-size:12px; color:#444; }
+
+    /* ── Focus mode ── */
+    #focus-overlay { position:fixed; inset:0; z-index:9996; pointer-events:none; background:rgba(0,0,0,0); transition:background 0.4s; }
+    body.focus-mode #titlebar { opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    body.focus-mode webview { top:0 !important; height:100% !important; }
+    body.focus-mode #bg-canvas, body.focus-mode #particle-canvas { top:0; height:100%; }
+    #focus-hint { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.7); color:#555; font-size:11px; padding:5px 14px; border-radius:20px; z-index:9997; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    #focus-hint.show { opacity:1; }
+
+    /* ── Session timer widget ── */
+    /* (rendered in widget bar, no extra CSS needed) */
+
+    /* ── Per-server zoom display ── */
+    /* (handled in JS) */
+
+    /* ── Unread badge on conn-dot area ── */
+    #unread-badge { background:#ff5f57; color:#fff; font-size:9px; font-weight:700; padding:1px 5px; border-radius:10px; display:none; -webkit-app-region:no-drag; }
+    #unread-badge.show { display:inline-flex; }
+
+    /* ── Font override ── */
+    /* injected dynamically */
+
+    /* ── Compact mode ── */
+    /* injected dynamically */
+
+    /* ── Titlebar height variable ── */
+    :root { --tb-height: 32px; }
+
+    /* ── Emoji stash ── */
+    .emoji-card { display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 4px;background:rgba(255,255,255,0.03);border:1px solid #2a2a2a;border-radius:8px;cursor:default;transition:border-color 0.15s;position:relative; }
+    .emoji-card:hover { border-color:#444; }
+    .emoji-card img { width:36px;height:36px;object-fit:contain;image-rendering:auto; }
+    .emoji-card .ec-name { font-size:9px;color:#666;text-align:center;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%; }
+    .emoji-card .ec-actions { display:none;position:absolute;top:3px;right:3px;gap:2px; }
+    .emoji-card:hover .ec-actions { display:flex; }
+    .ec-btn { width:16px;height:16px;border:none;border-radius:3px;background:rgba(255,255,255,0.1);color:#aaa;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0; }
+    .ec-btn:hover { background:rgba(255,80,80,0.3);color:#fff; }
+    .ec-btn.edit:hover { background:rgba(255,107,0,0.3);color:#fff; }
+
+    /* ── Emoji inject autocomplete popup ── */
+    #emoji-autocomplete { position:fixed;background:#1a1a1a;border:1px solid #333;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.8);z-index:9999999;display:none;flex-direction:column;overflow:hidden;max-height:220px;overflow-y:auto;min-width:180px; }
+    #emoji-autocomplete.open { display:flex; }
+    .ea-item { display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;transition:background 0.1s; }
+    .ea-item:hover,.ea-item.selected { background:rgba(255,107,0,0.15); }
+    .ea-item img { width:24px;height:24px;object-fit:contain; }
+    .ea-item span { font-size:12px;color:#ccc; }
+
+    /* ── Format radio pill active ── */
+    .fmt-active { background:rgba(255,107,0,0.15) !important; border-color:#ff6b00 !important; color:#ff6b00 !important; }
+
     /* ── Settings panel ── */
     .panel { position: fixed; top: 36px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 9998; display: none; flex-direction: column; overflow: hidden; -webkit-app-region: no-drag; font-size: 12px; }
     .panel.open { display: flex; }
@@ -497,6 +597,9 @@
   <div id="fav-footer">Right-click star to open · Left-click star to save current channel</div>
 </div>
 
+<!-- Reconnect banner -->
+<div id="reconnect-banner"><span>⚠</span><span id="reconnect-msg">No connection — retrying…</span></div>
+
 <webview id="site" src="https://kloak.app/auth?mode=login" allowpopups partition="persist:main"></webview>
 
 <!-- Titlebar -->
@@ -508,9 +611,31 @@
     <button id="btn-star" title="Left-click to star this page · Right-click to view favourites">☆</button>
   </div>
   <div class="divider"></div>
+  <!-- Search -->
+  <div id="search-wrap">
+    <input id="search-input" placeholder="Search page…" />
+    <button id="btn-search-submit">↵</button>
+  </div>
+  <button class="tb-btn" id="btn-search-toggle" title="Search page (Ctrl+F)">🔍</button>
+  <div class="divider"></div>
+  <!-- Copy URL -->
+  <button class="tb-btn" id="btn-copy-url" title="Copy current URL">📋</button>
+  <!-- Mute -->
+  <button class="tb-btn" id="btn-mute" title="Mute/unmute page audio">🔊</button>
+  <!-- Screenshot -->
+  <button class="tb-btn" id="btn-screenshot-tb" title="Take screenshot (Ctrl+Shift+S)">📸</button>
+  <!-- PiP -->
+  <button class="tb-btn" id="btn-pip" title="Picture-in-picture mode">⧉</button>
+  <!-- Last visited -->
+  <div id="last-visited-wrap">
+    <button class="tb-btn" id="btn-last-visited" title="Recent pages">🕐 Recent</button>
+    <div id="last-visited-menu"><div class="lv-header">Recent Pages</div><div id="lv-list"></div></div>
+  </div>
+  <div class="divider"></div>
   <!-- Pinned widgets -->
   <div id="widget-bar"></div>
   <div class="divider"></div>
+  <div id="unread-badge" title="Unread messages"></div>
   <div id="conn-dot" title="Connected"></div>
   <div class="divider"></div>
   <button class="tb-btn" id="btn-update">↑ Update</button>
@@ -574,8 +699,9 @@
         <div class="sidebar-tab" data-tab="keybinds"><span class="tab-icon">⌨️</span> Keybinds</div>
         <div class="sidebar-tab" data-tab="accounts"><span class="tab-icon">👤</span> Accounts</div>
         <div class="sidebar-tab" data-tab="blocker"><span class="tab-icon">🚫</span> Blocker</div>
+        <div class="sidebar-tab" data-tab="emojis"><span class="tab-icon">😀</span> Emojis</div>
         <div class="sidebar-tab locked" id="fun-tab" data-tab="fun"><span class="tab-icon">✨</span> Fun & Effects</div>
-        <div class="sidebar-tab locked" id="addons-tab" data-tab="addons" style="opacity:0.38;cursor:not-allowed;pointer-events:none"><span class="tab-icon">🧩</span> Addons <span style="font-size:9px;background:rgba(255,255,255,0.08);border-radius:3px;padding:1px 5px;margin-left:4px;color:#555">Soon</span></div>
+        <div class="sidebar-tab" id="addons-tab" data-tab="addons"><span class="tab-icon">🧩</span> Addons</div>
         <div id="sidebar-footer"><kbd>Esc</kbd> to close<br><span id="konami-hint" style="display:none;color:#ff6b00;font-size:9px">✦ secret unlocked</span></div>
       </div>
 
@@ -619,6 +745,40 @@
             <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
               <div><div class="setting-label">Ambient mode</div><div class="setting-sub">Tint titlebar to match page colours</div></div>
               <label class="toggle"><input type="checkbox" id="ms-ambient"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+              <div><div class="setting-label">Compact mode</div><div class="setting-sub">Reduce padding for denser layout</div></div>
+              <label class="toggle"><input type="checkbox" id="ms-compact"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+              <div><div class="setting-label">Focus mode</div><div class="setting-sub">Hide titlebar, full-screen kloak</div></div>
+              <label class="toggle"><input type="checkbox" id="ms-focus"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+              <div><div class="setting-label">Per-server zoom</div><div class="setting-sub">Remember zoom per server</div></div>
+              <label class="toggle"><input type="checkbox" id="ms-per-zoom"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+              <div><div class="setting-label">Font override</div><div class="setting-sub">Apply custom font across kloak</div></div>
+              <select id="ms-font" style="background:#1a1a1a;border:1px solid #333;color:#aaa;font-size:11px;padding:3px 6px;border-radius:5px;font-family:inherit;cursor:pointer">
+                <option value="">— Default —</option>
+                <option value="Inter">Inter</option>
+                <option value="Segoe UI">Segoe UI</option>
+                <option value="JetBrains Mono">JetBrains Mono</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Comic Sans MS">Comic Sans</option>
+              </select>
+            </div>
+            <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+              <div><div class="setting-label">Titlebar height</div><div class="setting-sub">Adjust titlebar size</div></div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <input type="range" id="ms-tb-height" min="24" max="52" value="32" style="width:80px;accent-color:#ff6b00">
+                <span id="ms-tb-height-val" style="font-size:11px;color:#aaa;min-width:28px">32px</span>
+              </div>
+            </div>
+            <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+              <div><div class="setting-label">Force show member list</div><div class="setting-sub">Override any CSS hiding the right-side panel</div></div>
+              <label class="toggle"><input type="checkbox" id="ms-show-members"><span class="slider"></span></label>
             </div>
             <div class="setting-row" style="padding:9px 0">
               <div><div class="setting-label">Onboarding tour</div><div class="setting-sub">Replay the welcome walkthrough</div></div>
@@ -859,14 +1019,97 @@ body { background: #0a0a0a !important; }"></textarea>
         </div>
 
 
-        <!-- Addons (coming soon) -->
-        <div class="tab-pane" id="pane-addons">
-          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:320px;gap:16px;opacity:0.45;pointer-events:none;user-select:none">
-            <div style="font-size:52px">🧩</div>
-            <div style="font-size:16px;font-weight:700;color:#ccc">Addons</div>
-            <div style="font-size:12px;color:#666;text-align:center;max-width:260px;line-height:1.7">Install community-built addons to extend Entropy Client with new features, integrations, and UI tweaks.</div>
-            <div style="padding:6px 16px;border:1px solid #2a2a2a;border-radius:6px;font-size:11px;color:#555;background:rgba(255,255,255,0.03)">Coming soon</div>
+        <!-- ══ Emoji Stash ══ -->
+        <div class="tab-pane" id="pane-emojis">
+          <div class="section-title">Add Discord Emoji</div>
+          <div style="font-size:11px;color:#555;margin-bottom:14px;line-height:1.6">
+            Paste a Discord emoji ID, pick a format, give it a name — the image is served directly from Discord's CDN, nothing is downloaded to your computer. Type <code style="background:#1a1a1a;padding:1px 5px;border-radius:3px;color:#ff6b00">:name:</code> in any kloak message box to use it.
           </div>
+
+          <!-- Add form -->
+          <div style="display:flex;flex-direction:column;gap:10px;background:rgba(255,255,255,0.03);border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;margin-bottom:18px">
+            <div style="display:flex;gap:8px;align-items:flex-start">
+              <!-- Emoji ID -->
+              <div style="flex:1">
+                <div style="font-size:10px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px">Emoji ID</div>
+                <input id="emoji-id-input" type="text" placeholder="e.g. 1270549299704627293"
+                  style="width:100%;background:#111;border:1px solid #2a2a2a;color:#fff;font-size:12px;padding:6px 10px;border-radius:6px;font-family:inherit;outline:none;transition:border-color 0.15s"
+                  onfocus="this.style.borderColor='#ff6b00'" onblur="this.style.borderColor='#2a2a2a'" />
+              </div>
+              <!-- Name -->
+              <div style="flex:1">
+                <div style="font-size:10px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px">Name <span style="color:#444;font-weight:400">(used as :name:)</span></div>
+                <input id="emoji-name-input" type="text" placeholder="e.g. pepe_happy"
+                  style="width:100%;background:#111;border:1px solid #2a2a2a;color:#fff;font-size:12px;padding:6px 10px;border-radius:6px;font-family:inherit;outline:none;transition:border-color 0.15s"
+                  onfocus="this.style.borderColor='#ff6b00'" onblur="this.style.borderColor='#2a2a2a'" />
+              </div>
+            </div>
+
+            <!-- Format + Preview row -->
+            <div style="display:flex;gap:12px;align-items:center">
+              <div>
+                <div style="font-size:10px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px">Format</div>
+                <div style="display:flex;gap:4px">
+                  <label id="emoji-fmt-png" style="display:flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid #2a2a2a;border-radius:5px;cursor:pointer;font-size:11px;color:#aaa;transition:all 0.15s;background:rgba(255,107,0,0.15);border-color:#ff6b00;color:#ff6b00">
+                    <input type="radio" name="emoji-fmt" value="png" checked style="display:none" id="emoji-fmt-png-radio"> PNG
+                  </label>
+                  <label id="emoji-fmt-gif" style="display:flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid #2a2a2a;border-radius:5px;cursor:pointer;font-size:11px;color:#aaa;transition:all 0.15s">
+                    <input type="radio" name="emoji-fmt" value="gif" style="display:none" id="emoji-fmt-gif-radio"> GIF
+                  </label>
+                  <label id="emoji-fmt-webp" style="display:flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid #2a2a2a;border-radius:5px;cursor:pointer;font-size:11px;color:#aaa;transition:all 0.15s">
+                    <input type="radio" name="emoji-fmt" value="webp" style="display:none" id="emoji-fmt-webp-radio"> WebP
+                  </label>
+                </div>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:10px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px">Preview</div>
+                <div id="emoji-preview-wrap" style="display:flex;align-items:center;gap:10px">
+                  <div id="emoji-preview-box" style="width:48px;height:48px;background:#111;border:1px solid #2a2a2a;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+                    <span style="font-size:10px;color:#444">—</span>
+                  </div>
+                  <button id="emoji-preview-btn" style="padding:5px 12px;border:1px solid #333;border-radius:6px;background:transparent;color:#888;font-size:11px;cursor:pointer;font-family:inherit;transition:all 0.15s" onmouseover="this.style.borderColor='#555';this.style.color='#ccc'" onmouseout="this.style.borderColor='#333';this.style.color='#888'">👁 Preview</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action row -->
+            <div style="display:flex;gap:8px;align-items:center;margin-top:2px">
+              <button id="emoji-add-btn" style="padding:7px 18px;border:none;border-radius:7px;background:linear-gradient(135deg,#ff6b00,#ff0080);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity 0.15s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">✚ Add Emoji</button>
+              <span id="emoji-status" style="font-size:11px;color:#555;margin-left:10px"></span>
+            </div>
+          </div>
+
+          <!-- Saved emojis -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div class="section-title" style="margin:0">Saved Emojis</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input id="emoji-search" type="text" placeholder="Filter…"
+                style="background:#111;border:1px solid #2a2a2a;color:#aaa;font-size:11px;padding:4px 9px;border-radius:5px;font-family:inherit;outline:none;width:110px"
+                onfocus="this.style.borderColor='#ff6b00'" onblur="this.style.borderColor='#2a2a2a'" />
+              <span id="emoji-count-label" style="font-size:10px;color:#444">0 saved</span>
+            </div>
+          </div>
+          <div id="emoji-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;max-height:280px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#333 transparent">
+            <div id="emoji-grid-empty" style="grid-column:1/-1;text-align:center;padding:32px 0;font-size:11px;color:#444">No emojis saved yet. Add one above.</div>
+          </div>
+
+          <!-- Injection status -->
+          <div style="margin-top:14px;padding:10px 12px;background:rgba(255,107,0,0.05);border:1px solid rgba(255,107,0,0.12);border-radius:7px;display:flex;align-items:center;gap:8px">
+            <span style="font-size:14px">💬</span>
+            <div>
+              <div style="font-size:11px;color:#888;font-weight:600">Auto-injection active</div>
+              <div style="font-size:10px;color:#555;margin-top:1px">Type <code style="color:#ff6b00">:emojiname:</code> in any kloak message box — it replaces with the emoji image inline.</div>
+            </div>
+            <label class="toggle" style="margin-left:auto"><input type="checkbox" id="emoji-inject-toggle" checked><span class="slider"></span></label>
+          </div>
+        </div>
+
+        <!-- Addons -->
+        <div class="tab-pane" id="pane-addons">
+          <div class="section-title">🧩 Addons</div>
+          <div style="font-size:11px;color:#555;margin-bottom:14px">Toggle addons on or off. Changes apply instantly.</div>
+          <div id="addon-debug" style="font-size:10px;color:#ff6b00;margin-bottom:8px;font-family:monospace"></div>
+          <div id="addon-list" style="display:flex;flex-direction:column;gap:8px"></div>
         </div>
 
       </div><!-- /modal-content -->
@@ -883,11 +1126,23 @@ const pCtx     = pCanvas.getContext('2d');
 const backdrop = document.getElementById('modal-backdrop');
 
 let injectedKey=null, themeKey=null, updateState='idle', zoomStep=0;
+// Restore saved injected CSS into editor on startup
+(()=>{const s=localStorage.getItem('ec_injected_css');if(s){const el=document.getElementById('css-input');if(el)el.value=s;}})();
 let notifsOn=true, activeTheme='default', bgOpacity=0.2, currentCursor='none';
 let konamiOn=true, soundPack='none', funUnlocked=false;
 let sessionHistory=[], blockedDomains=[], keybinds={}, accounts=[], activeAccount='main';
 let schedEnabled=false, schedDay='default', schedNight='midnight';
 let notes='', bookmarks=[];
+let isMuted=false, isPip=false, isFocusMode=false, isCompact=false;
+let perZoomEnabled=false, serverZooms={}, lastServerKey='';
+let unreadCount=0, sessionStart=Date.now();
+let cmdOpen=false;
+
+// ── Addon globals (declared here so they're available before the addon block) ──
+var BUILTIN_ADDONS = [];
+var ADDONS = [];
+var addonState = {};
+var addonCssKeys = {};
 
 function resizeCanvases(){bgCanvas.width=pCanvas.width=window.innerWidth;bgCanvas.height=pCanvas.height=window.innerHeight-32;}
 resizeCanvases(); window.addEventListener('resize',resizeCanvases);
@@ -931,9 +1186,15 @@ const DEFAULT_KEYBINDS={
   zoomin:     {label:'Zoom in',          sub:'',                         default:'Ctrl+=',         action:()=>handleZoom(0.5)},
   zoomout:    {label:'Zoom out',         sub:'',                         default:'Ctrl+-',         action:()=>handleZoom(-0.5)},
   zoomreset:  {label:'Reset zoom',       sub:'',                         default:'Ctrl+0',         action:()=>handleZoom(0,true)},
-  screenshot: {label:'Screenshot',       sub:'Capture webview',          default:'Ctrl+Shift+S',   action:()=>takeScreenshot()},
   modal:      {label:'Open modal',       sub:'Customization panel',      default:'Ctrl+,',         action:()=>openModal()},
   settings:   {label:'Toggle settings',  sub:'',                         default:'Ctrl+Shift+P',   action:()=>document.getElementById('settings-panel').classList.toggle('open')},
+  screenshot: {label:'Screenshot',         sub:'Capture webview as PNG',   default:'Ctrl+Shift+S',   action:()=>takeScreenshot()},
+  mute:       {label:'Mute / unmute audio', sub:'Toggle page audio',        default:'Ctrl+Shift+M',   action:()=>toggleMute()},
+  copyurl:    {label:'Copy URL',            sub:'Copy current page URL',    default:'Ctrl+Shift+C',   action:()=>copyUrl()},
+  search:     {label:'Search in page',      sub:'Find text on the page',    default:'Ctrl+f',         action:()=>toggleSearch()},
+  cmdpalette: {label:'Command palette',     sub:'Quick actions & navigation',default:'Ctrl+p',        action:()=>openCmdPalette()},
+  pip:        {label:'Picture-in-picture',  sub:'Float window on top',      default:'Ctrl+Shift+F',   action:()=>togglePip()},
+  focusmode:  {label:'Focus mode',          sub:'Hide titlebar (toggle)',   default:'F11',            action:()=>toggleFocusMode()},
 };
 // Load saved keybinds
 try { const saved=JSON.parse(localStorage.getItem('ec_keybinds')||'{}'); Object.keys(saved).forEach(k=>{if(DEFAULT_KEYBINDS[k]) DEFAULT_KEYBINDS[k].current=saved[k];}); } catch{}
@@ -1075,6 +1336,16 @@ const WIDGETS = {
     render: () => { const acc=accounts.find(a=>a.id===activeAccount)||{name:'Main',color:'#ff6b00'}; return `<span style="color:${acc.color}">●</span><span>${acc.name}</span>`; },
     clickable: false, interval: 2000,
   },
+  session_timer: {
+    label: 'Session Timer', icon: '⏱️', desc: 'Time since app launched',
+    render: () => { const s=Math.floor((Date.now()-sessionStart)/1000); const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60; return `<span>⏱️</span><span>${h?h+'h ':''}`+`${m?m+'m ':''}`+`${ss}s</span>`; },
+    clickable: false, interval: 1000,
+  },
+  unread: {
+    label: 'Unread Badge', icon: '🔔', desc: 'Show unread message count',
+    render: () => `<span>🔔</span><span id='tb-unread-count'>${unreadCount||'0'}</span>`,
+    clickable: false, interval: 2000,
+  },
 };
 
 let pinnedWidgets = [];
@@ -1141,13 +1412,19 @@ function closeModal(){backdrop.classList.remove('open');playSound('close');}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&backdrop.classList.contains('open'))closeModal();});
 
 document.querySelectorAll('.sidebar-tab').forEach(tab=>{
-  tab.onclick=()=>{
+  tab.onclick=async()=>{
     if(tab.classList.contains('locked'))return;
     document.querySelectorAll('.sidebar-tab').forEach(t=>t.classList.remove('active'));
     document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById('pane-'+tab.dataset.tab).classList.add('active');
-    playSound('nav');
+    try{playSound('nav');}catch{}
+    if(tab.dataset.tab === 'addons'){
+      const debugEl = document.getElementById('addon-debug');
+      if (debugEl) debugEl.innerHTML = 'Tab clicked...<br>';
+      try{ await loadAddons(); }catch(e){ console.warn('loadAddons failed',e); if(debugEl) debugEl.innerHTML += 'loadAddons threw: '+e.message+'<br>'; }
+      renderAddons();
+    }
   };
 });
 
@@ -1156,16 +1433,21 @@ document.querySelectorAll('.preset-btn').forEach(btn=>{btn.onclick=()=>{document
 document.getElementById('btn-apply').onclick=async()=>{
   const css=document.getElementById('css-input').value.trim();
   if(!css){setStatus('Nothing to inject.','');return;}
-  try{if(injectedKey){await webview.removeInsertedCSS(injectedKey);injectedKey=null;}injectedKey=await webview.insertCSS(css);setStatus('✔ Applied!','ok');}
+  try{if(injectedKey){await webview.removeInsertedCSS(injectedKey);injectedKey=null;}injectedKey=await webview.insertCSS(css);localStorage.setItem('ec_injected_css',css);setStatus('✔ Applied!','ok');}
   catch(err){setStatus('✘ '+err.message,'err');}
 };
-document.getElementById('btn-clear').onclick=async()=>{try{if(injectedKey){await webview.removeInsertedCSS(injectedKey);injectedKey=null;}setStatus('✔ Cleared.','ok');}catch(err){setStatus('✘ '+err.message,'err');}};
-document.getElementById('btn-reset').onclick=async()=>{try{if(injectedKey){await webview.removeInsertedCSS(injectedKey);injectedKey=null;}document.getElementById('css-input').value='';setStatus('Ready.','');}catch(err){setStatus('✘ '+err.message,'err');}};
+document.getElementById('btn-clear').onclick=async()=>{try{if(injectedKey){await webview.removeInsertedCSS(injectedKey);injectedKey=null;}localStorage.removeItem('ec_injected_css');setStatus('✔ Cleared.','ok');}catch(err){setStatus('✘ '+err.message,'err');}};
+document.getElementById('btn-reset').onclick=async()=>{try{if(injectedKey){await webview.removeInsertedCSS(injectedKey);injectedKey=null;}localStorage.removeItem('ec_injected_css');document.getElementById('css-input').value='';setStatus('Ready.','');}catch(err){setStatus('✘ '+err.message,'err');}};
 webview.addEventListener('did-navigate',async()=>{
-  injectedKey=null;
-  const css=document.getElementById('css-input').value.trim();
-  if(css){try{injectedKey=await webview.insertCSS(css);setStatus('✔ Re-applied.','ok');}catch{}}
-  if(activeTheme&&activeTheme!=='default'){const t=THEMES.find(t=>t.id===activeTheme);const css=t?t.css:null;if(css){try{themeKey=await webview.insertCSS(css);}catch{}}}
+  injectedKey=null;themeKey=null;
+  // Restore CSS from localStorage in case textarea is empty (e.g. fresh launch)
+  const savedCss=localStorage.getItem('ec_injected_css')||'';
+  const editorCss=document.getElementById('css-input').value.trim();
+  // Keep textarea in sync with saved
+  if(savedCss&&!editorCss)document.getElementById('css-input').value=savedCss;
+  const cssToApply=savedCss||editorCss;
+  if(cssToApply){try{injectedKey=await webview.insertCSS(cssToApply);setStatus('✔ Re-applied.','ok');}catch{}}
+  if(activeTheme&&activeTheme!=='default'){const t=THEMES.find(t=>t.id===activeTheme);if(t&&t.css){try{themeKey=await webview.insertCSS(t.css);}catch{}}}
   applyBlockRules();
 });
 function setStatus(msg,type){const s=document.getElementById('css-status');s.textContent=msg;s.className='status-line '+type;}
@@ -1405,6 +1687,603 @@ document.getElementById('block-add').onclick=()=>{
   setTimeout(()=>document.getElementById('block-status').textContent='',2000);
 };
 
+// ══════════════════════════════════════════════════
+// EMOJI STASH
+// ══════════════════════════════════════════════════
+
+let emojiData = [];          // [{id, name, format, cdnUrl}, ...]
+let emojiInjectOn = true;    // autocomplete toggle
+let emojiInjectKey = null;   // insertedCSS key for emoji CSS (unused but reserved)
+
+// ── Helpers ──────────────────────────────────────
+function getEmojiUrl(id, format) {
+  return `https://cdn.discordapp.com/emojis/${id}.${format}`;
+}
+function getSelectedFormat() {
+  const r = document.querySelector('input[name="emoji-fmt"]:checked');
+  return r ? r.value : 'png';
+}
+function setEmojiStatus(msg, ok) {
+  const s = document.getElementById('emoji-status');
+  s.textContent = msg;
+  s.style.color = ok === true ? '#28c840' : ok === false ? '#ff5f57' : '#888';
+}
+
+// ── Format radio styling ─────────────────────────
+document.querySelectorAll('input[name="emoji-fmt"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    ['emoji-fmt-png','emoji-fmt-gif','emoji-fmt-webp'].forEach(lid => {
+      const lbl = document.getElementById(lid);
+      if (!lbl) return;
+      const active = lbl.querySelector('input').checked;
+      lbl.style.background  = active ? 'rgba(255,107,0,0.15)' : '';
+      lbl.style.borderColor = active ? '#ff6b00' : '#2a2a2a';
+      lbl.style.color       = active ? '#ff6b00' : '#aaa';
+    });
+  });
+});
+
+// ── Preview button ───────────────────────────────
+document.getElementById('emoji-preview-btn').onclick = () => {
+  const id  = document.getElementById('emoji-id-input').value.trim();
+  if (!id || !/^\d{5,}$/.test(id)) { setEmojiStatus('Enter an emoji ID first.', false); return; }
+  previewEmoji(id);
+};
+
+// Auto-preview + auto-detect format when ID is typed (debounced)
+let previewTimer = null;
+document.getElementById('emoji-id-input').addEventListener('input', () => {
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(() => {
+    const id = document.getElementById('emoji-id-input').value.trim();
+    if (id && /^\d{5,}$/.test(id)) previewEmoji(id);
+  }, 600);
+});
+
+// Try each format in order until one loads; update the format radio to match
+async function previewEmoji(id) {
+  const box = document.getElementById('emoji-preview-box');
+  box.innerHTML = '<span style="font-size:10px;color:#555">…</span>';
+  const preferred = getSelectedFormat();
+  // Try preferred format first, then the others
+  const order = [preferred, ...['png','gif','webp'].filter(f => f !== preferred)];
+  for (const fmt of order) {
+    const url = getEmojiUrl(id, fmt);
+    const ok  = await new Promise(resolve => {
+      const img = new Image();
+      img.onload  = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = url;
+    });
+    if (ok) {
+      // Update format radio to the one that actually worked
+      const radio = document.getElementById('emoji-fmt-' + fmt + '-radio');
+      if (radio && !radio.checked) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      box.innerHTML = `<img src="${url}"
+        style="width:44px;height:44px;object-fit:contain"
+        title="Discord CDN: ${url}" />`;
+      setEmojiStatus('', null);
+      return;
+    }
+  }
+  box.innerHTML = '<span style="font-size:10px;color:#ff5f57">Not found</span>';
+  setEmojiStatus('✘ Emoji not found on Discord CDN — check the ID.', false);
+}
+
+// ── Load emojis from main process ────────────────
+async function loadEmojiData() {
+  try {
+    emojiData = await window.electronAPI.emojiList();
+  } catch {
+    emojiData = [];
+  }
+  renderEmojiGrid();
+}
+
+// ── Render the saved emoji grid ──────────────────
+function renderEmojiGrid(filter = '') {
+  const grid  = document.getElementById('emoji-grid');
+  const empty = document.getElementById('emoji-grid-empty');
+  const q     = filter.toLowerCase().trim();
+  const visible = q ? emojiData.filter(e => e.name.toLowerCase().includes(q)) : emojiData;
+
+  // Clear existing cards (keep the empty placeholder)
+  grid.querySelectorAll('.emoji-card').forEach(c => c.remove());
+
+  if (!visible.length) {
+    if (empty) empty.style.display = '';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  visible.forEach(em => {
+    const card = document.createElement('div');
+    card.className = 'emoji-card';
+    card.dataset.id = em.id;
+    card.innerHTML = `
+      <div class="ec-actions">
+        <button title="Rename" style="width:16px;height:16px;border:none;border-radius:3px;background:rgba(255,255,255,0.1);color:#aaa;font-size:9px;cursor:pointer;padding:0;line-height:1">✎</button>
+        <button title="Download" style="width:16px;height:16px;border:none;border-radius:3px;background:rgba(255,255,255,0.1);color:#aaa;font-size:9px;cursor:pointer;padding:0;line-height:1">↓</button>
+        <button title="Delete" style="width:16px;height:16px;border:none;border-radius:3px;background:rgba(255,95,87,0.2);color:#ff5f57;font-size:9px;cursor:pointer;padding:0;line-height:1">✕</button>
+      </div>
+      <img src="${em.cdnUrl}" alt="${em.name}"
+        onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'36\\' height=\\'36\\'><text y=\\'28\\' font-size=\\'24\\'>❓</text></svg>'"
+        loading="lazy" />
+      <div class="ec-name" title=":${em.name}:">:${em.name}:</div>`;
+
+    // Rename
+    card.querySelector('[title="Rename"]').onclick = async (e) => {
+      e.stopPropagation();
+      const newName = prompt(`Rename :${em.name}: to:`, em.name);
+      if (!newName || newName === em.name) return;
+      const safe = newName.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+      try {
+        await window.electronAPI.emojiRename(em.id, safe);
+        emojiData = await window.electronAPI.emojiList(); // refresh full list
+        renderEmojiGrid(document.getElementById('emoji-search').value);
+      } catch(err) {
+        alert('Rename failed: ' + err.message);
+      }
+    };
+
+    // Download
+    card.querySelector('[title="Download"]').onclick = (e) => {
+      e.stopPropagation();
+      const a = document.createElement('a');
+      a.href     = em.cdnUrl;
+      a.download = `${em.name}.${em.format}`;
+      a.target   = '_blank';
+      a.click();
+    };
+
+    // Delete
+    card.querySelector('[title="Delete"]').onclick = async (e) => {
+      e.stopPropagation();
+      if (!confirm(`Remove :${em.name}: from your stash?`)) return;
+      try {
+        await window.electronAPI.emojiDelete(em.id);
+        emojiData = emojiData.filter(x => x.id !== em.id);
+        renderEmojiGrid(document.getElementById('emoji-search').value);
+      } catch(err) {
+        alert('Delete failed: ' + err.message);
+      }
+    };
+
+    grid.appendChild(card);
+  });
+}
+
+// ── Search / filter ──────────────────────────────
+document.getElementById('emoji-search').addEventListener('input', e => {
+  renderEmojiGrid(e.target.value);
+});
+
+// ── Open folder ──────────────────────────────────
+
+
+// ── Add & Save (CDN-only — no local file download) ──
+document.getElementById('emoji-add-btn').onclick = async () => {
+  const id     = document.getElementById('emoji-id-input').value.trim();
+  const name   = document.getElementById('emoji-name-input').value.trim();
+  const format = getSelectedFormat();
+
+  if (!id || !/^\d{5,}$/.test(id)) {
+    setEmojiStatus('Enter a valid Discord emoji ID (numeric).', false); return;
+  }
+  if (!name) {
+    setEmojiStatus('Enter a name — e.g. pepe_happy', false); return;
+  }
+  if (emojiData.find(e => e.id === id)) {
+    setEmojiStatus('That emoji ID is already in your stash.', false); return;
+  }
+
+  const safeName = name.toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 48);
+  // Build the CDN URL exactly as Discord serves it:
+  // https://cdn.discordapp.com/emojis/{id}.{format}
+  const cdnUrl = getEmojiUrl(id, format);
+
+  setEmojiStatus('Checking…', null);
+
+  // Verify the URL actually resolves before saving
+  try {
+    const res = await fetch(cdnUrl, { method: 'HEAD', cache: 'no-store' });
+    if (!res.ok) throw new Error(`Discord CDN returned ${res.status} — check the ID and format`);
+  } catch (headErr) {
+    // HEAD may be blocked; try GET with a range request instead
+    try {
+      const res2 = await fetch(cdnUrl, { cache: 'no-store' });
+      if (!res2.ok) throw new Error(`Emoji not found on Discord CDN (${res2.status}) — is the ID correct?`);
+    } catch (getErr) {
+      setEmojiStatus('✘ ' + getErr.message, false); return;
+    }
+  }
+
+  try {
+    // Save to JSON index via main process — cdnUrl stored as-is, no file written
+    const result = await window.electronAPI.emojiSave({ id, name: safeName, format });
+    emojiData = result;
+    renderEmojiGrid(document.getElementById('emoji-search').value);
+    pushEmojiMap(); // push updated map into the webview immediately
+
+    // Clear form
+    document.getElementById('emoji-id-input').value   = '';
+    document.getElementById('emoji-name-input').value = '';
+    document.getElementById('emoji-preview-box').innerHTML = '<span style="font-size:10px;color:#444">—</span>';
+    setEmojiStatus(`✔ :${safeName}: added!`, true);
+    setTimeout(() => setEmojiStatus('', null), 3000);
+
+  } catch (err) {
+    setEmojiStatus('✘ ' + err.message, false);
+  }
+};
+
+// ── Inject toggle ────────────────────────────────
+document.getElementById('emoji-inject-toggle').onchange = e => {
+  emojiInjectOn = e.target.checked;
+  localStorage.setItem('ec_emoji_inject', emojiInjectOn ? '1' : '0');
+};
+emojiInjectOn = localStorage.getItem('ec_emoji_inject') !== '0';
+document.getElementById('emoji-inject-toggle').checked = emojiInjectOn;
+
+// ── Load on modal open ───────────────────────────
+document.querySelector('.sidebar-tab[data-tab="emojis"]')
+  .addEventListener('click', () => setTimeout(loadEmojiData, 50));
+
+// ══════════════════════════════════════════════════
+// EMOJI AUTO-INJECT — textarea-targeted approach
+// ══════════════════════════════════════════════════
+// Kloak uses plain <textarea> elements (not contenteditable).
+// Strategy:
+//   1. Inject a script into the webview that watches ALL textareas
+//      matching kloak's known composer classes.
+//   2. On every keyup, scan the textarea value for :name: patterns.
+//   3. When a complete :name: is found AND it maps to a saved emoji,
+//      we DON'T touch the textarea text — instead we:
+//        a. Find the textarea's parent form / send wrapper.
+//        b. Insert a floating <img> overlay positioned over the :name:
+//           text in the textarea using a mirrored-div technique to get
+//           accurate character positions.
+//        c. On form submit / Enter key, fire a synthetic paste of the
+//           img HTML into the sibling rich-text wrapper if one exists,
+//           or fall back to leaving the :name: text as-is.
+//   4. The autocomplete popup is driven by polling the textarea value
+//      directly (much simpler and more reliable than caret-range APIs).
+// ══════════════════════════════════════════════════
+
+// ── The script string injected into the webview page ──
+function buildEmojiScript(mapJson) {
+  return `
+(function(){
+  if (window.__ecEmoji2) return;
+  window.__ecEmoji2 = true;
+
+  var EM = ${mapJson};
+
+  // Build an img element matching kloak's own fluent-emoji style
+  function makeImg(name) {
+    var img = document.createElement('img');
+    img.src       = EM[name];
+    img.alt       = ':' + name + ':';
+    img.title     = ':' + name + ':';
+    img.width     = 20;
+    img.height    = 20;
+    img.className = 'inline-block align-text-bottom object-contain fluent-emoji';
+    img.decoding  = 'async';
+    img.draggable = false;
+    img.style.cssText = 'width:20px;height:20px;vertical-align:text-bottom;'
+      + 'display:inline-block;object-fit:contain;margin:0 1px;pointer-events:none';
+    return img;
+  }
+
+  // Patch a span whose textContent contains :name: tokens.
+  // Replaces text in-place with text nodes + img elements.
+  function patchSpan(span) {
+    if (span.__ecDone) return;
+    var text = span.textContent || '';
+    if (!text.includes(':')) return;
+    var rx = /:([a-z0-9_]+):/g, m, hit = false;
+    while ((m = rx.exec(text)) !== null) { if (EM[m[1]]) { hit = true; break; } }
+    if (!hit) return;
+
+    span.__ecDone = true; // mark before mutating
+
+    // Gather all child text nodes that contain :name: and replace them
+    // We rebuild the span contents from the full textContent so mixed
+    // text+existing-imgs work correctly.
+    // Clear and rebuild:
+    span.innerHTML = '';
+    var cursor = 0;
+    rx.lastIndex = 0;
+    while ((m = rx.exec(text)) !== null) {
+      var name = m[1];
+      if (!EM[name]) continue;
+      if (m.index > cursor) span.appendChild(document.createTextNode(text.slice(cursor, m.index)));
+      span.appendChild(makeImg(name));
+      cursor = m.index + m[0].length;
+    }
+    if (cursor < text.length) span.appendChild(document.createTextNode(text.slice(cursor)));
+  }
+
+  // Walk an added node looking for spans to patch
+  function scan(node) {
+    if (!node || node.nodeType !== 1) return;
+    var tag = node.tagName;
+    if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SCRIPT' || tag === 'STYLE') return;
+    // Check the node itself
+    if (tag === 'SPAN' && !node.__ecDone) patchSpan(node);
+    // Check all descendant spans
+    var spans = node.getElementsByTagName('span');
+    for (var i = 0; i < spans.length; i++) {
+      if (!spans[i].__ecDone) patchSpan(spans[i]);
+    }
+  }
+
+  // Initial scan after a short delay to let React finish first render
+  setTimeout(function() { scan(document.body); }, 500);
+
+  // MutationObserver — fires on every new node added to the DOM
+  var obs = new MutationObserver(function(muts) {
+    for (var i = 0; i < muts.length; i++) {
+      var nodes = muts[i].addedNodes;
+      for (var j = 0; j < nodes.length; j++) {
+        var n = nodes[j];
+        if (n.nodeType !== 1) continue;
+        if (n.style && n.style.top === '-9999px') continue; // skip mirror divs
+        scan(n);
+      }
+    }
+  });
+  obs.observe(document.body, { childList: true, subtree: true });
+
+  // ── Textarea selectors ──
+  var TA_SEL = [
+    'textarea.message-input-textarea',
+    'textarea.font-normal.flex-1.bg-transparent'
+  ].join(',');
+  function getTextareas() { return Array.from(document.querySelectorAll(TA_SEL)); }
+
+  // ── Autocomplete state ──
+  window.__ecGetAcState = function() {
+    var tas = getTextareas();
+    for (var i = 0; i < tas.length; i++) {
+      if (document.activeElement !== tas[i]) continue;
+      var ta = tas[i];
+      var val = ta.value, pos = ta.selectionStart;
+      var before = val.slice(0, pos);
+      var lc = before.lastIndexOf(':');
+      if (lc === -1) return null;
+      var typed = before.slice(lc + 1);
+      if (!typed || /[\s:]/.test(typed)) return null;
+      var rect = ta.getBoundingClientRect();
+      var cs   = window.getComputedStyle(ta);
+      var mir  = document.createElement('div');
+      var props = ['fontFamily','fontSize','fontWeight','letterSpacing','lineHeight',
+        'paddingTop','paddingRight','paddingBottom','paddingLeft',
+        'borderTopWidth','borderRightWidth','borderBottomWidth','borderLeftWidth',
+        'boxSizing','whiteSpace','wordWrap','overflowWrap','tabSize'];
+      for (var p = 0; p < props.length; p++) mir.style[props[p]] = cs[props[p]];
+      mir.style.position = 'absolute'; mir.style.visibility = 'hidden';
+      mir.style.top = '-9999px'; mir.style.left = '-9999px';
+      mir.style.width = ta.offsetWidth + 'px';
+      mir.style.whiteSpace = 'pre-wrap'; mir.style.wordBreak = 'break-word';
+      document.body.appendChild(mir);
+      mir.appendChild(document.createTextNode(val.slice(0, lc)));
+      var sp = document.createElement('span'); sp.textContent = ':';
+      mir.appendChild(sp);
+      var relL = sp.offsetLeft - ta.scrollLeft;
+      var relT = sp.offsetTop  - ta.scrollTop;
+      var lineH = parseInt(cs.lineHeight) || 20;
+      document.body.removeChild(mir);
+      return { query: typed, caretLeft: rect.left + relL, caretBottom: rect.top + relT + lineH + 4 };
+    }
+    return null;
+  };
+
+  // ── Insert :name: into focused textarea ──
+  var _nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+  window.__ecInsertEmoji = function(name) {
+    var tas = getTextareas();
+    for (var i = 0; i < tas.length; i++) {
+      var ta = tas[i];
+      if (document.activeElement !== ta) continue;
+      var val = ta.value, pos = ta.selectionStart;
+      var lc = val.slice(0, pos).lastIndexOf(':');
+      if (lc === -1) return;
+      ta.focus(); ta.setSelectionRange(lc, pos);
+      var insert = ':' + name + ':';
+      var ok = document.execCommand('insertText', false, insert);
+      if (!ok) {
+        _nativeSetter.call(ta, val.slice(0, lc) + insert + val.slice(pos));
+        ta.setSelectionRange(lc + insert.length, lc + insert.length);
+        ta.dispatchEvent(new Event('input',  { bubbles: true }));
+        ta.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      return;
+    }
+  };
+
+  window.__ecUpdateEmojiMap = function(map) {
+    EM = map;
+    // Clear done flags and re-scan
+    var allSpans = document.getElementsByTagName('span');
+    for (var i = 0; i < allSpans.length; i++) allSpans[i].__ecDone = false;
+    scan(document.body);
+  };
+
+  console.log('[EC] Emoji script active — ' + Object.keys(EM).length + ' emojis loaded');
+})();
+`;
+}
+
+// ── Build emoji map object ──
+function buildEmojiMap() {
+  const map = {};
+  emojiData.forEach(em => { map[em.name] = em.cdnUrl; });
+  return map;
+}
+
+// ── Inject the watcher script into the webview ──
+// Only called after emojiData is loaded AND webview has finished loading.
+async function injectEmojiMap() {
+  if (!emojiInjectOn) return;
+  const map = buildEmojiMap();
+  const mapJson = JSON.stringify(map);
+  try {
+    await webview.executeJavaScript(buildEmojiScript(mapJson));
+    console.log('[EC] Emoji injected —', Object.keys(map).length, 'emojis in map');
+    const hint = document.getElementById('focus-hint');
+    if (hint) { hint.textContent = '⚡ Emoji engine active (' + Object.keys(map).length + ' emojis)'; hint.classList.add('show'); setTimeout(() => hint.classList.remove('show'), 2500); }
+  } catch(err) {
+    console.warn('[EC] Emoji inject failed:', err);
+    const hint2 = document.getElementById('focus-hint');
+    if (hint2) { hint2.textContent = '⚠️ Emoji inject failed'; hint2.classList.add('show'); setTimeout(() => hint2.classList.remove('show'), 3000); }
+  }
+}
+
+// ── Push an updated map without re-injecting the full script ──
+async function pushEmojiMap() {
+  if (!emojiInjectOn) return;
+  const map = buildEmojiMap();
+  try {
+    await webview.executeJavaScript(
+      `if(window.__ecUpdateEmojiMap) window.__ecUpdateEmojiMap(${JSON.stringify(map)})`
+    );
+  } catch {}
+}
+
+
+// Re-inject after every navigation.
+// Use a flag so rapid did-finish-load events don't stack up.
+let _emojiInjecting = false;
+webview.addEventListener('did-finish-load', async () => {
+  if (_emojiInjecting) return;
+  _emojiInjecting = true;
+  try {
+    if (emojiData.length === 0) await loadEmojiData();
+    // Small delay — let kloak's React app finish mounting before we inject
+    await new Promise(r => setTimeout(r, 1000));
+    await injectEmojiMap();
+    startAcPoll();
+  } finally {
+    _emojiInjecting = false;
+  }
+});
+
+// Load emoji data on startup — inject will happen on did-finish-load.
+loadEmojiData();
+
+// ── Autocomplete popup ────────────────────────────
+// Positioned overlay popup rendered in the Electron chrome (overlay.html),
+// positioned over the webview using coordinates reported by __ecGetAcState.
+const acPopup = document.createElement('div');
+acPopup.id = 'emoji-autocomplete';
+document.body.appendChild(acPopup);
+
+let acQuery = '', acSelectedIdx = 0;
+
+function buildAcItems(q) {
+  if (!q) return [];
+  return emojiData.filter(e => e.name.includes(q.toLowerCase())).slice(0, 8);
+}
+
+function renderAcPopup(items, x, y) {
+  acPopup.innerHTML = '';
+  if (!items.length) { acPopup.classList.remove('open'); return; }
+  // Position — clamp to window edges
+  acPopup.style.left = Math.min(x, window.innerWidth  - 210) + 'px';
+  acPopup.style.top  = Math.min(y, window.innerHeight - 260) + 'px';
+  items.forEach((em, i) => {
+    const row = document.createElement('div');
+    const sel = i === acSelectedIdx;
+    row.style.cssText = `display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;`
+      + `font-size:12px;color:${sel?'#fff':'#aaa'};background:${sel?'rgba(255,107,0,0.18)':'transparent'};`
+      + `transition:background 0.1s;`;
+    row.innerHTML = `<img src="${em.cdnUrl}" style="width:22px;height:22px;object-fit:contain;flex-shrink:0" `
+      + `onerror="this.style.display='none'"><span style="flex:1">:${em.name}:</span>`;
+    row.onmouseenter = () => { acSelectedIdx = i; renderAcPopup(items, x, y); };
+    row.onmousedown  = (e) => { e.preventDefault(); selectAcItem(em); };
+    acPopup.appendChild(row);
+  });
+  acPopup.classList.add('open');
+}
+
+function closeAcPopup() {
+  acPopup.classList.remove('open');
+  acQuery = '';
+  acSelectedIdx = 0;
+}
+
+async function selectAcItem(em) {
+  closeAcPopup();
+  try {
+    await webview.executeJavaScript(
+      `if(window.__ecInsertEmoji) window.__ecInsertEmoji(${JSON.stringify(em.name)})`
+    );
+  } catch {}
+}
+
+// ── Poll loop — runs every 150ms when webview is loaded ──
+let acPollInterval = null;
+function startAcPoll() {
+  clearInterval(acPollInterval);
+  acPollInterval = setInterval(async () => {
+    if (!emojiInjectOn) { closeAcPopup(); return; }
+    try {
+      const state = await webview.executeJavaScript(
+        `window.__ecGetAcState ? window.__ecGetAcState() : null`
+      );
+      if (!state || !state.query) { closeAcPopup(); return; }
+      const items = buildAcItems(state.query);
+      if (!items.length) { closeAcPopup(); return; }
+      // Reset selection index when query changes
+      if (state.query !== acQuery) { acQuery = state.query; acSelectedIdx = 0; }
+      // Translate webview-local coords to overlay-window coords
+      const wvRect = webview.getBoundingClientRect();
+      const px = wvRect.left + state.caretLeft;
+      const py = wvRect.top  + state.caretBottom;
+      renderAcPopup(items, px, py);
+    } catch { closeAcPopup(); }
+  }, 150);
+}
+
+// ── Keyboard navigation for the popup ──
+document.addEventListener('keydown', e => {
+  if (!acPopup.classList.contains('open')) return;
+  const items = buildAcItems(acQuery);
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    acSelectedIdx = Math.min(acSelectedIdx + 1, items.length - 1);
+    const wvRect = webview.getBoundingClientRect();
+    renderAcPopup(items,
+      parseFloat(acPopup.style.left),
+      parseFloat(acPopup.style.top)
+    );
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    acSelectedIdx = Math.max(acSelectedIdx - 1, 0);
+    renderAcPopup(items,
+      parseFloat(acPopup.style.left),
+      parseFloat(acPopup.style.top)
+    );
+  } else if (e.key === 'Tab' || (e.key === 'Enter' && acPopup.classList.contains('open'))) {
+    if (items[acSelectedIdx]) { e.preventDefault(); selectAcItem(items[acSelectedIdx]); }
+  } else if (e.key === 'Escape') {
+    closeAcPopup();
+  }
+}, true);
+
+webview.addEventListener('did-finish-load', startAcPoll);
+webview.addEventListener('did-navigate', startAcPoll);
+startAcPoll();
+
+// ── Wire into openModal ───────────────────────────
+document.querySelector('.sidebar-tab[data-tab="emojis"]')
+  .addEventListener('click', loadEmojiData);
+
+// ══════════════════════════════════════════════════
 // ── Weather ───────────────────────────────────────
 async function fetchWeather(){
   try{
@@ -1420,7 +2299,6 @@ async function fetchWeather(){
     if(w2)w2.innerHTML=WIDGETS.weather.render();
   }catch{cachedWeather={icon:'⛅',temp:'--°F'};}
 }
-
 fetchWeather();
 setInterval(fetchWeather,10*60*1000);
 
@@ -1594,56 +2472,76 @@ document.getElementById('crash-reload').onclick = () => {
 const OB_STEPS = [
   {
     icon: '⚡', title: 'Welcome to Entropy Client',
-    desc: 'A supercharged desktop wrapper for kloak.app. Let\'s take a quick tour of what\'s available.',
+    desc: 'A supercharged desktop wrapper for kloak.app with a full suite of power-user tools. Let\'s take a quick tour.',
     features: [
-      ['🎨', 'Full theme system with 10 built-in themes'],
-      ['⚡', 'CSS injector to customise any element'],
-      ['✨', 'Animated backgrounds and particle effects'],
+      ['🎨', 'Full theme system — 10 built-in themes + custom CSS file support'],
+      ['⚡', 'CSS injector that persists across page refreshes and relaunches'],
+      ['✨', 'Animated backgrounds, particles, custom cursors, and sound packs'],
     ]
   },
   {
-    icon: '🎨', title: 'Customization Modal',
-    desc: 'Click the Customization button in Settings, or press Ctrl+, to open the full customization panel.',
+    icon: '🔧', title: 'Titlebar Tools',
+    desc: 'The titlebar is packed with quick-access tools. Every button is there to save you time.',
     features: [
-      ['🔖', 'Save bookmarks and jump to pages instantly'],
-      ['📝', 'Built-in notes that persist between sessions'],
-      ['🕐', 'Session history for the last 50 pages visited'],
+      ['🔍', 'Search in page — find text inside kloak without leaving the titlebar'],
+      ['📋', 'Copy URL — one click to copy the current page URL to clipboard'],
+      ['🔇', 'Mute toggle — silence page audio instantly (Ctrl+Shift+M)'],
+      ['📸', 'Screenshot button — capture the webview as a PNG (Ctrl+Shift+S)'],
+    ]
+  },
+  {
+    icon: '⧉', title: 'Picture-in-Picture & Focus Mode',
+    desc: 'Two ways to get kloak out of your way — or front and centre.',
+    features: [
+      ['⧉', 'PiP mode — float Entropy Client on top of other windows (Ctrl+Shift+F)'],
+      ['◻', 'Focus mode — hide the titlebar entirely for a clean full-screen view'],
+      ['F11', 'Press F11 at any time to toggle focus mode, Esc to exit'],
     ]
   },
   {
     icon: '⌨️', title: 'Keyboard Shortcuts',
-    desc: 'Every shortcut is fully remappable from the Keybinds tab in the customization panel.',
+    desc: 'Every shortcut is fully remappable from the Keybinds tab. Here are the new ones to know.',
     features: [
-      ['Ctrl+,', 'Open customization modal'],
-      ['Ctrl+Shift+S', 'Take a screenshot'],
-      ['Alt+← / →', 'Navigate back and forward'],
+      ['Ctrl+P', 'Command palette — search tabs, actions, starred channels & history'],
+      ['Ctrl+Shift+M', 'Mute / unmute page audio'],
+      ['Ctrl+Shift+C', 'Copy current URL to clipboard'],
+      ['F11', 'Toggle focus mode (hides titlebar)'],
     ]
   },
   {
     icon: '📌', title: 'Titlebar Widgets',
-    desc: 'Pin live widgets to your titlebar from the Main Settings tab — weather, clock, zoom level and more.',
+    desc: 'Pin live widgets to the titlebar from Main Settings. New widgets added this version.',
     features: [
-      ['⛅', 'Live weather from your location'],
-      ['🕐', 'Real-time clock display'],
-      ['👤', 'Active account indicator'],
+      ['⏱️', 'Session timer — shows how long you\'ve been logged in this session'],
+      ['🔔', 'Unread badge — shows unread message count from the page title'],
+      ['⛅', 'Live weather, 🕐 clock, 🔍 zoom level, and 👤 account indicator'],
     ]
   },
   {
     icon: '⭐', title: 'Favourite Channels',
-    desc: 'Star any server channel to save it instantly. Left-click the star (☆) in the titlebar to favourite the current page — right-click it to open your saved channels list.',
+    desc: 'Star any page to save it. Left-click the ☆ to star, right-click to open your saved list.',
     features: [
-      ['☆', 'Left-click the star to save the current channel'],
-      ['🖱️', 'Right-click the star to open your favourites list'],
-      ['✕', 'Remove individual channels from inside the popup'],
+      ['☆', 'Left-click the star to save or remove the current channel'],
+      ['🖱️', 'Right-click the star to open your favourites popup'],
+      ['⌨️', 'Also accessible from the Starred Channels tab in Customization'],
+    ]
+  },
+  {
+    icon: '🎨', title: 'CSS & Themes',
+    desc: 'Your injected CSS now persists across page refreshes and app relaunches automatically.',
+    features: [
+      ['💾', 'CSS Injector saves automatically — no need to re-paste after refresh'],
+      ['🎨', 'Custom theme files (ember, sapphire, cyberpunk) loaded from your themes folder'],
+      ['🔤', 'Font override, compact mode, and titlebar height in Main Settings'],
     ]
   },
   {
     icon: '🚀', title: 'You\'re all set!',
-    desc: 'Entropy Client is ready to use. You can revisit this tour anytime from Main Settings.',
+    desc: 'Entropy Client is ready. Replay this tour any time from Main Settings → Onboarding tour.',
     features: [
-      ['✦', 'Try the Konami code for a secret surprise'],
-      ['🚫', 'Block unwanted domains in the Blocker tab'],
-      ['👤', 'Create multiple accounts with isolated sessions'],
+      ['Ctrl+P', 'Open the command palette to jump anywhere instantly'],
+      ['✦', 'Try the Konami code (↑↑↓↓←→←→BA) for a secret surprise'],
+      ['🚫', 'Block domains, create isolated accounts, and set per-server zoom levels'],
     ]
   },
 ];
@@ -1856,12 +2754,12 @@ if (localStorage.getItem('ec_ambient') === '1') setAmbientEnabled(true);
 // ── CSS Section Parser ───────────────────────────
 // Parses a .css file into named sections using /* SectionName */ markers.
 // Supported top-level sections: Root, Themes
-// Root sub-sections: Root-Background, Root-DMBackground, Root-Colors, Root-Channels, Root-ChannelsBG, Root-ChannelText, Root-ChannelText-BG, Root-AccountText, Root-UsernameColor, Root-MembersBG
+// Root sub-sections: Root-Tokens, Root-Layout, Root-Background, Root-DMBackground, Root-Colors, Root-Channels, Root-ChannelsBG, Root-ChannelText, Root-ChannelText-BG, Root-AccountText, Root-UsernameColor, Root-MembersBG
 // Themes sub-sections: Theme-Light, Theme-Dark, Theme-Darker, Theme-Midnight
 function parseCssThemeFile(raw) {
   const result = {
     meta: { name: '', description: '' },
-    root: { background: '', colors: '', channels: '', channelsBG: '', channelText: '', channelTextBG: '', accountText: '', membersBG: '', dmBackground: '', usernameColor: '', other: '' },
+    root: { tokens: '', layout: '', background: '', colors: '', channels: '', channelsBG: '', channelText: '', channelTextBG: '', accountText: '', membersBG: '', dmBackground: '', usernameColor: '', other: '' },
     themes: { light: '', dark: '', darker: '', midnight: '' },
     raw
   };
@@ -1880,7 +2778,9 @@ function parseCssThemeFile(raw) {
     const sectionCss  = m[2].trim();
     if (!sectionCss) continue;
     switch (sectionName) {
-      case 'root':               result.root.other       += sectionCss + ''; break;
+      case 'root':               result.root.other       += sectionCss + '\n'; break;
+      case 'root-tokens':        result.root.tokens       = sectionCss; break;
+      case 'root-layout':        result.root.layout       = sectionCss; break;
       case 'root-background':    result.root.background   = sectionCss; break;
       case 'root-dmbackground':  result.root.dmBackground = sectionCss; break;
       case 'root-colors':       result.root.colors      = sectionCss; break;
@@ -1908,7 +2808,7 @@ function buildCssFromParsed(parsed, variation = 'dark') {
   const t = parsed.themes;
   const variationCss = t[variation] || t.dark || '';
   // Order: colors (variables) → background → channels → channelText → variation → other root
-  return [r.colors, r.background, r.dmBackground, r.membersBG, r.channelsBG, r.channels, r.channelText, r.channelTextBG, r.accountText, r.usernameColor, variationCss, r.other]
+  return [r.tokens, r.colors, r.background, r.dmBackground, r.membersBG, r.channelsBG, r.channels, r.channelText, r.channelTextBG, r.accountText, r.usernameColor, r.layout, variationCss, r.other]
     .filter(Boolean).join('\n\n');
 }
 
@@ -1961,6 +2861,8 @@ async function refreshCtPopup() {
     // Detect section presence for badges
     const sectionBadges = [];
     if (parsed.root.background)   sectionBadges.push('Background');
+    if (parsed.root.tokens)        sectionBadges.push('Tokens');
+    if (parsed.root.layout)        sectionBadges.push('Layout');
     if (parsed.root.dmBackground)  sectionBadges.push('DMBackground');
     if (parsed.root.usernameColor) sectionBadges.push('UsernameColor');
     if (parsed.root.colors)       sectionBadges.push('Colors');
@@ -2335,9 +3237,620 @@ webview.addEventListener('did-navigate', updateStarAppearance);
 webview.addEventListener('did-navigate-in-page', updateStarAppearance);
 webview.addEventListener('did-finish-load', updateStarAppearance);
 
+
+// ══════════════════════════════════════════════════
+// CSS PERSISTENCE — re-inject saved CSS after every page load
+// ══════════════════════════════════════════════════
+async function reapplyPersistedCss() {
+  // Restore injected CSS from localStorage (survives refresh & relaunch)
+  const savedCss = localStorage.getItem('ec_injected_css') || '';
+  if (savedCss) {
+    const editorEl = document.getElementById('css-input');
+    if (editorEl && !editorEl.value.trim()) editorEl.value = savedCss;
+    if (!injectedKey) {
+      try { injectedKey = await webview.insertCSS(savedCss); } catch(e) {}
+    }
+  }
+  // Re-inject active theme
+  if (activeTheme && activeTheme !== 'default') {
+    if (!themeKey) setTimeout(() => applyTheme(activeTheme), 80);
+  }
+  // Re-inject compact mode
+  if (isCompact && !compactKey) {
+    try { compactKey = await webview.insertCSS(COMPACT_CSS); } catch {}
+  }
+  // Re-inject font override
+  const savedFont = localStorage.getItem('ec_font_override') || '';
+  if (savedFont && !fontOverrideKey) applyFontOverride(savedFont);
+  // Reapply block rules
+  applyBlockRules();
+}
+// CSS restore on finish-load (covers hard refresh / reopening)
+webview.addEventListener('did-finish-load', reapplyPersistedCss);
+
+
+
+// ══════════════════════════════════════════════════
+// MUTE TOGGLE
+// ══════════════════════════════════════════════════
+function toggleMute() {
+  isMuted = !isMuted;
+  webview.setAudioMuted(isMuted);
+  const btn = document.getElementById('btn-mute');
+  btn.textContent = isMuted ? '🔇' : '🔊';
+  btn.classList.toggle('muted', isMuted);
+  btn.title = isMuted ? 'Unmute page audio' : 'Mute page audio';
+}
+document.getElementById('btn-mute').onclick = toggleMute;
+
+// ══════════════════════════════════════════════════
+// COPY URL
+// ══════════════════════════════════════════════════
+function copyUrl() {
+  const url = webview.getURL();
+  if (!url || url === 'about:blank') return;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('btn-copy-url');
+    btn.textContent = '✓';
+    btn.style.color = '#28c840';
+    setTimeout(() => { btn.textContent = '📋'; btn.style.color = ''; }, 1200);
+  });
+}
+document.getElementById('btn-copy-url').onclick = copyUrl;
+
+// ══════════════════════════════════════════════════
+// PICTURE-IN-PICTURE (always-on-top toggle)
+// ══════════════════════════════════════════════════
+function togglePip() {
+  isPip = !isPip;
+  const btn = document.getElementById('btn-pip');
+  btn.style.color = isPip ? '#febc2e' : '';
+  btn.title = isPip ? 'Exit picture-in-picture' : 'Picture-in-picture mode';
+  // Use electron API to toggle always-on-top + resize to small float
+  try {
+    if (isPip) {
+      window.electronAPI.minimize(); // trigger main process always-on-top via ipc if available
+    }
+  } catch {}
+  // Inject message to main process via page title trick (fallback)
+  document.title = isPip ? '__ec_pip_on__' : '__ec_pip_off__';
+  setTimeout(() => { document.title = 'Entropy Client'; }, 500);
+}
+document.getElementById('btn-pip').onclick = togglePip;
+
+// ══════════════════════════════════════════════════
+// SCREENSHOT TITLEBAR BUTTON
+// ══════════════════════════════════════════════════
+document.getElementById('btn-screenshot-tb').onclick = takeScreenshot;
+
+// ══════════════════════════════════════════════════
+// SEARCH BAR
+// ══════════════════════════════════════════════════
+let searchOpen = false;
+function toggleSearch() {
+  searchOpen = !searchOpen;
+  const wrap = document.getElementById('search-wrap');
+  wrap.classList.toggle('open', searchOpen);
+  if (searchOpen) { setTimeout(() => document.getElementById('search-input').focus(), 310); }
+  else { webview.stopFindInPage('clearSelection'); document.getElementById('search-input').value = ''; }
+}
+document.getElementById('btn-search-toggle').onclick = toggleSearch;
+document.getElementById('search-input').addEventListener('input', e => {
+  const q = e.target.value.trim();
+  if (q) webview.findInPage(q, { findNext: false, forward: true, matchCase: false });
+  else webview.stopFindInPage('clearSelection');
+});
+document.getElementById('search-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const q = document.getElementById('search-input').value.trim();
+    if (q) webview.findInPage(q, { findNext: true, forward: !e.shiftKey });
+  }
+  if (e.key === 'Escape') toggleSearch();
+});
+document.getElementById('btn-search-submit').onclick = () => {
+  const q = document.getElementById('search-input').value.trim();
+  if (q) webview.findInPage(q, { findNext: true, forward: true });
+};
+
+// ══════════════════════════════════════════════════
+// LAST VISITED DROPDOWN
+// ══════════════════════════════════════════════════
+function renderLastVisited() {
+  const list = document.getElementById('lv-list');
+  const recent = sessionHistory.slice(0, 8);
+  if (!recent.length) { list.innerHTML = '<div class="lv-empty">No recent pages yet.</div>'; return; }
+  list.innerHTML = '';
+  recent.forEach(h => {
+    const d = document.createElement('div');
+    d.className = 'lv-item';
+    let display = h.url;
+    try { display = new URL(h.url).pathname.slice(0, 36) || h.url; } catch {}
+    d.innerHTML = `<span class="lv-item-url" title="${h.url}">${display}</span><span class="lv-item-time">${h.time}</span>`;
+    d.onclick = () => { webview.loadURL(h.url); closeLvMenu(); };
+    list.appendChild(d);
+  });
+}
+function openLvMenu() {
+  renderLastVisited();
+  const menu = document.getElementById('last-visited-menu');
+  const btn = document.getElementById('btn-last-visited');
+  const rect = btn.getBoundingClientRect();
+  menu.style.left = rect.left + 'px';
+  menu.classList.add('open');
+}
+function closeLvMenu() { document.getElementById('last-visited-menu').classList.remove('open'); }
+document.getElementById('btn-last-visited').onclick = (e) => {
+  e.stopPropagation();
+  const menu = document.getElementById('last-visited-menu');
+  if (menu.classList.contains('open')) closeLvMenu(); else openLvMenu();
+};
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('last-visited-menu');
+  const wrap = document.getElementById('last-visited-wrap');
+  if (!wrap.contains(e.target)) closeLvMenu();
+});
+
+// ══════════════════════════════════════════════════
+// RECONNECTING BANNER
+// ══════════════════════════════════════════════════
+const reconnectBanner = document.getElementById('reconnect-banner');
+const reconnectMsg = document.getElementById('reconnect-msg');
+// Patch setConnState to also show/hide the banner
+const _origSetConnState = setConnState;
+setConnState = function(state) {
+  _origSetConnState(state);
+  if (state === 'offline') {
+    reconnectBanner.className = 'show';
+    reconnectMsg.textContent = 'No connection — retrying in 5s…';
+  } else if (state === 'checking') {
+    reconnectBanner.className = 'show checking';
+    reconnectMsg.textContent = 'Checking connection…';
+  } else {
+    reconnectBanner.classList.remove('show');
+  }
+};
+
+// ══════════════════════════════════════════════════
+// PER-SERVER ZOOM MEMORY
+// ══════════════════════════════════════════════════
+try { serverZooms = JSON.parse(localStorage.getItem('ec_server_zooms') || '{}'); } catch {}
+try { perZoomEnabled = localStorage.getItem('ec_per_zoom') === '1'; } catch {}
+
+function getServerKey(url) {
+  try { const u = new URL(url); return u.hostname + (u.pathname.split('/')[1] ? '/' + u.pathname.split('/')[1] : ''); }
+  catch { return ''; }
+}
+function applyServerZoom(url) {
+  if (!perZoomEnabled) return;
+  const key = getServerKey(url);
+  if (!key || key === lastServerKey) return;
+  if (serverZooms[key] !== undefined) {
+    zoomStep = serverZooms[key];
+    webview.setZoomLevel(zoomStep);
+    const zl = document.getElementById('zoom-level');
+    if (zl) zl.textContent = Math.round(Math.pow(1.2, zoomStep) * 100) + '%';
+  }
+  lastServerKey = key;
+}
+// Save zoom per server whenever zoom changes
+const _origHandleZoom = handleZoom;
+handleZoom = function(d, reset) {
+  _origHandleZoom(d, reset);
+  if (perZoomEnabled) {
+    const key = getServerKey(webview.getURL());
+    if (key) {
+      serverZooms[key] = zoomStep;
+      localStorage.setItem('ec_server_zooms', JSON.stringify(serverZooms));
+    }
+  }
+};
+webview.addEventListener('did-navigate', e => applyServerZoom(e.url || webview.getURL()));
+
+document.getElementById('ms-per-zoom').onchange = e => {
+  perZoomEnabled = e.target.checked;
+  localStorage.setItem('ec_per_zoom', perZoomEnabled ? '1' : '0');
+};
+try { document.getElementById('ms-per-zoom').checked = perZoomEnabled; } catch {}
+
+// ══════════════════════════════════════════════════
+// FONT OVERRIDE
+// ══════════════════════════════════════════════════
+let fontOverrideKey = null;
+async function applyFontOverride(font) {
+  if (fontOverrideKey) { try { await webview.removeInsertedCSS(fontOverrideKey); fontOverrideKey = null; } catch {} }
+  localStorage.setItem('ec_font_override', font);
+  if (!font) return;
+  const css = `* { font-family: '${font}', sans-serif !important; }`;
+  try { fontOverrideKey = await webview.insertCSS(css); } catch {}
+}
+document.getElementById('ms-font').onchange = e => applyFontOverride(e.target.value);
+const savedFont = localStorage.getItem('ec_font_override') || '';
+if (savedFont) { document.getElementById('ms-font').value = savedFont; }
+webview.addEventListener('did-finish-load', () => { if (savedFont || localStorage.getItem('ec_font_override')) applyFontOverride(localStorage.getItem('ec_font_override') || ''); });
+
+// ══════════════════════════════════════════════════
+// COMPACT MODE
+// ══════════════════════════════════════════════════
+let compactKey = null;
+const COMPACT_CSS = `
+  [class*="message-item"],[class*="MessageItem"],[class*="chat-message"],[data-message-id] { padding-top: 2px !important; padding-bottom: 2px !important; }
+  [class*="message-content"],[class*="MessageContent"] { font-size: 13px !important; line-height: 1.4 !important; }
+  [class*="avatar"],[class*="Avatar"] { width: 28px !important; height: 28px !important; }
+  [class*="channel-item"],[class*="ChannelItem"] { padding-top: 3px !important; padding-bottom: 3px !important; font-size: 12px !important; }
+`;
+// ── Force-show member list ──
+let membersKey = null;
+const MEMBERS_CSS = `
+  [class*="members-sidebar"],[class*="MembersSidebar"],
+  [class*="member-list"],[class*="MemberList"],
+  [class*="users-sidebar"],[class*="UsersSidebar"],
+  [class*="rightPanel"],[class*="right-panel"],
+  [class*="channelMembers"],[class*="channel-members"],
+  aside { display: flex !important; visibility: visible !important;
+          opacity: 1 !important; width: auto !important;
+          min-width: 100px !important; max-width: none !important;
+          pointer-events: auto !important; overflow: visible !important; }
+`;
+async function setShowMembers(on) {
+  localStorage.setItem('ec_show_members', on ? '1' : '0');
+  if (membersKey) { try { await webview.removeInsertedCSS(membersKey); membersKey = null; } catch {} }
+  if (on) { try { membersKey = await webview.insertCSS(MEMBERS_CSS); } catch {} }
+}
+document.getElementById('ms-show-members').onchange = e => setShowMembers(e.target.checked);
+if (localStorage.getItem('ec_show_members') === '1') {
+  document.getElementById('ms-show-members').checked = true;
+  setShowMembers(true);
+}
+webview.addEventListener('did-finish-load', () => {
+  membersKey = null;
+  if (localStorage.getItem('ec_show_members') === '1') setShowMembers(true);
+});
+
+async function setCompactMode(on) {
+  isCompact = on;
+  localStorage.setItem('ec_compact', on ? '1' : '0');
+  if (compactKey) { try { await webview.removeInsertedCSS(compactKey); compactKey = null; } catch {} }
+  if (on) { try { compactKey = await webview.insertCSS(COMPACT_CSS); } catch {} }
+}
+document.getElementById('ms-compact').onchange = e => setCompactMode(e.target.checked);
+if (localStorage.getItem('ec_compact') === '1') { document.getElementById('ms-compact').checked = true; setCompactMode(true); }
+webview.addEventListener('did-finish-load', () => { if (isCompact) setCompactMode(true); });
+
+// ══════════════════════════════════════════════════
+// FOCUS MODE
+// ══════════════════════════════════════════════════
+function toggleFocusMode() {
+  isFocusMode = !isFocusMode;
+  document.body.classList.toggle('focus-mode', isFocusMode);
+  document.getElementById('ms-focus').checked = isFocusMode;
+  const hint = document.getElementById('focus-hint');
+  if (isFocusMode) {
+    hint.classList.add('show');
+    setTimeout(() => hint.classList.remove('show'), 3000);
+  }
+}
+document.getElementById('ms-focus').onchange = () => toggleFocusMode();
+
+// ══════════════════════════════════════════════════
+// TITLEBAR HEIGHT
+// ══════════════════════════════════════════════════
+function applyTitlebarHeight(px) {
+  const h = parseInt(px);
+  document.getElementById('titlebar').style.height = h + 'px';
+  document.querySelector('webview').style.top = h + 'px';
+  document.querySelector('webview').style.height = `calc(100% - ${h}px)`;
+  const canvases = document.querySelectorAll('#bg-canvas, #particle-canvas');
+  canvases.forEach(cv => { cv.style.top = h + 'px'; cv.style.height = `calc(100% - ${h}px)`; });
+  document.getElementById('ms-tb-height-val').textContent = h + 'px';
+  localStorage.setItem('ec_tb_height', h);
+}
+document.getElementById('ms-tb-height').oninput = e => applyTitlebarHeight(e.target.value);
+const savedTbH = localStorage.getItem('ec_tb_height');
+if (savedTbH) { document.getElementById('ms-tb-height').value = savedTbH; applyTitlebarHeight(savedTbH); }
+
+// ══════════════════════════════════════════════════
+// UNREAD BADGE
+// ══════════════════════════════════════════════════
+webview.addEventListener('page-title-updated', e => {
+  const match = e.title && e.title.match(/\((\d+)\)/);
+  unreadCount = match ? parseInt(match[1]) : 0;
+  const badge = document.getElementById('unread-badge');
+  if (unreadCount > 0) { badge.textContent = unreadCount; badge.classList.add('show'); }
+  else badge.classList.remove('show');
+  const tbCount = document.getElementById('tb-unread-count');
+  if (tbCount) tbCount.textContent = unreadCount;
+});
+
+// ══════════════════════════════════════════════════
+// COMMAND PALETTE
+// ══════════════════════════════════════════════════
+function buildCmdItems(query) {
+  const q = query.toLowerCase().trim();
+  const items = [];
+
+  // Tabs
+  const tabs = [
+    { icon: '🏠', label: 'Main Settings',     sub: 'tab', action: () => { openModal(); switchTab('main'); } },
+    { icon: '⚡', label: 'CSS Injector',       sub: 'tab', action: () => { openModal(); switchTab('css'); } },
+    { icon: '🎨', label: 'Themes',             sub: 'tab', action: () => { openModal(); switchTab('themes'); } },
+    { icon: '⭐', label: 'Starred Channels',   sub: 'tab', action: () => { openModal(); switchTab('bookmarks'); } },
+    { icon: '📝', label: 'Notes',              sub: 'tab', action: () => { openModal(); switchTab('notes'); } },
+    { icon: '🕐', label: 'History',            sub: 'tab', action: () => { openModal(); switchTab('history'); } },
+    { icon: '⌨️', label: 'Keybinds',           sub: 'tab', action: () => { openModal(); switchTab('keybinds'); } },
+    { icon: '👤', label: 'Accounts',           sub: 'tab', action: () => { openModal(); switchTab('accounts'); } },
+    { icon: '🚫', label: 'Blocker',            sub: 'tab', action: () => { openModal(); switchTab('blocker'); } },
+  ];
+
+  // Actions
+  const actions = [
+    { icon: '📸', label: 'Screenshot',           sub: 'action', action: takeScreenshot },
+    { icon: '📋', label: 'Copy URL',              sub: 'action', action: copyUrl },
+    { icon: isMuted ? '🔊' : '🔇', label: isMuted ? 'Unmute audio' : 'Mute audio', sub: 'action', action: toggleMute },
+    { icon: '🔍', label: 'Search in page',        sub: 'action', action: toggleSearch },
+    { icon: '↻',  label: 'Reload page',           sub: 'action', action: () => webview.reload() },
+    { icon: '⧉',  label: 'Picture-in-picture',    sub: 'action', action: togglePip },
+    { icon: '◻',  label: 'Focus mode',             sub: 'action', action: toggleFocusMode },
+    { icon: '⚙',  label: 'Toggle settings panel', sub: 'action', action: () => document.getElementById('settings-panel').classList.toggle('open') },
+  ];
+
+  // Favourites
+  const favItems = [];
+  favData.forEach(srv => {
+    srv.channels.forEach(ch => {
+      favItems.push({ icon: '⭐', label: ch.name, sub: srv.serverName, action: () => { webview.loadURL(ch.url); closeCmdPalette(); } });
+    });
+  });
+
+  // History
+  const histItems = sessionHistory.slice(0, 5).map(h => {
+    let label = h.url;
+    try { label = new URL(h.url).pathname || h.url; } catch {}
+    return { icon: '🕐', label: label.slice(0, 40), sub: h.time, action: () => { webview.loadURL(h.url); closeCmdPalette(); } };
+  });
+
+  const all = [
+    { section: 'Tabs', items: tabs },
+    { section: 'Actions', items: actions },
+    { section: 'Starred', items: favItems },
+    { section: 'Recent', items: histItems },
+  ];
+
+  return all.map(g => ({
+    section: g.section,
+    items: q ? g.items.filter(i => i.label.toLowerCase().includes(q) || i.sub.toLowerCase().includes(q)) : g.items,
+  })).filter(g => g.items.length);
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  const tab = document.querySelector(`.sidebar-tab[data-tab="${id}"]`);
+  const pane = document.getElementById(`pane-${id}`);
+  if (tab) tab.classList.add('active');
+  if (pane) pane.classList.add('active');
+}
+
+function renderCmdResults(query) {
+  const container = document.getElementById('cmd-results');
+  const groups = buildCmdItems(query);
+  if (!groups.length) { container.innerHTML = '<div id="cmd-empty">No results for "' + query + '"</div>'; return; }
+  container.innerHTML = '';
+  let selectedIdx = 0;
+  let allItems = [];
+  groups.forEach(g => {
+    const sec = document.createElement('div');
+    sec.className = 'cmd-section';
+    sec.textContent = g.section;
+    container.appendChild(sec);
+    g.items.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'cmd-item' + (allItems.length === selectedIdx ? ' selected' : '');
+      el.innerHTML = `<span class="cmd-item-icon">${item.icon}</span><span class="cmd-item-label">${item.label}</span><span class="cmd-item-sub">${item.sub}</span>`;
+      el.onclick = () => { item.action(); closeCmdPalette(); };
+      container.appendChild(el);
+      allItems.push({ el, action: item.action });
+    });
+  });
+  // Keyboard navigation
+  container._allItems = allItems;
+  container._selectedIdx = 0;
+  if (allItems[0]) allItems[0].el.classList.add('selected');
+}
+
+function openCmdPalette() {
+  cmdOpen = true;
+  document.getElementById('cmd-backdrop').classList.add('open');
+  const input = document.getElementById('cmd-input');
+  input.value = '';
+  renderCmdResults('');
+  setTimeout(() => input.focus(), 50);
+}
+function closeCmdPalette() {
+  cmdOpen = false;
+  document.getElementById('cmd-backdrop').classList.remove('open');
+}
+
+document.getElementById('cmd-input').addEventListener('input', e => renderCmdResults(e.target.value));
+document.getElementById('cmd-input').addEventListener('keydown', e => {
+  const results = document.getElementById('cmd-results');
+  const items = results._allItems || [];
+  let idx = results._selectedIdx || 0;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (items[idx]) items[idx].el.classList.remove('selected');
+    idx = Math.min(idx + 1, items.length - 1);
+    if (items[idx]) { items[idx].el.classList.add('selected'); items[idx].el.scrollIntoView({ block: 'nearest' }); }
+    results._selectedIdx = idx;
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (items[idx]) items[idx].el.classList.remove('selected');
+    idx = Math.max(idx - 1, 0);
+    if (items[idx]) { items[idx].el.classList.add('selected'); items[idx].el.scrollIntoView({ block: 'nearest' }); }
+    results._selectedIdx = idx;
+  } else if (e.key === 'Enter') {
+    if (items[idx]) { items[idx].action(); closeCmdPalette(); }
+  } else if (e.key === 'Escape') {
+    closeCmdPalette();
+  }
+});
+document.getElementById('cmd-backdrop').addEventListener('click', e => { if (e.target === document.getElementById('cmd-backdrop')) closeCmdPalette(); });
+
 // ── Init ──────────────────────────────────────────
 renderWidgetBar();
 document.querySelector('[data-tab="main"]').addEventListener('click', renderWidgetConfig);
+
+// ══════════════════════════════════════════════════
+// ADDONS SYSTEM — file-based
+// Addons are .js files in userData/addons/.
+// Each exports a manifest: id, icon, name, desc,
+// category, css, script, onDisable.
+// Main process parses them and sends manifests here.
+// ══════════════════════════════════════════════════
+
+BUILTIN_ADDONS = [{"id": "hide-members", "icon": "👥", "name": "Hide Member List", "desc": "Collapses the right-side members panel.", "category": "Visual", "css": "\n    [class*=\"members-sidebar\"],[class*=\"MembersSidebar\"],\n    [class*=\"member-list\"],[class*=\"MemberList\"],\n    [class*=\"users-sidebar\"],[class*=\"UsersSidebar\"],\n    aside[class*=\"right\"],aside[class*=\"side\"],\n    [class*=\"rightPanel\"],[class*=\"right-panel\"],\n    [data-testid*=\"member\"],[data-testid*=\"users\"],\n    [class*=\"channelMembers\"],[class*=\"channel-members\"] {\n      display: none !important;\n    }\n  ", "script": "", "onDisable": ""}, {"id": "custom-font", "icon": "🔤", "name": "Custom Message Font", "desc": "Applies a clean monospace font to chat messages.", "category": "Visual", "css": "\n    [class*=\"message-content\"],[class*=\"MessageContent\"],\n    [class*=\"chat-message\"],[data-message-id] span,\n    [class*=\"text-content\"],[class*=\"TextContent\"] {\n      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace !important;\n    }\n  ", "script": "", "onDisable": ""}, {"id": "markdown-preview", "icon": "✍️", "name": "Markdown Preview", "desc": "Renders **bold**, *italic*, `code`, and ~~strike~~ live as you type.", "category": "Chat", "css": "", "script": "\n    (function(){\n      if (window.__ecMdPreview) return;\n      window.__ecMdPreview = true;\n\n      var preview = document.createElement('div');\n      preview.id = '__ec-md-preview';\n      preview.style.cssText =\n        'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);'\n        + 'background:rgba(18,18,24,0.97);border:1px solid rgba(255,107,0,0.25);'\n        + 'border-radius:10px;padding:10px 16px;font-size:13px;color:#ccc;'\n        + 'max-width:520px;min-width:200px;pointer-events:none;z-index:99999;'\n        + 'display:none;line-height:1.6;box-shadow:0 8px 32px rgba(0,0,0,0.5);'\n        + 'word-break:break-word;';\n      document.body.appendChild(preview);\n\n      function renderMd(text) {\n        return text\n          .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')\n          .replace(/\\*\\*(.+?)\\*\\*/g,'<strong>$1</strong>')\n          .replace(/\\*(.+?)\\*/g,'<em>$1</em>')\n          .replace(/~~(.+?)~~/g,'<s>$1</s>')\n          .replace(/\\", "onDisable": "if (window.__ecMdPreviewOff) window.__ecMdPreviewOff();"}, {"id": "typing-sound", "icon": "⌨️", "name": "Typing Sound", "desc": "Plays a subtle click sound as you type messages.", "category": "Fun", "css": "", "script": "\n    (function(){\n      if (window.__ecTypingSound) return;\n      window.__ecTypingSound = true;\n      var ctx = new (window.AudioContext || window.webkitAudioContext)();\n      function click() {\n        var o = ctx.createOscillator();\n        var g = ctx.createGain();\n        o.connect(g); g.connect(ctx.destination);\n        o.frequency.value = 1200 + Math.random() * 400;\n        o.type = 'square';\n        g.gain.setValueAtTime(0.04, ctx.currentTime);\n        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.04);\n        o.start(ctx.currentTime);\n        o.stop(ctx.currentTime + 0.04);\n      }\n      function onKey(e) {\n        if (!e.key) return;\n        if (e.key.length === 1 || e.key === 'Backspace' || e.key === ' ') click();\n      }\n      document.addEventListener('keydown', onKey, true);\n      window.__ecTypingSoundOff = function() {\n        document.removeEventListener('keydown', onKey, true);\n        window.__ecTypingSound = false;\n      };\n    })();\n  ", "onDisable": "if (window.__ecTypingSoundOff) window.__ecTypingSoundOff();"}, {"id": "message-sound", "icon": "🔔", "name": "Message Sound", "desc": "Plays a soft chime when a new message arrives in chat.", "category": "Fun", "css": "", "script": "\n    (function(){\n      if (window.__ecMsgSound) return;\n      window.__ecMsgSound = true;\n      var ctx = new (window.AudioContext || window.webkitAudioContext)();\n      function chime() {\n        [523, 659, 784].forEach(function(freq, i) {\n          var o = ctx.createOscillator();\n          var g = ctx.createGain();\n          o.connect(g); g.connect(ctx.destination);\n          o.frequency.value = freq;\n          o.type = 'sine';\n          var t = ctx.currentTime + i * 0.12;\n          g.gain.setValueAtTime(0, t);\n          g.gain.linearRampToValueAtTime(0.08, t + 0.02);\n          g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);\n          o.start(t); o.stop(t + 0.35);\n        });\n      }\n      var obs = new MutationObserver(function(muts) {\n        for (var i = 0; i < muts.length; i++) {\n          var added = muts[i].addedNodes;\n          for (var j = 0; j < added.length; j++) {\n            var n = added[j];\n            if (n.nodeType === 1 && (\n              (n.dataset && n.dataset.messageId) ||\n              (n.querySelector && n.querySelector('[data-message-id]'))\n            )) { chime(); break; }\n          }\n        }\n      });\n      obs.observe(document.body, { childList: true, subtree: true });\n      window.__ecMsgSoundOff = function() {\n        obs.disconnect();\n        window.__ecMsgSound = false;\n      };\n    })();\n  ", "onDisable": "if (window.__ecMsgSoundOff) window.__ecMsgSoundOff();"}];
+
+// ── Load addons from userData/addons/ via IPC ──
+async function loadAddons() {
+  try {
+    if (window.electronAPI && window.electronAPI.addonsList) {
+      const list = await window.electronAPI.addonsList();
+      if (list && list.length) {
+        ADDONS = list.map(item => item.manifest).filter(m => m && m.id);
+      }
+    }
+  } catch(e) {
+    console.warn('[EC] addonsList IPC failed:', e.message);
+  }
+  // Always fall back to builtins if nothing came from disk
+  if (!ADDONS.length) ADDONS = BUILTIN_ADDONS.slice();
+  // Restore saved toggle states
+  ADDONS.forEach(a => {
+    if (!(a.id in addonState)) {
+      addonState[a.id] = localStorage.getItem('ec_addon_' + a.id) === '1';
+    }
+  });
+}
+
+// ── Apply / remove a single addon ──
+async function setAddon(id, on) {
+  const addon = ADDONS.find(a => a.id === id);
+  if (!addon) return;
+  addonState[id] = on;
+  localStorage.setItem('ec_addon_' + id, on ? '1' : '0');
+
+  if (on) {
+    if (addon.css && addon.css.trim()) {
+      try { addonCssKeys[id] = await webview.insertCSS(addon.css); } catch {}
+    }
+    if (addon.script && addon.script.trim()) {
+      try { await webview.executeJavaScript(addon.script); } catch {}
+    }
+  } else {
+    if (addonCssKeys[id]) {
+      try { await webview.removeInsertedCSS(addonCssKeys[id]); } catch {}
+      addonCssKeys[id] = null;
+    }
+    if (addon.onDisable && addon.onDisable.trim()) {
+      try { await webview.executeJavaScript(addon.onDisable); } catch {}
+    }
+  }
+}
+
+// ── Re-inject all enabled addons after navigation ──
+webview.addEventListener('did-finish-load', async () => {
+  if (!ADDONS.length) await loadAddons();
+  for (const addon of ADDONS) {
+    if (addonState[addon.id]) {
+      addonCssKeys[addon.id] = null;
+      await setAddon(addon.id, true);
+    }
+  }
+});
+
+// ── Render addon cards in the UI ──
+function dbg(msg) {
+  const el = document.getElementById('addon-debug');
+  if (el) el.innerHTML += msg + '<br>';
+  console.log('[EC-ADDON]', msg);
+}
+
+function renderAddons() {
+  dbg('renderAddons() called, ADDONS.length=' + ADDONS.length + ', BUILTIN_ADDONS.length=' + BUILTIN_ADDONS.length);
+  const list = document.getElementById('addon-list');
+  if (!list) { dbg('ERROR: #addon-list not found!'); return; }
+
+  // Hard fallback — if ADDONS is still empty after load, use builtins directly
+  if (!ADDONS.length && BUILTIN_ADDONS.length) {
+    dbg('Using BUILTIN_ADDONS fallback');
+    ADDONS = BUILTIN_ADDONS.slice();
+    ADDONS.forEach(a => {
+      if (!(a.id in addonState))
+        addonState[a.id] = localStorage.getItem('ec_addon_' + a.id) === '1';
+    });
+  }
+
+  if (!ADDONS.length) {
+    dbg('No addons at all, showing empty state');
+    list.innerHTML = '<div style="text-align:center;padding:40px 0;font-size:11px;color:#444">'
+      + 'No addons found in the addons folder.<br>'
+      + '<span style="color:#ff6b00;cursor:pointer;margin-top:8px;display:inline-block" '
+      + 'onclick="window.electronAPI.addonsOpenFolder()">📂 Open addons folder</span></div>';
+    return;
+  }
+
+  dbg('Rendering ' + ADDONS.length + ' addons');
+  list.innerHTML = '';
+
+  // Open folder button at top
+  const openBtn = document.createElement('button');
+  openBtn.textContent = '📂 Open addons folder';
+  openBtn.style.cssText = 'display:block;margin:0 0 8px auto;background:transparent;'
+    + 'border:1px solid #2a2a2a;color:#555;font-size:10px;padding:4px 10px;'
+    + 'border-radius:5px;cursor:pointer;font-family:inherit;transition:all 0.15s';
+  openBtn.onmouseover = function() { this.style.borderColor='#555'; this.style.color='#aaa'; };
+  openBtn.onmouseout  = function() { this.style.borderColor='#2a2a2a'; this.style.color='#555'; };
+  openBtn.onclick = () => window.electronAPI.addonsOpenFolder();
+  list.appendChild(openBtn);
+
+  const categories = [...new Set(ADDONS.map(a => a.category || 'Other'))];
+  categories.forEach(cat => {
+    const header = document.createElement('div');
+    header.style.cssText = 'font-size:10px;font-weight:700;text-transform:uppercase;'
+      + 'letter-spacing:0.7px;color:#555;margin:10px 0 5px';
+    header.textContent = cat;
+    list.appendChild(header);
+
+    ADDONS.filter(a => (a.category || 'Other') === cat).forEach(addon => {
+      const on = addonState[addon.id] || false;
+      const card = document.createElement('div');
+      card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 13px;'
+        + 'background:rgba(255,255,255,0.03);border:1px solid '
+        + (on ? 'rgba(255,107,0,0.3)' : 'rgba(255,255,255,0.07)') + ';'
+        + 'border-radius:9px;transition:border-color 0.15s';
+
+      card.innerHTML = '<span style="font-size:20px">' + (addon.icon || '🧩') + '</span>'
+        + '<div style="flex:1;min-width:0">'
+        + '<div style="font-size:12px;font-weight:600;color:' + (on ? '#ff6b00' : '#aaa') + '">'
+        + (addon.name || addon.id) + '</div>'
+        + '<div style="font-size:10px;color:#555;margin-top:1px;line-height:1.4">'
+        + (addon.desc || '') + '</div>'
+        + '</div>'
+        + '<label class="toggle"><input type="checkbox" ' + (on ? 'checked' : '') + '>'
+        + '<span class="slider"></span></label>';
+
+      list.appendChild(card);
+
+      card.querySelector('input').onchange = async function() {
+        await setAddon(addon.id, this.checked);
+        renderAddons();
+      };
+    });
+  });
+}
+
+
+// ── Init: addon states will be loaded when the tab is first opened ──
+
 </script>
 
 <!-- ══ CUSTOM THEMES POPUP ══ -->
@@ -2364,6 +3877,20 @@ document.querySelector('[data-tab="main"]').addEventListener('click', renderWidg
     </div>
   </div>
 </div>
+
+<!-- ══ COMMAND PALETTE ══ -->
+<div id="cmd-backdrop">
+  <div id="cmd-palette">
+    <div id="cmd-input-wrap">
+      <span>⌘</span>
+      <input id="cmd-input" placeholder="Type a command, tab, or channel…" autocomplete="off" />
+    </div>
+    <div id="cmd-results"></div>
+  </div>
+</div>
+
+<!-- Focus hint -->
+<div id="focus-hint">Press Esc or F11 to exit focus mode</div>
 
 </body>
 </html>
