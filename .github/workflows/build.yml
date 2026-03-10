@@ -38,12 +38,6 @@ jobs:
           CSC_LINK: ""
           CSC_KEY_PASSWORD: ""
         run: npm run dist:mac
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          CSC_IDENTITY_AUTO_DISCOVERY: false
-          CSC_LINK: ""
-          CSC_KEY_PASSWORD: ""
-        run: npm run dist:mac
 
   build-linux:
     runs-on: ubuntu-22.04
