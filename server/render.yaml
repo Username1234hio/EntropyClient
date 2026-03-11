@@ -2,14 +2,13 @@ services:
   - type: web
     name: ec-profile-server
     runtime: node
+    rootDir: server
     buildCommand: npm install
     startCommand: node server.js
     envVars:
-      - key: EC_SECRET
-        generateValue: true
       - key: BASE_URL
-        value: https://entropyclient.onrender.com
-    disk:
-      name: profiles-db
-      mountPath: /data
-      sizeGB: 1
+        value: https://ec-profile-server.onrender.com
+      - key: TURSO_URL
+        sync: false
+      - key: TURSO_TOKEN
+        sync: false
