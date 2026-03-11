@@ -7,7 +7,7 @@ services:
     startCommand: node server.js
     envVars:
       - key: BASE_URL
-        value: https://ec-profile-server.onrender.com
+        value: https://entropyclient.onrender.com
       - key: TURSO_URL
         sync: false
       - key: TURSO_TOKEN
