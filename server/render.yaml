@@ -8,7 +8,7 @@ services:
       - key: EC_SECRET
         generateValue: true
       - key: BASE_URL
-        value: https://ec-profile-server.onrender.com  # change to your actual Render URL
+        value: https://entropyclient.onrender.com
     disk:
       name: profiles-db
       mountPath: /data
