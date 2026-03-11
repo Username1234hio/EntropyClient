@@ -123,6 +123,59 @@
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.6} }
 
     #win-controls { display: flex; gap: 6px; align-items: center; -webkit-app-region: no-drag; padding-left: 2px; }
+    #mac-controls { -webkit-app-region: no-drag; padding: 0 4px 0 6px; flex-shrink: 0; }
+    /* ── Addon cards ── */
+    .addon-card { background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:9px;overflow:hidden;transition:border-color 0.15s; }
+    .addon-card.enabled { border-color:rgba(255,107,0,0.3); }
+    .addon-card-header { display:flex;align-items:center;gap:12px;padding:10px 13px;cursor:pointer;user-select:none; }
+    .addon-card-header:hover { background:rgba(255,255,255,0.02); }
+    .addon-card-chevron { font-size:10px;color:#444;transition:transform 0.2s;margin-left:auto;margin-right:6px; }
+    .addon-card.expanded .addon-card-chevron { transform:rotate(90deg); }
+    .addon-settings-panel { display:none;padding:12px 14px 14px;border-top:1px solid #1a1a1a;background:rgba(0,0,0,0.2); }
+    .addon-card.expanded .addon-settings-panel { display:block; }
+    .addon-settings-row { display:flex;flex-direction:column;gap:6px;margin-bottom:12px; }
+    .addon-settings-label { font-size:11px;color:#888;font-weight:600; }
+    .addon-settings-input { background:#1a1a1a;border:1px solid #333;color:#ccc;font-size:11px;padding:6px 8px;border-radius:6px;font-family:inherit;width:100%;box-sizing:border-box;outline:none; }
+    .addon-settings-input:focus { border-color:rgba(255,107,0,0.5); }
+    .addon-settings-btn { padding:6px 14px;border-radius:6px;border:none;font-family:inherit;font-size:11px;cursor:pointer;transition:all 0.15s; }
+    .addon-btn-save { background:rgba(255,107,0,0.2);border:1px solid rgba(255,107,0,0.4);color:#ff9944; }
+    .addon-btn-save:hover { background:rgba(255,107,0,0.35); }
+    .addon-btn-danger { background:rgba(255,80,80,0.12);border:1px solid rgba(255,80,80,0.3);color:#ff8080; }
+    .addon-btn-danger:hover { background:rgba(255,80,80,0.25); }
+    .addon-no-settings { font-size:11px;color:#444;font-style:italic; }
+
+    /* ── Profile Card System ── */
+    .prof-inner-tab { background:transparent;border:1px solid transparent;color:rgba(255,255,255,0.35);font-size:11px;font-weight:500;padding:5px 10px;border-radius:6px;cursor:pointer;font-family:inherit;transition:all 0.15s; }
+    .prof-inner-tab:hover { color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.05); }
+    .prof-inner-tab.active { color:#ff6b00;background:rgba(255,107,0,0.12);border-color:rgba(255,107,0,0.2); }
+    .prof-link-row { display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:7px; }
+    .prof-link-icon { font-size:16px;flex-shrink:0; }
+    .prof-link-info { flex:1;min-width:0; }
+    .prof-link-platform { font-size:11px;font-weight:600;color:#888; }
+    .prof-link-handle { font-size:12px;color:#ccc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    .prof-link-verified { font-size:9px;color:#28c840;background:rgba(40,200,64,0.1);padding:2px 5px;border-radius:3px;border:1px solid rgba(40,200,64,0.2); }
+    .prof-link-remove { background:transparent;border:none;color:#444;cursor:pointer;font-size:14px;padding:4px;border-radius:4px;transition:color 0.15s; }
+    .prof-link-remove:hover { color:#ff5f57; }
+    .ec-profile-card-header { display:flex;align-items:center;gap:12px;margin-bottom:10px; }
+    .ec-profile-card-avatar { width:48px;height:48px;border-radius:50%;background:#1a1a1a;border:2px solid #333;position:relative;overflow:hidden;flex-shrink:0; }
+    .ec-profile-card-name { font-size:14px;font-weight:700;color:#fff;margin-bottom:2px; }
+    .ec-profile-card-username { font-size:11px;color:#555; }
+    .ec-profile-card-bio { font-size:11px;color:#777;line-height:1.5;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #1a1a1a; }
+    .ec-profile-card-links { display:flex;flex-direction:column;gap:5px; }
+    .ec-profile-card-link { display:flex;align-items:center;gap:8px;font-size:11px;color:#888;text-decoration:none; }
+    .ec-profile-card-link:hover { color:#ff6b00; }
+    .splash-card { position:relative;border-radius:9px;overflow:hidden;border:2px solid #2a2a2a;cursor:pointer;aspect-ratio:16/9;background:#111;transition:border-color 0.15s,transform 0.12s; }
+    .splash-card:hover { border-color:#555;transform:scale(1.02); }
+    .splash-card.selected { border-color:#28c840; }
+    .splash-card img { width:100%;height:100%;object-fit:cover;display:block;filter:brightness(0.85); }
+    .splash-card .splash-check { position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:#28c840;display:none;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,0.5);z-index:2; }
+    .splash-card.selected .splash-check { display:flex; }
+    .splash-card .splash-del { position:absolute;top:6px;left:6px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,0.7);border:none;color:#ff5f57;font-size:11px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2;padding:0; }
+    .splash-card:hover .splash-del { display:flex; }
+    .splash-card .splash-label { position:absolute;bottom:0;left:0;right:0;padding:4px 6px;background:linear-gradient(transparent,rgba(0,0,0,0.75));font-size:9px;color:rgba(255,255,255,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .splash-card.is-default { border-color:#ff6b00; }
+    .splash-card.is-default .splash-check { background:#ff6b00; display:flex; }
+    #splash-upload-label:hover { background:rgba(255,107,0,0.2);border-color:#ff6b00; }
     .ctrl { -webkit-app-region: no-drag; width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; opacity: 0.8; transition: opacity 0.15s, transform 0.1s; }
     .ctrl:hover { opacity: 1; transform: scale(1.2); }
     #btn-close { background: #ff5f57; } #btn-minimize { background: #febc2e; } #btn-maximize { background: #28c840; }
@@ -604,6 +657,13 @@
 
 <!-- Titlebar -->
 <div id="titlebar">
+  <!-- Mac-style controls (shown on left when mac mode enabled) -->
+  <div id="mac-controls" style="display:none;gap:6px;align-items:center;-webkit-app-region:no-drag;padding-right:6px;flex-shrink:0">
+    <button class="ctrl" id="mac-btn-close" style="background:#ff5f57" title="Close"></button>
+    <button class="ctrl" id="mac-btn-minimize" style="background:#febc2e" title="Minimize"></button>
+    <button class="ctrl" id="mac-btn-maximize" style="background:#28c840" title="Maximize"></button>
+  </div>
+  <div id="mac-controls-divider" class="divider" style="display:none"></div>
   <div id="nav-group">
     <button class="tb-btn nav-btn" id="btn-back">‹</button>
     <button class="tb-btn nav-btn" id="btn-forward">›</button>
@@ -641,7 +701,7 @@
   <button class="tb-btn" id="btn-update">↑ Update</button>
   <div class="divider"></div>
   <button class="tb-btn" id="settings-toggle">⚙</button>
-  <div class="divider"></div>
+  <div class="divider" id="win-controls-divider"></div>
   <div id="win-controls">
     <button class="ctrl" id="btn-minimize"></button>
     <button class="ctrl" id="btn-maximize"></button>
@@ -692,6 +752,8 @@
         <div class="sidebar-tab active" data-tab="main"><span class="tab-icon">🏠</span> Main Settings</div>
         <div class="sidebar-tab" data-tab="css"><span class="tab-icon">⚡</span> CSS Injector</div>
         <div class="sidebar-tab" data-tab="themes"><span class="tab-icon">🎨</span> Themes</div>
+        <div class="sidebar-tab" data-tab="titlebar"><span class="tab-icon">🖥️</span> Titlebar</div>
+        <div class="sidebar-tab" data-tab="splashes"><span class="tab-icon">🖼️</span> Splash Screens</div>
 
         <div class="sidebar-tab" data-tab="bookmarks"><span class="tab-icon">⭐</span> Starred Channels</div>
         <div class="sidebar-tab" data-tab="notes"><span class="tab-icon">📝</span> Notes</div>
@@ -702,6 +764,7 @@
         <div class="sidebar-tab" data-tab="emojis"><span class="tab-icon">😀</span> Emojis</div>
         <div class="sidebar-tab locked" id="fun-tab" data-tab="fun"><span class="tab-icon">✨</span> Fun & Effects</div>
         <div class="sidebar-tab" id="addons-tab" data-tab="addons"><span class="tab-icon">🧩</span> Addons</div>
+        <div class="sidebar-tab" id="profile-tab" data-tab="profile"><span class="tab-icon">🪪</span> My Profile</div>
         <div id="sidebar-footer"><kbd>Esc</kbd> to close<br><span id="konami-hint" style="display:none;color:#ff6b00;font-size:9px">✦ secret unlocked</span></div>
       </div>
 
@@ -709,17 +772,7 @@
 
         <!-- Main Settings -->
         <div class="tab-pane active" id="pane-main">
-          <div class="section-title">Pinned Widgets</div>
-          <div style="font-size:11px;color:#666;margin-bottom:12px">Choose which widgets appear in the titlebar.</div>
-          <div id="widget-config" style="display:flex;flex-direction:column;gap:8px"></div>
-
-          <div class="section-title" style="margin-top:20px">Widget Preview</div>
-          <div style="background:rgba(255,255,255,0.04);border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:6px;min-height:38px">
-            <span style="font-size:10px;color:#444;margin-right:4px">PREVIEW</span>
-            <div id="widget-preview-bar" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-          </div>
-
-          <div class="section-title" style="margin-top:20px">General</div>
+          <div class="section-title" style="margin-top:4px">General</div>
           <div style="display:flex;flex-direction:column;gap:0">
             <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
               <div><div class="setting-label">Launch at startup</div><div class="setting-sub">Start Entropy Client with your computer</div></div>
@@ -804,6 +857,91 @@
           </div>
         </div>
 
+        <!-- Titlebar Settings -->
+        <div class="tab-pane" id="pane-titlebar">
+
+          <div class="section-title">Window Controls Style</div>
+          <div style="font-size:11px;color:#666;margin-bottom:14px">Choose where the close/minimise/maximise buttons appear.</div>
+          <div style="display:flex;gap:10px;margin-bottom:20px">
+            <div id="tb-style-windows" class="tb-style-opt" onclick="setTitlebarStyle('windows')" style="flex:1;border:2px solid #ff6b00;border-radius:10px;padding:14px 10px;cursor:pointer;background:rgba(255,107,0,0.08);display:flex;flex-direction:column;align-items:center;gap:8px;transition:all 0.2s">
+              <div style="font-size:11px;color:#aaa;font-weight:600">Windows</div>
+              <div style="display:flex;gap:5px;background:#111;border-radius:6px;padding:6px 10px;width:100%;justify-content:flex-end;box-sizing:border-box">
+                <div style="width:10px;height:10px;border-radius:50%;background:#555"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:#555"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:#ff5f57"></div>
+              </div>
+              <div style="font-size:10px;color:#555">Controls on the right</div>
+            </div>
+            <div id="tb-style-mac" class="tb-style-opt" onclick="setTitlebarStyle('mac')" style="flex:1;border:2px solid #333;border-radius:10px;padding:14px 10px;cursor:pointer;background:rgba(255,255,255,0.02);display:flex;flex-direction:column;align-items:center;gap:8px;transition:all 0.2s">
+              <div style="font-size:11px;color:#aaa;font-weight:600">macOS</div>
+              <div style="display:flex;gap:5px;background:#111;border-radius:6px;padding:6px 10px;width:100%;justify-content:flex-start;box-sizing:border-box">
+                <div style="width:10px;height:10px;border-radius:50%;background:#ff5f57"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:#febc2e"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:#28c840"></div>
+              </div>
+              <div style="font-size:10px;color:#555">Controls on the left</div>
+            </div>
+          </div>
+
+          <div class="section-title">Titlebar Height</div>
+          <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+            <div><div class="setting-label">Height</div><div class="setting-sub">Adjust titlebar size (also in Main Settings)</div></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <input type="range" id="tb-height-2" min="24" max="52" value="32" style="width:80px;accent-color:#ff6b00">
+              <span id="tb-height-2-val" style="font-size:11px;color:#aaa;min-width:28px">32px</span>
+            </div>
+          </div>
+
+          <div class="section-title" style="margin-top:20px">Pinned Widgets</div>
+          <div style="font-size:11px;color:#666;margin-bottom:12px">Choose which widgets appear in the titlebar.</div>
+          <div id="widget-config" style="display:flex;flex-direction:column;gap:8px"></div>
+
+          <div class="section-title" style="margin-top:20px">Widget Preview</div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:6px;min-height:38px">
+            <span style="font-size:10px;color:#444;margin-right:4px">PREVIEW</span>
+            <div id="widget-preview-bar" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+          </div>
+
+        </div>
+
+        <!-- Splash Screens -->
+        <div class="tab-pane" id="pane-splashes">
+          <div class="section-title">Custom Splash Screens</div>
+          <div style="font-size:11px;color:#666;margin-bottom:14px">Upload images to use as splash screens. Selected ones cycle every 5 seconds on load. If none selected, the default is used.</div>
+
+          <!-- Upload button -->
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px">
+            <label id="splash-upload-label" style="display:flex;align-items:center;gap:7px;padding:8px 14px;background:rgba(255,107,0,0.12);border:1px solid rgba(255,107,0,0.35);border-radius:8px;color:#ff9944;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s">
+              <span style="font-size:15px">＋</span> Upload Images
+              <input type="file" id="splash-file-input" accept="image/*" multiple style="display:none">
+            </label>
+            <button id="splash-clear-all" style="padding:8px 12px;background:rgba(255,255,255,0.04);border:1px solid #333;border-radius:8px;color:#888;font-size:11px;cursor:pointer;transition:all 0.15s">🗑 Clear All</button>
+            <span id="splash-count-label" style="font-size:11px;color:#555;margin-left:auto"></span>
+          </div>
+
+          <!-- Grid -->
+          <div id="splash-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px"></div>
+
+          <!-- Empty state -->
+          <div id="splash-empty" style="display:none;flex-direction:column;align-items:center;gap:8px;padding:40px 0;color:#444">
+            <div style="font-size:32px">🖼️</div>
+            <div style="font-size:12px">No custom splash screens yet</div>
+            <div style="font-size:11px;color:#333">Upload images above to get started</div>
+          </div>
+
+          <div class="section-title" style="margin-top:22px">Cycle Behaviour</div>
+          <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+            <div><div class="setting-label">Cycle interval</div><div class="setting-sub">How long each splash shows</div></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <input type="range" id="splash-interval-slider" min="2" max="15" value="5" style="width:80px;accent-color:#ff6b00">
+              <span id="splash-interval-val" style="font-size:11px;color:#aaa;min-width:24px">5s</span>
+            </div>
+          </div>
+          <div class="setting-row" style="padding:9px 0">
+            <div><div class="setting-label">Shuffle order</div><div class="setting-sub">Randomise which splash shows next</div></div>
+            <label class="toggle"><input type="checkbox" id="splash-shuffle"><span class="slider"></span></label>
+          </div>
+        </div>
 
         <!-- CSS (was previously first, now just in place) -->
         <div class="tab-pane" id="pane-css">
@@ -1106,10 +1244,142 @@ body { background: #0a0a0a !important; }"></textarea>
 
         <!-- Addons -->
         <div class="tab-pane" id="pane-addons">
-          <div class="section-title">🧩 Addons</div>
-          <div style="font-size:11px;color:#555;margin-bottom:14px">Toggle addons on or off. Changes apply instantly.</div>
-          <div id="addon-debug" style="font-size:10px;color:#ff6b00;margin-bottom:8px;font-family:monospace"></div>
-          <div id="addon-list" style="display:flex;flex-direction:column;gap:8px"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <div class="section-title" style="margin:0">🧩 Addons</div>
+            <button id="addons-open-folder-btn" style="background:transparent;border:1px solid #2a2a2a;color:#555;font-size:10px;padding:4px 10px;border-radius:5px;cursor:pointer;font-family:inherit;transition:all 0.15s">📂 Open Folder</button>
+          </div>
+          <div style="font-size:11px;color:#555;margin-bottom:14px">Addons can inject CSS and JS into kloak. Click an addon to configure it.</div>
+          <div id="addon-list" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+
+
+        <!-- Profile Card -->
+        <div class="tab-pane" id="pane-profile">
+          <!-- Step indicator -->
+          <div id="prof-step-register" style="display:none">
+            <div class="section-title" style="margin-top:4px">🪪 Create Your Profile Card</div>
+            <p style="font-size:11px;color:#666;margin:0 0 14px">Your profile card lets other Entropy Client users see your linked accounts and avatar overlay.</p>
+            <div style="background:rgba(255,107,0,0.06);border:1px solid rgba(255,107,0,0.15);border-radius:8px;padding:12px 14px;margin-bottom:14px">
+              <div style="font-size:11px;font-weight:700;color:#ff6b00;margin-bottom:6px">How it works</div>
+              <div style="font-size:11px;color:#666;line-height:1.7">1. Enter your kloak username below<br>2. We give you a short code<br>3. Paste it in your kloak bio<br>4. Click Verify — done!</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+              <input class="mini-input" id="prof-username-input" placeholder="your kloak username" style="flex:1">
+              <button class="act-btn btn-orange" id="prof-register-btn">Get Code</button>
+            </div>
+            <div id="prof-register-status" style="font-size:11px;color:#666;min-height:16px"></div>
+          </div>
+
+          <!-- Verification step -->
+          <div id="prof-step-verify" style="display:none">
+            <div class="section-title" style="margin-top:4px">📋 Paste Code in Your Bio</div>
+            <div style="background:rgba(0,0,0,0.3);border:1px solid #333;border-radius:8px;padding:12px 14px;margin-bottom:12px;text-align:center">
+              <div style="font-size:10px;color:#555;margin-bottom:6px">Add this to your kloak.app bio:</div>
+              <div id="prof-claim-code-display" style="font-size:15px;font-weight:700;color:#ff6b00;letter-spacing:1px;font-family:monospace;user-select:all"></div>
+              <button id="prof-copy-code-btn" style="margin-top:8px;background:transparent;border:1px solid #333;color:#777;font-size:10px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:inherit">📋 Copy</button>
+            </div>
+            <ol style="font-size:11px;color:#666;margin:0 0 14px;padding-left:18px;line-height:2">
+              <li>Go to your kloak profile</li>
+              <li>Edit your bio</li>
+              <li>Paste the code anywhere in the bio</li>
+              <li>Save and come back here</li>
+            </ol>
+            <div style="display:flex;gap:8px">
+              <button class="act-btn" id="prof-back-btn" style="background:transparent;border:1px solid #333;color:#666">← Back</button>
+              <button class="act-btn btn-orange" id="prof-verify-btn" style="flex:1">✓ I've Added It — Verify</button>
+            </div>
+            <div id="prof-verify-status" style="font-size:11px;color:#666;margin-top:8px;min-height:16px"></div>
+          </div>
+
+          <!-- Main editor (shown when verified) -->
+          <div id="prof-step-editor" style="display:none">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div id="prof-avatar-preview" style="width:44px;height:44px;border-radius:50%;background:#1a1a1a;border:2px solid #333;position:relative;overflow:hidden;flex-shrink:0">
+                  <div id="prof-avatar-gif-layer" style="position:absolute;inset:0;background-size:cover;background-position:center;display:none"></div>
+                </div>
+                <div>
+                  <div id="prof-editor-name" style="font-size:13px;font-weight:700;color:#fff"></div>
+                  <div style="font-size:10px;color:#555">@<span id="prof-editor-username"></span></div>
+                </div>
+              </div>
+              <button id="prof-logout-btn" style="background:transparent;border:1px solid #2a2a2a;color:#444;font-size:10px;padding:4px 8px;border-radius:5px;cursor:pointer;font-family:inherit">Log out</button>
+            </div>
+
+            <!-- Tabs inside profile editor -->
+            <div style="display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid #1a1a1a;padding-bottom:10px">
+              <button class="prof-inner-tab active" data-ptab="appearance">🎨 Appearance</button>
+              <button class="prof-inner-tab" data-ptab="social">🔗 Social Links</button>
+              <button class="prof-inner-tab" data-ptab="preview">👁 Preview</button>
+            </div>
+
+            <!-- Appearance tab -->
+            <div class="prof-inner-pane active" id="prof-pane-appearance">
+              <div class="section-title" style="margin-top:0">Display Name</div>
+              <input class="mini-input" id="prof-display-name" placeholder="Your display name" style="width:100%;box-sizing:border-box;margin-bottom:12px">
+
+              <div class="section-title">Avatar GIF Overlay</div>
+              <div style="font-size:11px;color:#555;margin-bottom:8px">A transparent GIF or animated WebP layered over your avatar.</div>
+              <input class="mini-input" id="prof-gif-url" placeholder="https://... (GIF, WebP, APNG)" style="width:100%;box-sizing:border-box;margin-bottom:8px">
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+                <span style="font-size:11px;color:#666;flex-shrink:0">Opacity</span>
+                <input type="range" id="prof-gif-opacity" min="0" max="100" value="85" style="flex:1;accent-color:#ff6b00">
+                <span id="prof-gif-opacity-val" style="font-size:11px;color:#666;width:28px;text-align:right">85%</span>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+                <span style="font-size:11px;color:#666;flex-shrink:0">Blend</span>
+                <select class="mini-input" id="prof-gif-blend" style="flex:1">
+                  <option value="normal">Normal</option>
+                  <option value="overlay">Overlay</option>
+                  <option value="screen">Screen</option>
+                  <option value="multiply">Multiply</option>
+                  <option value="soft-light">Soft Light</option>
+                </select>
+              </div>
+
+              <div class="section-title">Profile Bio</div>
+              <textarea id="prof-bio" class="mini-input" placeholder="Short bio (max 300 chars)" style="width:100%;box-sizing:border-box;height:60px;resize:none;margin-bottom:4px"></textarea>
+              <div style="font-size:10px;color:#555;margin-bottom:12px;text-align:right"><span id="prof-bio-counter">0</span>/300</div>
+
+              <button class="act-btn btn-orange" id="prof-save-appearance" style="width:100%">Save Appearance</button>
+              <div id="prof-appearance-status" style="font-size:11px;color:#666;margin-top:8px;text-align:center;min-height:16px"></div>
+            </div>
+
+            <!-- Social links tab -->
+            <div class="prof-inner-pane" id="prof-pane-social" style="display:none">
+              <div id="prof-links-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px"></div>
+              <div class="section-title">Add Link</div>
+              <div style="display:flex;gap:8px;margin-bottom:8px">
+                <select class="mini-input" id="prof-link-platform" style="width:130px;flex-shrink:0">
+                  <option value="bluesky">🦋 Bluesky</option>
+                  <option value="youtube">▶️ YouTube</option>
+                  <option value="discord">🎮 Discord</option>
+                  <option value="github">🐙 GitHub</option>
+                  <option value="twitter">🐦 Twitter/X</option>
+                  <option value="twitch">💜 Twitch</option>
+                  <option value="instagram">📸 Instagram</option>
+                </select>
+                <input class="mini-input" id="prof-link-handle" placeholder="@username" style="flex:1">
+              </div>
+              <button class="act-btn btn-orange" id="prof-add-link-btn" style="width:100%">+ Add Link</button>
+              <div id="prof-links-status" style="font-size:11px;color:#666;margin-top:8px;min-height:16px"></div>
+            </div>
+
+            <!-- Preview tab -->
+            <div class="prof-inner-pane" id="prof-pane-preview" style="display:none">
+              <div style="font-size:11px;color:#555;margin-bottom:10px">This is how your card looks to other Entropy Client users.</div>
+              <div id="prof-preview-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;"></div>
+            </div>
+          </div>
+
+          <!-- Server URL config (always visible at bottom) -->
+          <div style="margin-top:16px;padding-top:12px;border-top:1px solid #161616">
+            <div style="display:flex;align-items:center;gap:8px">
+              <input class="mini-input" id="prof-server-url" placeholder="https://ec-profile-server.onrender.com" style="flex:1;font-size:10px">
+              <button id="prof-server-save-btn" style="background:transparent;border:1px solid #2a2a2a;color:#555;font-size:10px;padding:5px 8px;border-radius:5px;cursor:pointer;font-family:inherit;white-space:nowrap">Save URL</button>
+            </div>
+            <div style="font-size:10px;color:#444;margin-top:4px">Profile server URL</div>
+          </div>
         </div>
 
       </div><!-- /modal-content -->
@@ -1143,6 +1413,22 @@ var BUILTIN_ADDONS = [];
 var ADDONS = [];
 var addonState = {};
 var addonCssKeys = {};
+
+// ── Performance monitoring ────────────────────────
+// Logs any task >50ms to console so you can spot bottlenecks in DevTools
+try {
+  new PerformanceObserver(list => {
+    list.getEntries().forEach(e => {
+      if (e.duration > 50) console.warn(`[EC perf] Long task: ${Math.round(e.duration)}ms`, e);
+    });
+  }).observe({ type: 'longtask', buffered: true });
+} catch {}
+
+// Run non-urgent work when the browser is idle
+function whenIdle(fn) {
+  if (window.requestIdleCallback) requestIdleCallback(fn, { timeout: 2000 });
+  else setTimeout(fn, 200);
+}
 
 function resizeCanvases(){bgCanvas.width=pCanvas.width=window.innerWidth;bgCanvas.height=pCanvas.height=window.innerHeight-32;}
 resizeCanvases(); window.addEventListener('resize',resizeCanvases);
@@ -1346,6 +1632,27 @@ const WIDGETS = {
     render: () => `<span>🔔</span><span id='tb-unread-count'>${unreadCount||'0'}</span>`,
     clickable: false, interval: 2000,
   },
+  active_theme: {
+    label: 'Active Theme', icon: '🎨', desc: 'Shows the currently active theme',
+    render: () => {
+      const t = THEMES.find(t => t.id === activeTheme);
+      const name = t ? t.name : (activeTheme.startsWith('file:') ? activeTheme.split(':')[2] || 'Custom' : activeTheme === 'custom' ? 'Custom CSS' : 'Default');
+      const dot  = t ? t.preview.accent : '#ff6b00';
+      return `<span style="color:${dot}">◆</span><span>${name}</span>`;
+    },
+    clickable: true, onClick: () => {
+      const modal = document.getElementById('modal-backdrop');
+      if (modal) {
+        modal.classList.add('open');
+        document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        const tab = document.querySelector('[data-tab="themes"]');
+        const pane = document.getElementById('pane-themes');
+        if (tab) tab.classList.add('active');
+        if (pane) pane.classList.add('active');
+      }
+    },
+  },
 };
 
 let pinnedWidgets = [];
@@ -1420,9 +1727,6 @@ document.querySelectorAll('.sidebar-tab').forEach(tab=>{
     document.getElementById('pane-'+tab.dataset.tab).classList.add('active');
     try{playSound('nav');}catch{}
     if(tab.dataset.tab === 'addons'){
-      const debugEl = document.getElementById('addon-debug');
-      if (debugEl) debugEl.innerHTML = 'Tab clicked...<br>';
-      try{ await loadAddons(); }catch(e){ console.warn('loadAddons failed',e); if(debugEl) debugEl.innerHTML += 'loadAddons threw: '+e.message+'<br>'; }
       renderAddons();
     }
   };
@@ -1453,16 +1757,158 @@ webview.addEventListener('did-navigate',async()=>{
 function setStatus(msg,type){const s=document.getElementById('css-status');s.textContent=msg;s.className='status-line '+type;}
 
 // ── Themes ───────────────────────────────────────
-function makeThemeCss(bg,accent,text='#e2e8f0',surface='rgba(255,255,255,0.06)',border='rgba(255,255,255,0.1)'){
-  return `*{--ec-bg:${bg};--ec-accent:${accent};--ec-text:${text};--ec-surface:${surface};--ec-border:${border}}
-html,body,#root,#app,[class*="layout"],[class*="main"],[class*="wrapper"],[class*="container"],[class*="page"]{background:${bg}!important;color:${text}!important}
-[class*="sidebar"],[class*="panel"],[class*="drawer"]{background:color-mix(in srgb,${bg} 85%,#000)!important}
-[class*="card"],[class*="message"],[class*="item"],[class*="row"]:not(tr){background:${surface}!important}
-[class*="input"],[class*="textarea"],[class*="select"]{background:rgba(0,0,0,0.3)!important;color:${text}!important;border-color:${border}!important}
-a,[class*="link"]{color:${accent}!important}
-[class*="button"],[class*="btn"]:not([class*="icon"]){background:${accent}!important;color:#fff!important}
-[class*="header"],[class*="topbar"],[class*="navbar"]{background:color-mix(in srgb,${bg} 90%,#000)!important;border-color:${border}!important}
-::-webkit-scrollbar-track{background:${bg}!important}::-webkit-scrollbar-thumb{background:${accent}!important}`;
+function makeThemeCss(bg, accent, text='#e2e8f0', surface='rgba(255,255,255,0.06)', border='rgba(255,255,255,0.1)') {
+  // Convert hex bg to slightly lighter/darker variants
+  const bgDark   = `color-mix(in srgb, ${bg} 85%, #000)`;
+  const bgLight  = `color-mix(in srgb, ${bg} 90%, #fff)`;
+  const accentDim = `color-mix(in srgb, ${accent} 60%, #000)`;
+  return `
+/* ── EC Theme: CSS custom properties ── */
+:root, .theme-dark, .theme-darker, .theme-midnight,
+[class*="theme-dark"], [class*="colorTheme"] {
+  --background-primary:         ${bg} !important;
+  --background-secondary:       ${bgDark} !important;
+  --background-secondary-alt:   ${bgDark} !important;
+  --background-tertiary:        color-mix(in srgb, ${bg} 80%, #000) !important;
+  --background-accent:          ${accent} !important;
+  --background-floating:        color-mix(in srgb, ${bg} 92%, #000) !important;
+  --background-modifier-hover:  ${surface} !important;
+  --background-modifier-active: color-mix(in srgb, ${accent} 15%, transparent) !important;
+  --background-modifier-selected: color-mix(in srgb, ${accent} 20%, transparent) !important;
+  --channeltextarea-background: ${bgDark} !important;
+  --text-normal:        ${text} !important;
+  --text-muted:         color-mix(in srgb, ${text} 55%, transparent) !important;
+  --text-link:          ${accent} !important;
+  --interactive-normal: color-mix(in srgb, ${text} 80%, transparent) !important;
+  --interactive-hover:  ${text} !important;
+  --interactive-active: ${accent} !important;
+  --interactive-muted:  color-mix(in srgb, ${text} 40%, transparent) !important;
+  --header-primary:     ${text} !important;
+  --header-secondary:   color-mix(in srgb, ${text} 65%, transparent) !important;
+  --brand-experiment:         ${accent} !important;
+  --brand-experiment-560:     ${accent} !important;
+  --brand-experiment-600:     ${accentDim} !important;
+  --scrollbar-thin-thumb:     ${accent} !important;
+  --scrollbar-auto-thumb:     ${accent} !important;
+  --scrollbar-auto-track:     ${bg} !important;
+  --focus-primary:            ${accent} !important;
+  --mention-foreground:       ${accent} !important;
+  --mention-background:       color-mix(in srgb, ${accent} 12%, transparent) !important;
+  --channels-default:         color-mix(in srgb, ${text} 65%, transparent) !important;
+  --channel-icon:             color-mix(in srgb, ${text} 55%, transparent) !important;
+  --deprecated-panel-background: ${bgDark} !important;
+  --deprecated-text-input-bg:    ${bgDark} !important;
+  --deprecated-text-input-border: ${border} !important;
+  --modal-background:           color-mix(in srgb, ${bg} 95%, #000) !important;
+  --elevation-high:             0 8px 32px rgba(0,0,0,0.45) !important;
+}
+
+/* ── Backgrounds ── */
+html, body, #app-mount, [class*="app-"],
+[class*="base-"], [class*="content-"],
+[class*="chat-"], [class*="chatContent"],
+[class*="messagesWrapper"], [class*="scroller"] {
+  background-color: ${bg} !important;
+}
+[class*="sidebar"], [class*="guilds"],
+[class*="guildsList"], [class*="navBar"],
+[class*="panels-"], [class*="panel-"],
+[class*="privateChannels"] {
+  background-color: ${bgDark} !important;
+}
+[class*="titleBar"], [class*="title-bar"],
+[class*="toolbar"], [class*="topbar"] {
+  background-color: ${bgDark} !important;
+  border-bottom: 1px solid ${border} !important;
+}
+
+/* ── Channels ── */
+[class*="channel-"], [class*="channelName"],
+[class*="linkChannel"], [class*="containerDefault"] {
+  color: color-mix(in srgb, ${text} 70%, transparent) !important;
+}
+[class*="channel-"][class*="selected"],
+[class*="channel-"][class*="active"],
+[class*="containerDefault"][class*="modeSelected"] {
+  background-color: color-mix(in srgb, ${accent} 18%, transparent) !important;
+  color: ${text} !important;
+}
+[class*="channel-"]:hover, [class*="containerDefault"]:hover {
+  background-color: color-mix(in srgb, ${accent} 10%, transparent) !important;
+  color: ${text} !important;
+}
+
+/* ── Messages ── */
+[class*="message-"], [class*="messageContent"],
+[class*="markup-"], [class*="cozyMessage"] {
+  color: ${text} !important;
+}
+[class*="message-"]:hover, [class*="messageListItem"]:hover {
+  background-color: ${surface} !important;
+}
+[class*="username"], [class*="usernameClickable"] {
+  color: color-mix(in srgb, ${accent} 90%, #fff) !important;
+}
+[class*="timestamp-"] { color: color-mix(in srgb, ${text} 38%, transparent) !important; }
+
+/* ── Input / Textarea ── */
+[class*="textArea-"], [class*="textAreaSlate"],
+[class*="inner-"] > [class*="textArea"] {
+  background-color: ${bgDark} !important;
+  color: ${text} !important;
+}
+[class*="channelTextArea"] {
+  background-color: color-mix(in srgb, ${bg} 80%, #000) !important;
+  border: 1px solid ${border} !important;
+}
+
+/* ── Buttons ── */
+[class*="colorBrand"], [class*="lookFilled"][class*="colorBrand"],
+button[class*="button-"][class*="filled"] {
+  background-color: ${accent} !important;
+  color: #fff !important;
+}
+[class*="colorBrand"]:hover { background-color: ${accentDim} !important; }
+[class*="colorLink"] { color: ${accent} !important; }
+
+/* ── Modals ── */
+[class*="modal-"], [class*="container-"][role="dialog"],
+[class*="backdrop-"] ~ [class*="layers-"] [class*="root-"] {
+  background-color: color-mix(in srgb, ${bg} 95%, #000) !important;
+}
+
+/* ── Scrollbars ── */
+::-webkit-scrollbar-track { background: ${bg} !important; }
+::-webkit-scrollbar-thumb { background: ${accent} !important; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, ${accent} 80%, #fff) !important; }
+
+/* ── Mention / code ── */
+[class*="mention"], [class*="inlineCode"] {
+  background: color-mix(in srgb, ${accent} 12%, transparent) !important;
+  color: ${accent} !important;
+}
+code, pre, [class*="codeBlock"] {
+  background: ${bgDark} !important;
+  border: 1px solid ${border} !important;
+  color: ${text} !important;
+}
+
+/* ── Reactions ── */
+[class*="reaction-"] {
+  background: ${surface} !important;
+  border-color: ${border} !important;
+}
+[class*="reaction-"][class*="reactionMe"] {
+  background: color-mix(in srgb, ${accent} 18%, transparent) !important;
+  border-color: ${accent} !important;
+}
+
+/* ── Server list icons ── */
+[class*="blobContainer"], [class*="lottieIcon"] {
+  background-color: ${bgDark} !important;
+}
+[class*="pill-"] { background-color: ${accent} !important; }
+`.trim();
 }
 const THEMES=[
   {id:'default',   name:'Default',   preview:{bg:'#1e2124',accent:'#94a3b8'},css:''},
@@ -1517,6 +1963,9 @@ async function applyTheme(id, css=null){
     try{themeKey=await webview.insertCSS(themeCss);}
     catch(e){console.warn('Theme apply failed:',e);}
   }
+  // Refresh the active-theme titlebar widget
+  const tw = document.getElementById('tb-widget-active_theme');
+  if (tw && WIDGETS.active_theme) tw.innerHTML = WIDGETS.active_theme.render();
 }
 document.getElementById('apply-custom-theme').onclick=async()=>{
   const css=document.getElementById('custom-css-input').value.trim();
@@ -2155,15 +2604,13 @@ async function pushEmojiMap() {
 }
 
 
-// Re-inject after every navigation.
-// Use a flag so rapid did-finish-load events don't stack up.
-let _emojiInjecting = false;
+// ── Load emoji data lazily on first webview load, not at script parse time ──
+let _emojiLoaded = false;
 webview.addEventListener('did-finish-load', async () => {
   if (_emojiInjecting) return;
   _emojiInjecting = true;
   try {
-    if (emojiData.length === 0) await loadEmojiData();
-    // Small delay — let kloak's React app finish mounting before we inject
+    if (!_emojiLoaded) { await loadEmojiData(); _emojiLoaded = true; }
     await new Promise(r => setTimeout(r, 1000));
     await injectEmojiMap();
     startAcPoll();
@@ -2171,9 +2618,6 @@ webview.addEventListener('did-finish-load', async () => {
     _emojiInjecting = false;
   }
 });
-
-// Load emoji data on startup — inject will happen on did-finish-load.
-loadEmojiData();
 
 // ── Autocomplete popup ────────────────────────────
 // Positioned overlay popup rendered in the Electron chrome (overlay.html),
@@ -2277,7 +2721,6 @@ document.addEventListener('keydown', e => {
 
 webview.addEventListener('did-finish-load', startAcPoll);
 webview.addEventListener('did-navigate', startAcPoll);
-startAcPoll();
 
 // ── Wire into openModal ───────────────────────────
 document.querySelector('.sidebar-tab[data-tab="emojis"]')
@@ -2299,7 +2742,7 @@ async function fetchWeather(){
     if(w2)w2.innerHTML=WIDGETS.weather.render();
   }catch{cachedWeather={icon:'⛅',temp:'--°F'};}
 }
-fetchWeather();
+setTimeout(fetchWeather, 3000);
 setInterval(fetchWeather,10*60*1000);
 
 // ── Seasonal effects ──────────────────────────────
@@ -2345,10 +2788,11 @@ function setCursor(name){currentCursor=name;const c=CURSORS[name];if(name==='non
 document.getElementById('cursor-style').onchange=e=>setCursor(e.target.value);
 
 // ── Sounds ────────────────────────────────────────
-const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+let audioCtx=null;
+function getAudioCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
 const SOUNDS={retro:{nav:()=>beep(440,0.05,'square'),open:()=>beep(660,0.08,'square'),close:()=>beep(220,0.08,'square')},soft:{nav:()=>beep(528,0.06,'sine'),open:()=>beep(622,0.08,'sine'),close:()=>beep(415,0.08,'sine')},'sci-fi':{nav:()=>{beep(200,0.03,'sawtooth');setTimeout(()=>beep(400,0.03,'sawtooth'),60);},open:()=>sweep(200,800,0.1,'sawtooth'),close:()=>sweep(800,200,0.1,'sawtooth')},nature:{nav:()=>beep(392,0.05,'sine'),open:()=>{beep(523,0.04,'sine');setTimeout(()=>beep(659,0.04,'sine'),80);},close:()=>{beep(659,0.04,'sine');setTimeout(()=>beep(523,0.04,'sine'),80);}}};
-function beep(freq,dur,type='sine'){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(0.15,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);o.start();o.stop(audioCtx.currentTime+dur);}
-function sweep(f1,f2,dur,type='sine'){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type=type;o.frequency.setValueAtTime(f1,audioCtx.currentTime);o.frequency.linearRampToValueAtTime(f2,audioCtx.currentTime+dur);g.gain.setValueAtTime(0.12,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);o.start();o.stop(audioCtx.currentTime+dur);}
+function beep(freq,dur,type='sine'){const ctx=getAudioCtx();const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(0.15,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);o.start();o.stop(ctx.currentTime+dur);}
+function sweep(f1,f2,dur,type='sine'){const ctx=getAudioCtx();const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type=type;o.frequency.setValueAtTime(f1,ctx.currentTime);o.frequency.linearRampToValueAtTime(f2,ctx.currentTime+dur);g.gain.setValueAtTime(0.12,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);o.start();o.stop(ctx.currentTime+dur);}
 function playSound(type){if(soundPack==='none')return;try{SOUNDS[soundPack]?.[type]?.();}catch{}}
 document.getElementById('sound-pack').onchange=e=>{soundPack=e.target.value;if(soundPack!=='none')playSound('open');};
 webview.addEventListener('did-start-navigation',()=>{if(document.getElementById('sound-nav').checked)playSound('nav');});
@@ -2662,7 +3106,7 @@ function hideChangelog() {
 document.getElementById('cl-close').onclick   = hideChangelog;
 document.getElementById('cl-dismiss').onclick = hideChangelog;
 
-initChangelog();
+whenIdle(() => initChangelog());
 
 // ══════════════════════════════════════════════════
 // AMBIENT MODE
@@ -3542,11 +3986,278 @@ function applyTitlebarHeight(px) {
   const canvases = document.querySelectorAll('#bg-canvas, #particle-canvas');
   canvases.forEach(cv => { cv.style.top = h + 'px'; cv.style.height = `calc(100% - ${h}px)`; });
   document.getElementById('ms-tb-height-val').textContent = h + 'px';
+  // keep the titlebar-tab slider in sync
+  const s2 = document.getElementById('tb-height-2');
+  const v2 = document.getElementById('tb-height-2-val');
+  if (s2) s2.value = h;
+  if (v2) v2.textContent = h + 'px';
   localStorage.setItem('ec_tb_height', h);
 }
 document.getElementById('ms-tb-height').oninput = e => applyTitlebarHeight(e.target.value);
+// wire the duplicate slider in Titlebar pane
+document.getElementById('tb-height-2').oninput = e => {
+  applyTitlebarHeight(e.target.value);
+  document.getElementById('ms-tb-height').value = e.target.value;
+};
 const savedTbH = localStorage.getItem('ec_tb_height');
 if (savedTbH) { document.getElementById('ms-tb-height').value = savedTbH; applyTitlebarHeight(savedTbH); }
+
+// ── Titlebar style (Windows / macOS) ─────────────
+let tbStyle = localStorage.getItem('ec_tb_style') || 'windows';
+
+function setTitlebarStyle(mode) {
+  tbStyle = mode;
+  localStorage.setItem('ec_tb_style', mode);
+
+  const winCtrl   = document.getElementById('win-controls');
+  const winDiv    = document.getElementById('win-controls-divider');
+  const macCtrl   = document.getElementById('mac-controls');
+  const macDiv    = document.getElementById('mac-controls-divider');
+  const optWin    = document.getElementById('tb-style-windows');
+  const optMac    = document.getElementById('tb-style-mac');
+
+  if (mode === 'mac') {
+    // Hide Windows controls, show Mac controls on the left
+    winCtrl.style.display  = 'none';
+    winDiv.style.display   = 'none';
+    macCtrl.style.display  = 'flex';
+    macDiv.style.display   = 'block';
+    // Highlight mac option card
+    optMac.style.border    = '2px solid #ff6b00';
+    optMac.style.background = 'rgba(255,107,0,0.08)';
+    optWin.style.border    = '2px solid #333';
+    optWin.style.background = 'rgba(255,255,255,0.02)';
+  } else {
+    // Show Windows controls on the right, hide Mac controls
+    winCtrl.style.display  = 'flex';
+    winDiv.style.display   = 'block';
+    macCtrl.style.display  = 'none';
+    macDiv.style.display   = 'none';
+    // Highlight windows option card
+    optWin.style.border    = '2px solid #ff6b00';
+    optWin.style.background = 'rgba(255,107,0,0.08)';
+    optMac.style.border    = '2px solid #333';
+    optMac.style.background = 'rgba(255,255,255,0.02)';
+  }
+}
+
+// Wire mac control buttons to the same IPC as the windows ones
+document.getElementById('mac-btn-close').onclick    = () => window.electronAPI?.closeWindow?.();
+document.getElementById('mac-btn-minimize').onclick = () => window.electronAPI?.minimizeWindow?.();
+document.getElementById('mac-btn-maximize').onclick = () => window.electronAPI?.maximizeWindow?.();
+
+// Apply saved style on load
+setTitlebarStyle(tbStyle);
+
+// Re-render widget config when titlebar tab is opened
+document.querySelector('[data-tab="titlebar"]').addEventListener('click', () => {
+  renderWidgetConfig();
+  // sync height slider value
+  const saved = localStorage.getItem('ec_tb_height');
+  if (saved) {
+    document.getElementById('tb-height-2').value = saved;
+    document.getElementById('tb-height-2-val').textContent = saved + 'px';
+  }
+});
+
+// ══════════════════════════════════════════════════
+// SPLASH SCREEN MANAGER
+// ══════════════════════════════════════════════════
+(function() {
+
+  // ── State ─────────────────────────────────────────
+  // Each splash: { id, name, dataUrl, selected }
+  let splashes = [];
+  let splashInterval = 5;
+  let splashShuffle  = false;
+
+  function loadSplashState() {
+    try {
+      const raw = localStorage.getItem('ec_splashes');
+      if (raw) splashes = JSON.parse(raw);
+    } catch {}
+    splashInterval = parseInt(localStorage.getItem('ec_splash_interval') || '5');
+    splashShuffle  = localStorage.getItem('ec_splash_shuffle') === '1';
+  }
+
+  function saveSplashState() {
+    // Store dataUrls — images can be large but are JPEG-compressed on upload
+    try { localStorage.setItem('ec_splashes', JSON.stringify(splashes)); } catch(e) {
+      console.warn('[EC] Splash storage error — try smaller images', e);
+    }
+    localStorage.setItem('ec_splash_interval', splashInterval);
+    localStorage.setItem('ec_splash_shuffle',  splashShuffle ? '1' : '0');
+  }
+
+  // ── Render grid ───────────────────────────────────
+  function renderSplashGrid() {
+    const grid  = document.getElementById('splash-grid');
+    const empty = document.getElementById('splash-empty');
+    const countLbl = document.getElementById('splash-count-label');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+    const sel = splashes.filter(s => s.selected).length;
+    countLbl.textContent = splashes.length
+      ? `${splashes.length} image${splashes.length!==1?'s':''} · ${sel} selected`
+      : '';
+
+    if (!splashes.length) {
+      empty.style.display = 'flex';
+      grid.style.display  = 'none';
+      return;
+    }
+    empty.style.display = 'none';
+    grid.style.display  = 'grid';
+
+    splashes.forEach((sp, idx) => {
+      const card = document.createElement('div');
+      card.className = 'splash-card' + (sp.selected ? ' selected' : '');
+
+      const img = document.createElement('img');
+      img.src = sp.dataUrl;
+      img.loading = 'lazy';
+
+      const check = document.createElement('div');
+      check.className = 'splash-check';
+      check.textContent = '✓';
+
+      const del = document.createElement('button');
+      del.className = 'splash-del';
+      del.textContent = '✕';
+      del.title = 'Remove';
+      del.onclick = e => { e.stopPropagation(); splashes.splice(idx, 1); saveSplashState(); renderSplashGrid(); };
+
+      const label = document.createElement('div');
+      label.className = 'splash-label';
+      label.textContent = sp.name;
+
+      card.appendChild(img);
+      card.appendChild(check);
+      card.appendChild(del);
+      card.appendChild(label);
+
+      card.onclick = () => {
+        splashes[idx].selected = !splashes[idx].selected;
+        saveSplashState();
+        renderSplashGrid();
+      };
+
+      grid.appendChild(card);
+    });
+  }
+
+  // ── Upload handler ────────────────────────────────
+  function handleSplashUpload(files) {
+    let done = 0;
+    Array.from(files).forEach(file => {
+      if (!file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        // Compress to JPEG at lower quality to save localStorage space
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          // Cap at 800px wide for preview quality (enough to look good at card size)
+          const maxW = 800;
+          const scale = Math.min(1, maxW / img.width);
+          canvas.width  = Math.round(img.width  * scale);
+          canvas.height = Math.round(img.height * scale);
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+          splashes.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2), name: file.name, dataUrl, selected: true });
+          done++;
+          if (done === files.length) { saveSplashState(); renderSplashGrid(); }
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ── Wire UI ───────────────────────────────────────
+  document.querySelector('[data-tab="splashes"]').addEventListener('click', () => {
+    loadSplashState();
+    renderSplashGrid();
+    // Sync controls
+    const slider = document.getElementById('splash-interval-slider');
+    const val    = document.getElementById('splash-interval-val');
+    const shuf   = document.getElementById('splash-shuffle');
+    if (slider) { slider.value = splashInterval; val.textContent = splashInterval + 's'; }
+    if (shuf)   shuf.checked = splashShuffle;
+  });
+
+  document.getElementById('splash-file-input').addEventListener('change', e => {
+    handleSplashUpload(e.target.files);
+    e.target.value = ''; // allow re-upload of same file
+  });
+
+  document.getElementById('splash-clear-all').onclick = () => {
+    if (!splashes.length) return;
+    if (confirm('Remove all custom splash screens?')) {
+      splashes = [];
+      saveSplashState();
+      renderSplashGrid();
+    }
+  };
+
+  document.getElementById('splash-interval-slider').oninput = e => {
+    splashInterval = parseInt(e.target.value);
+    document.getElementById('splash-interval-val').textContent = splashInterval + 's';
+    saveSplashState();
+  };
+
+  document.getElementById('splash-shuffle').onchange = e => {
+    splashShuffle = e.target.checked;
+    saveSplashState();
+  };
+
+  // ── Splash cycling during load ────────────────────
+  // Called by the existing splash init (replaces the static background)
+  function startSplashCycle() {
+    loadSplashState();
+    const active = splashes.filter(s => s.selected);
+    if (!active.length) return; // fall back to default splash.png
+
+    const bg = document.getElementById('splash-bg');
+    if (!bg) return;
+
+    let pool = splashShuffle ? shuffleArray(active.slice()) : active.slice();
+    let idx  = 0;
+
+    function show(i) {
+      const sp = pool[i % pool.length];
+      bg.style.transition = 'opacity 0.6s';
+      bg.style.opacity    = '0';
+      setTimeout(() => {
+        bg.style.backgroundImage = `url('${sp.dataUrl}')`;
+        bg.style.opacity         = '1';
+      }, 600);
+    }
+
+    show(0);
+    const cycleTimer = setInterval(() => {
+      idx++;
+      if (splashShuffle && idx >= pool.length) { pool = shuffleArray(active.slice()); idx = 0; }
+      show(idx);
+    }, splashInterval * 1000);
+
+    // Stop cycling once splash is dismissed
+    webview.addEventListener('did-finish-load', () => clearInterval(cycleTimer), { once: true });
+  }
+
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  // Kick off cycling immediately (splash is visible at this point)
+  startSplashCycle();
+
+})();
 
 // ══════════════════════════════════════════════════
 // UNREAD BADGE
@@ -3696,160 +4407,770 @@ document.getElementById('cmd-input').addEventListener('keydown', e => {
 document.getElementById('cmd-backdrop').addEventListener('click', e => { if (e.target === document.getElementById('cmd-backdrop')) closeCmdPalette(); });
 
 // ── Init ──────────────────────────────────────────
-renderWidgetBar();
+whenIdle(() => renderWidgetBar());
 document.querySelector('[data-tab="main"]').addEventListener('click', renderWidgetConfig);
 
 // ══════════════════════════════════════════════════
-// ADDONS SYSTEM — file-based
-// Addons are .js files in userData/addons/.
-// Each exports a manifest: id, icon, name, desc,
-// category, css, script, onDisable.
-// Main process parses them and sends manifests here.
+// ADDONS SYSTEM — simple array-based registry
 // ══════════════════════════════════════════════════
 
-BUILTIN_ADDONS = [{"id": "hide-members", "icon": "👥", "name": "Hide Member List", "desc": "Collapses the right-side members panel.", "category": "Visual", "css": "\n    [class*=\"members-sidebar\"],[class*=\"MembersSidebar\"],\n    [class*=\"member-list\"],[class*=\"MemberList\"],\n    [class*=\"users-sidebar\"],[class*=\"UsersSidebar\"],\n    aside[class*=\"right\"],aside[class*=\"side\"],\n    [class*=\"rightPanel\"],[class*=\"right-panel\"],\n    [data-testid*=\"member\"],[data-testid*=\"users\"],\n    [class*=\"channelMembers\"],[class*=\"channel-members\"] {\n      display: none !important;\n    }\n  ", "script": "", "onDisable": ""}, {"id": "custom-font", "icon": "🔤", "name": "Custom Message Font", "desc": "Applies a clean monospace font to chat messages.", "category": "Visual", "css": "\n    [class*=\"message-content\"],[class*=\"MessageContent\"],\n    [class*=\"chat-message\"],[data-message-id] span,\n    [class*=\"text-content\"],[class*=\"TextContent\"] {\n      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace !important;\n    }\n  ", "script": "", "onDisable": ""}, {"id": "markdown-preview", "icon": "✍️", "name": "Markdown Preview", "desc": "Renders **bold**, *italic*, `code`, and ~~strike~~ live as you type.", "category": "Chat", "css": "", "script": "\n    (function(){\n      if (window.__ecMdPreview) return;\n      window.__ecMdPreview = true;\n\n      var preview = document.createElement('div');\n      preview.id = '__ec-md-preview';\n      preview.style.cssText =\n        'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);'\n        + 'background:rgba(18,18,24,0.97);border:1px solid rgba(255,107,0,0.25);'\n        + 'border-radius:10px;padding:10px 16px;font-size:13px;color:#ccc;'\n        + 'max-width:520px;min-width:200px;pointer-events:none;z-index:99999;'\n        + 'display:none;line-height:1.6;box-shadow:0 8px 32px rgba(0,0,0,0.5);'\n        + 'word-break:break-word;';\n      document.body.appendChild(preview);\n\n      function renderMd(text) {\n        return text\n          .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')\n          .replace(/\\*\\*(.+?)\\*\\*/g,'<strong>$1</strong>')\n          .replace(/\\*(.+?)\\*/g,'<em>$1</em>')\n          .replace(/~~(.+?)~~/g,'<s>$1</s>')\n          .replace(/\\", "onDisable": "if (window.__ecMdPreviewOff) window.__ecMdPreviewOff();"}, {"id": "typing-sound", "icon": "⌨️", "name": "Typing Sound", "desc": "Plays a subtle click sound as you type messages.", "category": "Fun", "css": "", "script": "\n    (function(){\n      if (window.__ecTypingSound) return;\n      window.__ecTypingSound = true;\n      var ctx = new (window.AudioContext || window.webkitAudioContext)();\n      function click() {\n        var o = ctx.createOscillator();\n        var g = ctx.createGain();\n        o.connect(g); g.connect(ctx.destination);\n        o.frequency.value = 1200 + Math.random() * 400;\n        o.type = 'square';\n        g.gain.setValueAtTime(0.04, ctx.currentTime);\n        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.04);\n        o.start(ctx.currentTime);\n        o.stop(ctx.currentTime + 0.04);\n      }\n      function onKey(e) {\n        if (!e.key) return;\n        if (e.key.length === 1 || e.key === 'Backspace' || e.key === ' ') click();\n      }\n      document.addEventListener('keydown', onKey, true);\n      window.__ecTypingSoundOff = function() {\n        document.removeEventListener('keydown', onKey, true);\n        window.__ecTypingSound = false;\n      };\n    })();\n  ", "onDisable": "if (window.__ecTypingSoundOff) window.__ecTypingSoundOff();"}, {"id": "message-sound", "icon": "🔔", "name": "Message Sound", "desc": "Plays a soft chime when a new message arrives in chat.", "category": "Fun", "css": "", "script": "\n    (function(){\n      if (window.__ecMsgSound) return;\n      window.__ecMsgSound = true;\n      var ctx = new (window.AudioContext || window.webkitAudioContext)();\n      function chime() {\n        [523, 659, 784].forEach(function(freq, i) {\n          var o = ctx.createOscillator();\n          var g = ctx.createGain();\n          o.connect(g); g.connect(ctx.destination);\n          o.frequency.value = freq;\n          o.type = 'sine';\n          var t = ctx.currentTime + i * 0.12;\n          g.gain.setValueAtTime(0, t);\n          g.gain.linearRampToValueAtTime(0.08, t + 0.02);\n          g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);\n          o.start(t); o.stop(t + 0.35);\n        });\n      }\n      var obs = new MutationObserver(function(muts) {\n        for (var i = 0; i < muts.length; i++) {\n          var added = muts[i].addedNodes;\n          for (var j = 0; j < added.length; j++) {\n            var n = added[j];\n            if (n.nodeType === 1 && (\n              (n.dataset && n.dataset.messageId) ||\n              (n.querySelector && n.querySelector('[data-message-id]'))\n            )) { chime(); break; }\n          }\n        }\n      });\n      obs.observe(document.body, { childList: true, subtree: true });\n      window.__ecMsgSoundOff = function() {\n        obs.disconnect();\n        window.__ecMsgSound = false;\n      };\n    })();\n  ", "onDisable": "if (window.__ecMsgSoundOff) window.__ecMsgSoundOff();"}];
+// Plain array of addon objects. Each has: id, icon, name, desc, category,
+// css (string), script (string), onDisable (string), renderSettings (fn, optional).
+var _addonRegistry = [];
+var _addonEnabled  = {};  // id -> bool
+var _addonCssKey   = {};  // id -> insertCSS key (for removal)
 
-// ── Load addons from userData/addons/ via IPC ──
-async function loadAddons() {
-  try {
-    if (window.electronAPI && window.electronAPI.addonsList) {
-      const list = await window.electronAPI.addonsList();
-      if (list && list.length) {
-        ADDONS = list.map(item => item.manifest).filter(m => m && m.id);
-      }
-    }
-  } catch(e) {
-    console.warn('[EC] addonsList IPC failed:', e.message);
+function addonRegister(def) {
+  if (!def || !def.id) return;
+  // Don't double-register
+  if (_addonRegistry.find(a => a.id === def.id)) return;
+  _addonRegistry.push(def);
+  // Restore persisted toggle state
+  _addonEnabled[def.id] = (localStorage.getItem('ec_addon_' + def.id) === '1');
+}
+
+function addonIsEnabled(id) {
+  return !!_addonEnabled[id];
+}
+
+function addonGetSettings(id) {
+  try { return JSON.parse(localStorage.getItem('ec_addon_cfg_' + id) || '{}'); } catch { return {}; }
+}
+
+function addonSaveSettings(id, data) {
+  localStorage.setItem('ec_addon_cfg_' + id, JSON.stringify(data));
+}
+
+async function addonEnable(id) {
+  const def = _addonRegistry.find(a => a.id === id);
+  if (!def) return;
+  _addonEnabled[id] = true;
+  localStorage.setItem('ec_addon_' + id, '1');
+  if (def.css && def.css.trim()) {
+    try { _addonCssKey[id] = await webview.insertCSS(def.css); } catch(e) { console.warn('[addon css]', id, e); }
   }
-  // Always fall back to builtins if nothing came from disk
-  if (!ADDONS.length) ADDONS = BUILTIN_ADDONS.slice();
-  // Restore saved toggle states
-  ADDONS.forEach(a => {
-    if (!(a.id in addonState)) {
-      addonState[a.id] = localStorage.getItem('ec_addon_' + a.id) === '1';
+  if (def.script && def.script.trim()) {
+    try { await webview.executeJavaScript(def.script); } catch(e) { console.warn('[addon script]', id, e); }
+  }
+  if (typeof def.onEnable === 'function') {
+    try { def.onEnable(addonGetSettings(id)); } catch {}
+  }
+}
+
+async function addonDisable(id) {
+  const def = _addonRegistry.find(a => a.id === id);
+  if (!def) return;
+  _addonEnabled[id] = false;
+  localStorage.setItem('ec_addon_' + id, '0');
+  if (_addonCssKey[id]) {
+    try { await webview.removeInsertedCSS(_addonCssKey[id]); } catch {}
+    delete _addonCssKey[id];
+  }
+  if (def.onDisable && typeof def.onDisable === 'string' && def.onDisable.trim()) {
+    try { await webview.executeJavaScript(def.onDisable); } catch {}
+  }
+  if (typeof def.onDisable === 'function') {
+    try { def.onDisable(); } catch {}
+  }
+}
+
+async function addonToggle(id, on) {
+  if (on) await addonEnable(id); else await addonDisable(id);
+}
+
+// Re-inject all enabled addons after page navigation
+webview.addEventListener('did-finish-load', () => {
+  _addonRegistry.forEach(def => {
+    if (_addonEnabled[def.id]) {
+      delete _addonCssKey[def.id];
+      addonEnable(def.id);
     }
   });
-}
-
-// ── Apply / remove a single addon ──
-async function setAddon(id, on) {
-  const addon = ADDONS.find(a => a.id === id);
-  if (!addon) return;
-  addonState[id] = on;
-  localStorage.setItem('ec_addon_' + id, on ? '1' : '0');
-
-  if (on) {
-    if (addon.css && addon.css.trim()) {
-      try { addonCssKeys[id] = await webview.insertCSS(addon.css); } catch {}
-    }
-    if (addon.script && addon.script.trim()) {
-      try { await webview.executeJavaScript(addon.script); } catch {}
-    }
-  } else {
-    if (addonCssKeys[id]) {
-      try { await webview.removeInsertedCSS(addonCssKeys[id]); } catch {}
-      addonCssKeys[id] = null;
-    }
-    if (addon.onDisable && addon.onDisable.trim()) {
-      try { await webview.executeJavaScript(addon.onDisable); } catch {}
-    }
-  }
-}
-
-// ── Re-inject all enabled addons after navigation ──
-webview.addEventListener('did-finish-load', async () => {
-  if (!ADDONS.length) await loadAddons();
-  for (const addon of ADDONS) {
-    if (addonState[addon.id]) {
-      addonCssKeys[addon.id] = null;
-      await setAddon(addon.id, true);
-    }
-  }
 });
 
-// ── Render addon cards in the UI ──
-function dbg(msg) {
-  const el = document.getElementById('addon-debug');
-  if (el) el.innerHTML += msg + '<br>';
-  console.log('[EC-ADDON]', msg);
-}
+// ── Open folder button ───────────────────────────
+document.getElementById('addons-open-folder-btn').addEventListener('click', () => {
+  window.electronAPI.addonsOpenFolder();
+});
 
+// ── Render addon list ────────────────────────────
 function renderAddons() {
-  dbg('renderAddons() called, ADDONS.length=' + ADDONS.length + ', BUILTIN_ADDONS.length=' + BUILTIN_ADDONS.length);
   const list = document.getElementById('addon-list');
-  if (!list) { dbg('ERROR: #addon-list not found!'); return; }
+  if (!list) return;
+  list.innerHTML = '';
 
-  // Hard fallback — if ADDONS is still empty after load, use builtins directly
-  if (!ADDONS.length && BUILTIN_ADDONS.length) {
-    dbg('Using BUILTIN_ADDONS fallback');
-    ADDONS = BUILTIN_ADDONS.slice();
-    ADDONS.forEach(a => {
-      if (!(a.id in addonState))
-        addonState[a.id] = localStorage.getItem('ec_addon_' + a.id) === '1';
-    });
-  }
-
-  if (!ADDONS.length) {
-    dbg('No addons at all, showing empty state');
-    list.innerHTML = '<div style="text-align:center;padding:40px 0;font-size:11px;color:#444">'
-      + 'No addons found in the addons folder.<br>'
-      + '<span style="color:#ff6b00;cursor:pointer;margin-top:8px;display:inline-block" '
-      + 'onclick="window.electronAPI.addonsOpenFolder()">📂 Open addons folder</span></div>';
+  if (!_addonRegistry.length) {
+    list.innerHTML = '<div style="text-align:center;padding:40px 0;font-size:11px;color:#555">No addons registered.</div>';
     return;
   }
 
-  dbg('Rendering ' + ADDONS.length + ' addons');
-  list.innerHTML = '';
+  const cats = [...new Set(_addonRegistry.map(a => a.category || 'Other'))];
+  cats.forEach(cat => {
+    const catEl = document.createElement('div');
+    catEl.style.cssText = 'font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:#555;margin:10px 0 4px';
+    catEl.textContent = cat;
+    list.appendChild(catEl);
 
-  // Open folder button at top
-  const openBtn = document.createElement('button');
-  openBtn.textContent = '📂 Open addons folder';
-  openBtn.style.cssText = 'display:block;margin:0 0 8px auto;background:transparent;'
-    + 'border:1px solid #2a2a2a;color:#555;font-size:10px;padding:4px 10px;'
-    + 'border-radius:5px;cursor:pointer;font-family:inherit;transition:all 0.15s';
-  openBtn.onmouseover = function() { this.style.borderColor='#555'; this.style.color='#aaa'; };
-  openBtn.onmouseout  = function() { this.style.borderColor='#2a2a2a'; this.style.color='#555'; };
-  openBtn.onclick = () => window.electronAPI.addonsOpenFolder();
-  list.appendChild(openBtn);
+    _addonRegistry.filter(a => (a.category || 'Other') === cat).forEach(addon => {
+      const on = addonIsEnabled(addon.id);
+      const hasSettings = typeof addon.renderSettings === 'function';
 
-  const categories = [...new Set(ADDONS.map(a => a.category || 'Other'))];
-  categories.forEach(cat => {
-    const header = document.createElement('div');
-    header.style.cssText = 'font-size:10px;font-weight:700;text-transform:uppercase;'
-      + 'letter-spacing:0.7px;color:#555;margin:10px 0 5px';
-    header.textContent = cat;
-    list.appendChild(header);
-
-    ADDONS.filter(a => (a.category || 'Other') === cat).forEach(addon => {
-      const on = addonState[addon.id] || false;
       const card = document.createElement('div');
-      card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 13px;'
-        + 'background:rgba(255,255,255,0.03);border:1px solid '
-        + (on ? 'rgba(255,107,0,0.3)' : 'rgba(255,255,255,0.07)') + ';'
-        + 'border-radius:9px;transition:border-color 0.15s';
+      card.className = 'addon-card' + (on ? ' enabled' : '');
 
-      card.innerHTML = '<span style="font-size:20px">' + (addon.icon || '🧩') + '</span>'
-        + '<div style="flex:1;min-width:0">'
-        + '<div style="font-size:12px;font-weight:600;color:' + (on ? '#ff6b00' : '#aaa') + '">'
-        + (addon.name || addon.id) + '</div>'
-        + '<div style="font-size:10px;color:#555;margin-top:1px;line-height:1.4">'
-        + (addon.desc || '') + '</div>'
-        + '</div>'
-        + '<label class="toggle"><input type="checkbox" ' + (on ? 'checked' : '') + '>'
-        + '<span class="slider"></span></label>';
+      const header = document.createElement('div');
+      header.className = 'addon-card-header';
+      header.innerHTML =
+        '<span style="font-size:20px">' + (addon.icon || '🧩') + '</span>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="addon-name" style="font-size:12px;font-weight:600;color:' + (on ? '#ff6b00' : '#aaa') + '">' + (addon.name || addon.id) + '</div>' +
+          '<div style="font-size:10px;color:#555;margin-top:1px;line-height:1.4">' + (addon.desc || '') + '</div>' +
+        '</div>' +
+        (hasSettings ? '<span class="addon-card-chevron">&#x203A;</span>' : '') +
+        '<label class="toggle" style="pointer-events:all">' +
+          '<input type="checkbox"' + (on ? ' checked' : '') + '>' +
+          '<span class="slider"></span>' +
+        '</label>';
 
+      const checkbox = header.querySelector('input[type=checkbox]');
+      checkbox.addEventListener('change', async function(e) {
+        e.stopPropagation();
+        await addonToggle(addon.id, this.checked);
+        card.className = 'addon-card' + (this.checked ? ' enabled' : '') + (card.classList.contains('expanded') ? ' expanded' : '');
+        header.querySelector('.addon-name').style.color = this.checked ? '#ff6b00' : '#aaa';
+      });
+
+      const settingsPanel = document.createElement('div');
+      settingsPanel.className = 'addon-settings-panel';
+
+      if (hasSettings) {
+        header.addEventListener('click', function(e) {
+          if (e.target.closest('label') || e.target.closest('input')) return;
+          card.classList.toggle('expanded');
+          if (card.classList.contains('expanded') && !settingsPanel.children.length) {
+            addon.renderSettings(settingsPanel, addonGetSettings(addon.id), (s) => addonSaveSettings(addon.id, s));
+          }
+        });
+      }
+
+      card.appendChild(header);
+      card.appendChild(settingsPanel);
       list.appendChild(card);
-
-      card.querySelector('input').onchange = async function() {
-        await setAddon(addon.id, this.checked);
-        renderAddons();
-      };
     });
   });
 }
 
+// ── Load file-based addons from disk ─────────────
+async function loadFileAddons() {
+  if (!window.electronAPI || !window.electronAPI.addonsList) return;
+  let list;
+  try { list = await window.electronAPI.addonsList(); } catch(e) { return; }
+  if (!list || !list.length) return;
+  list.forEach(function(item) {
+    var src = item.src;
+    if (!src) return;
+    // Extract fields with simple regex
+    function field(key) {
+      var m = src.match(new RegExp(key + "\s*:\s*'([^']*)'")) ||
+              src.match(new RegExp(key + '\s*:\s*`([^`]*)`'));
+      return m ? m[1] : '';
+    }
+    function fieldML(key) {
+      var m = src.match(new RegExp(key + '\s*:\s*`([\s\S]*?)`(?=\s*[,}])'));
+      if (m) return m[1];
+      var m2 = src.match(new RegExp(key + "\s*:\s*'([^']*)'"));
+      return m2 ? m2[1] : '';
+    }
+    var def = {
+      id:        field('id'),
+      icon:      field('icon'),
+      name:      field('name'),
+      desc:      field('desc'),
+      category:  field('category'),
+      css:       fieldML('css'),
+      script:    fieldML('script'),
+      onDisable: fieldML('onDisable'),
+    };
+    if (def.id) addonRegister(def);
+  });
+}
 
-// ── Init: addon states will be loaded when the tab is first opened ──
+// ── Built-in addons ───────────────────────────────
+addonRegister({
+  id: 'hide-members',
+  icon: '👥',
+  name: 'Hide Member List',
+  desc: 'Collapses the right-side members panel.',
+  category: 'Visual',
+  css: '[class*="members-sidebar"],[class*="MembersSidebar"],[class*="member-list"],[class*="MemberList"],[class*="users-sidebar"],[class*="UsersSidebar"],[class*="rightPanel"],[class*="right-panel"],[data-testid*="member"],[data-testid*="users"],[class*="channelMembers"]{display:none!important}',
+});
+
+addonRegister({
+  id: 'custom-font',
+  icon: '🔤',
+  name: 'Custom Message Font',
+  desc: 'Applies a custom font to chat messages.',
+  category: 'Visual',
+  get css() { return this._css || "[class*=\"message-content\"],[class*=\"MessageContent\"],[class*=\"chat-message\"]{font-family:'JetBrains Mono','Fira Code',monospace!important}"; },
+  renderSettings(container, settings, save) {
+    var font = settings.font || 'JetBrains Mono';
+    container.innerHTML =
+      '<div class="addon-settings-row">' +
+        '<label class="addon-settings-label">Font family</label>' +
+        '<select class="addon-settings-input" id="cf-sel">' +
+          ['JetBrains Mono','Fira Code','Cascadia Code','monospace','Inter','Segoe UI'].map(function(f) {
+            return '<option value="' + f + '"' + (f===font?' selected':'') + '>' + f + '</option>';
+          }).join('') +
+        '</select>' +
+      '</div>' +
+      '<button class="addon-settings-btn addon-btn-save" id="cf-save">Save & Apply</button>';
+    container.querySelector('#cf-save').onclick = async function() {
+      var f = container.querySelector('#cf-sel').value;
+      save({ font: f });
+      var def = _addonRegistry.find(function(a){return a.id==='custom-font';});
+      if (def) def._css = "[class*=\"message-content\"],[class*=\"MessageContent\"],[class*=\"chat-message\"]{font-family:'" + f + "',sans-serif!important}";
+      if (addonIsEnabled('custom-font')) { await addonDisable('custom-font'); await addonEnable('custom-font'); }
+      this.textContent = '✓ Applied';
+      var btn = this; setTimeout(function(){btn.textContent='Save & Apply';}, 2000);
+    };
+  },
+});
+
+addonRegister({
+  id: 'markdown-preview',
+  icon: '✍️',
+  name: 'Markdown Preview',
+  desc: 'Renders **bold**, *italic* and `code` live as you type.',
+  category: 'Chat',
+  script: '(function(){if(window.__ecMdP)return;window.__ecMdP=true;var p=document.createElement("div");p.style.cssText="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(18,18,24,0.97);border:1px solid rgba(255,107,0,0.25);border-radius:10px;padding:10px 16px;font-size:13px;color:#ccc;max-width:520px;pointer-events:none;z-index:99999;display:none;";document.body.appendChild(p);function md(t){return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>").replace(/~~(.+?)~~/g,"<s>$1</s>");}window.__ecMdT=setInterval(function(){var ta=document.querySelector("textarea");if(ta&&ta.value){p.innerHTML=md(ta.value);p.style.display="block";}else{p.style.display="none";}},300);window.__ecMdOff=function(){clearInterval(window.__ecMdT);p.remove();window.__ecMdP=false;};})();',
+  onDisable: 'if(window.__ecMdOff)window.__ecMdOff();',
+});
+
+addonRegister({
+  id: 'typing-sound',
+  icon: '⌨️',
+  name: 'Typing Sound',
+  desc: 'Plays a subtle click sound as you type.',
+  category: 'Fun',
+  script: '(function(){if(window.__ecTS)return;window.__ecTS=true;var c=new(window.AudioContext||window.webkitAudioContext)();function k(){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=1200+Math.random()*400;o.type="square";g.gain.setValueAtTime(0.04,c.currentTime);g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+0.04);o.start();o.stop(c.currentTime+0.04);}function h(e){if(e.key&&(e.key.length===1||e.key==="Backspace"))k();}document.addEventListener("keydown",h,true);window.__ecTSOff=function(){document.removeEventListener("keydown",h,true);window.__ecTS=false;};})();',
+  onDisable: 'if(window.__ecTSOff)window.__ecTSOff();',
+  renderSettings(container) { container.innerHTML = '<p class="addon-no-settings">No settings. Just enable and type!</p>'; },
+});
+
+addonRegister({
+  id: 'message-sound',
+  icon: '🔔',
+  name: 'Message Sound',
+  desc: 'Plays a soft chime when a new message arrives.',
+  category: 'Fun',
+  script: '(function(){if(window.__ecMS)return;window.__ecMS=true;var c=new(window.AudioContext||window.webkitAudioContext)();function ch(){[523,659,784].forEach(function(f,i){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=f;var t=c.currentTime+i*0.12;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.08,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.35);o.start(t);o.stop(t+0.35);});}var ob=new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType===1&&(n.dataset&&n.dataset.messageId))ch();});});});ob.observe(document.body,{childList:true,subtree:true});window.__ecMSOff=function(){ob.disconnect();window.__ecMS=false;};})();',
+  onDisable: 'if(window.__ecMSOff)window.__ecMSOff();',
+  renderSettings(container) { container.innerHTML = '<p class="addon-no-settings">No settings.</p>'; },
+});
+
+// ── Init: re-enable persisted addons on load ──────
+(async function() {
+  await loadFileAddons();
+  for (var i = 0; i < _addonRegistry.length; i++) {
+    var addon = _addonRegistry[i];
+    if (_addonEnabled[addon.id]) {
+      await addonEnable(addon.id);
+    }
+  }
+})();
+
+// ══════════════════════════════════════════════════
+// PROFILE CARD SYSTEM
+// ══════════════════════════════════════════════════
+
+const EC_PROFILE_SERVER_KEY = 'ec_profile_server_url';
+const EC_PROFILE_TOKEN_KEY  = 'ec_profile_token';
+const EC_PROFILE_USER_KEY   = 'ec_profile_username';
+
+function profServerUrl() {
+  return (localStorage.getItem(EC_PROFILE_SERVER_KEY) || '').replace(/\/$/, '');
+}
+
+function profToken()    { return localStorage.getItem(EC_PROFILE_TOKEN_KEY) || ''; }
+function profUsername() { return localStorage.getItem(EC_PROFILE_USER_KEY) || ''; }
+
+async function profApi(method, path, body, token) {
+  const url = profServerUrl() + path;
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+  if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+  if (body)  opts.body = JSON.stringify(body);
+  const r = await fetch(url, opts);
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.error || r.statusText);
+  return data;
+}
+
+// ── Server URL save ───────────────────────────────
+document.getElementById('prof-server-save-btn').addEventListener('click', function() {
+  const val = document.getElementById('prof-server-url').value.trim();
+  if (!val) return;
+  localStorage.setItem(EC_PROFILE_SERVER_KEY, val);
+  this.textContent = '✓';
+  setTimeout(() => { this.textContent = 'Save URL'; }, 1500);
+  profInitPanel();
+});
+
+// ── Inner tab switching ───────────────────────────
+document.querySelectorAll('.prof-inner-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.prof-inner-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.prof-inner-pane').forEach(p => p.style.display = 'none');
+    this.classList.add('active');
+    const pane = document.getElementById('prof-pane-' + this.dataset.ptab);
+    if (pane) { pane.style.display = 'block'; }
+    if (this.dataset.ptab === 'social') profRenderLinks();
+    if (this.dataset.ptab === 'preview') profRenderPreview();
+  });
+});
+
+// ── Bio counter ───────────────────────────────────
+document.getElementById('prof-bio').addEventListener('input', function() {
+  document.getElementById('prof-bio-counter').textContent = this.value.length;
+});
+
+// ── Opacity slider ────────────────────────────────
+document.getElementById('prof-gif-opacity').addEventListener('input', function() {
+  document.getElementById('prof-gif-opacity-val').textContent = this.value + '%';
+  const url = document.getElementById('prof-gif-url').value.trim();
+  if (url) {
+    const layer = document.getElementById('prof-avatar-gif-layer');
+    layer.style.backgroundImage = 'url("' + url + '")';
+    layer.style.opacity = this.value / 100;
+    layer.style.display = 'block';
+  }
+});
+
+document.getElementById('prof-gif-url').addEventListener('input', function() {
+  const url = this.value.trim();
+  const layer = document.getElementById('prof-avatar-gif-layer');
+  if (url) {
+    layer.style.backgroundImage = 'url("' + url + '")';
+    layer.style.opacity = document.getElementById('prof-gif-opacity').value / 100;
+    layer.style.mixBlendMode = document.getElementById('prof-gif-blend').value;
+    layer.style.display = 'block';
+  } else {
+    layer.style.display = 'none';
+  }
+});
+
+// ── Step: Register ────────────────────────────────
+document.getElementById('prof-register-btn').addEventListener('click', async function() {
+  const username = document.getElementById('prof-username-input').value.trim().toLowerCase();
+  const status = document.getElementById('prof-register-status');
+  if (!username) { status.style.color = '#ff5f57'; status.textContent = 'Enter your kloak username'; return; }
+  if (!profServerUrl()) { status.style.color = '#ff5f57'; status.textContent = 'Set a server URL below first'; return; }
+  this.disabled = true;
+  this.textContent = '...';
+  status.style.color = '#666';
+  status.textContent = 'Connecting...';
+  try {
+    const data = await profApi('POST', '/profile/register', { kloak_username: username });
+    localStorage.setItem(EC_PROFILE_USER_KEY, username);
+    localStorage.setItem('ec_profile_pending_claim', data.claim_code);
+    document.getElementById('prof-claim-code-display').textContent = data.claim_code;
+    profShowStep('verify');
+  } catch(e) {
+    status.style.color = '#ff5f57';
+    status.textContent = e.message;
+  } finally {
+    this.disabled = false;
+    this.textContent = 'Get Code';
+  }
+});
+
+// ── Copy claim code ───────────────────────────────
+document.getElementById('prof-copy-code-btn').addEventListener('click', function() {
+  const code = document.getElementById('prof-claim-code-display').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    this.textContent = '✓ Copied!';
+    setTimeout(() => { this.textContent = '📋 Copy'; }, 2000);
+  });
+});
+
+document.getElementById('prof-back-btn').addEventListener('click', () => profShowStep('register'));
+
+// ── Step: Verify ──────────────────────────────────
+document.getElementById('prof-verify-btn').addEventListener('click', async function() {
+  const status  = document.getElementById('prof-verify-status');
+  const username = profUsername();
+  if (!username) { profShowStep('register'); return; }
+  this.disabled = true;
+  this.textContent = 'Checking...';
+  status.style.color = '#666';
+  status.textContent = 'Fetching your kloak profile...';
+  try {
+    const data = await profApi('POST', '/profile/verify', { kloak_username: username });
+    localStorage.setItem(EC_PROFILE_TOKEN_KEY, data.edit_token);
+    localStorage.removeItem('ec_profile_pending_claim');
+    status.style.color = '#28c840';
+    status.textContent = '✓ Verified! Loading your profile...';
+    setTimeout(() => profShowStep('editor'), 800);
+  } catch(e) {
+    status.style.color = '#ff5f57';
+    status.textContent = e.message;
+  } finally {
+    this.disabled = false;
+    this.textContent = '✓ I\'ve Added It — Verify';
+  }
+});
+
+// ── Log out ───────────────────────────────────────
+document.getElementById('prof-logout-btn').addEventListener('click', () => {
+  if (!confirm('Log out of your profile? You can log back in by verifying your bio again.')) return;
+  localStorage.removeItem(EC_PROFILE_TOKEN_KEY);
+  localStorage.removeItem(EC_PROFILE_USER_KEY);
+  localStorage.removeItem('ec_profile_pending_claim');
+  profShowStep('register');
+});
+
+// ── Save appearance ───────────────────────────────
+document.getElementById('prof-save-appearance').addEventListener('click', async function() {
+  const status = document.getElementById('prof-appearance-status');
+  const token  = profToken();
+  if (!token) { profShowStep('register'); return; }
+  this.disabled = true;
+  this.textContent = 'Saving...';
+  status.textContent = '';
+  try {
+    await profApi('PATCH', '/profile/update', {
+      display_name:       document.getElementById('prof-display-name').value.trim(),
+      bio:                document.getElementById('prof-bio').value.trim(),
+      avatar_gif:         document.getElementById('prof-gif-url').value.trim(),
+      avatar_gif_opacity: parseFloat(document.getElementById('prof-gif-opacity').value) / 100,
+      avatar_gif_blend:   document.getElementById('prof-gif-blend').value,
+    }, token);
+    status.style.color = '#28c840';
+    status.textContent = '✓ Saved';
+    setTimeout(() => { status.textContent = ''; }, 2500);
+  } catch(e) {
+    status.style.color = '#ff5f57';
+    status.textContent = e.message;
+  } finally {
+    this.disabled = false;
+    this.textContent = 'Save Appearance';
+  }
+});
+
+// ── Social links ──────────────────────────────────
+function profRenderLinks() {
+  const token = profToken();
+  if (!token) return;
+  profApi('GET', '/profile/' + profUsername(), null, null).then(data => {
+    const list = document.getElementById('prof-links-list');
+    if (!list) return;
+    list.innerHTML = '';
+    const ICONS = { bluesky:'🦋', youtube:'▶️', discord:'🎮', github:'🐙', twitter:'🐦', twitch:'💜', instagram:'📸' };
+    const LABELS= { bluesky:'Bluesky', youtube:'YouTube', discord:'Discord', github:'GitHub', twitter:'Twitter/X', twitch:'Twitch', instagram:'Instagram' };
+    const links = data.social_links || {};
+    if (!Object.keys(links).length) {
+      list.innerHTML = '<div style="font-size:11px;color:#444;font-style:italic">No links added yet.</div>';
+      return;
+    }
+    Object.entries(links).forEach(([platform, info]) => {
+      const row = document.createElement('div');
+      row.className = 'prof-link-row';
+      row.innerHTML =
+        '<span class="prof-link-icon">' + (ICONS[platform]||'🔗') + '</span>' +
+        '<div class="prof-link-info">' +
+          '<div class="prof-link-platform">' + (LABELS[platform]||platform) + '</div>' +
+          '<div class="prof-link-handle">@' + info.handle + '</div>' +
+        '</div>' +
+        (info.verified ? '<span class="prof-link-verified">✓ verified</span>' : '') +
+        '<button class="prof-link-remove" data-plat="' + platform + '" title="Remove">✕</button>';
+      row.querySelector('.prof-link-remove').addEventListener('click', async function() {
+        try {
+          await profApi('DELETE', '/profile/links/' + this.dataset.plat, null, token);
+          profRenderLinks();
+        } catch(e) {
+          document.getElementById('prof-links-status').textContent = e.message;
+        }
+      });
+      list.appendChild(row);
+    });
+  }).catch(() => {});
+}
+
+document.getElementById('prof-add-link-btn').addEventListener('click', async function() {
+  const platform = document.getElementById('prof-link-platform').value;
+  const handle   = document.getElementById('prof-link-handle').value.trim();
+  const status   = document.getElementById('prof-links-status');
+  const token    = profToken();
+  if (!handle) { status.style.color='#ff5f57'; status.textContent='Enter a username'; return; }
+  this.disabled = true;
+  this.textContent = 'Adding...';
+  try {
+    await profApi('POST', '/profile/links', { platform, handle }, token);
+    document.getElementById('prof-link-handle').value = '';
+    status.style.color = '#28c840';
+    status.textContent = '✓ Added' + (platform==='bluesky' ? ' (auto-verified)' : '');
+    setTimeout(() => { status.textContent = ''; }, 2500);
+    profRenderLinks();
+  } catch(e) {
+    status.style.color = '#ff5f57';
+    status.textContent = e.message;
+  } finally {
+    this.disabled = false;
+    this.textContent = '+ Add Link';
+  }
+});
+
+// ── Preview ───────────────────────────────────────
+function profRenderPreview() {
+  const username = profUsername();
+  if (!username) return;
+  const card = document.getElementById('prof-preview-card');
+  card.innerHTML = '<div style="font-size:11px;color:#444">Loading...</div>';
+  profApi('GET', '/profile/' + username).then(data => {
+    card.innerHTML = buildProfileCardHtml(data, true);
+  }).catch(() => {
+    card.innerHTML = '<div style="font-size:11px;color:#666">Could not load preview.</div>';
+  });
+}
+
+function buildProfileCardHtml(data, internal) {
+  const gifStyle = data.avatar_gif
+    ? 'background-image:url("' + data.avatar_gif + '");opacity:' + (data.avatar_gif_opacity||0.85) + ';mix-blend-mode:' + (data.avatar_gif_blend||'normal') + ';'
+    : '';
+  const ICONS = { bluesky:'🦋', youtube:'▶️', discord:'🎮', github:'🐙', twitter:'🐦', twitch:'💜', instagram:'📸' };
+  const LABELS= { bluesky:'Bluesky', youtube:'YouTube', discord:'Discord', github:'GitHub', twitter:'Twitter/X', twitch:'Twitch', instagram:'Instagram' };
+  const URLS  = { bluesky:'https://bsky.app/profile/', youtube:'https://youtube.com/@', github:'https://github.com/', twitter:'https://x.com/', twitch:'https://twitch.tv/', instagram:'https://instagram.com/' };
+
+  let linksHtml = '';
+  const links = data.social_links || {};
+  Object.entries(links).forEach(([platform, info]) => {
+    const href = URLS[platform] ? URLS[platform] + info.handle : '#';
+    linksHtml += '<a class="ec-profile-card-link" href="' + href + '" target="_blank" rel="noopener">' +
+      '<span>' + (ICONS[platform]||'🔗') + '</span>' +
+      '<span>' + (LABELS[platform]||platform) + ': @' + info.handle + '</span>' +
+      (info.verified ? ' <span style="font-size:9px;color:#28c840">✓</span>' : '') +
+      '</a>';
+  });
+
+  return '<div class="ec-profile-card-header">' +
+    '<div class="ec-profile-card-avatar">' +
+      (gifStyle ? '<div class="ec-profile-card-avatar-gif" style="' + gifStyle + 'position:absolute;inset:0;background-size:cover;background-position:center;"></div>' : '') +
+    '</div>' +
+    '<div>' +
+      '<div class="ec-profile-card-name">' + (data.display_name || data.kloak_username) + '</div>' +
+      '<div class="ec-profile-card-username">@' + data.kloak_username + '</div>' +
+    '</div>' +
+  '</div>' +
+  (data.bio ? '<div class="ec-profile-card-bio">' + data.bio.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>' : '') +
+  (linksHtml ? '<div class="ec-profile-card-links">' + linksHtml + '</div>' : '<div style="font-size:11px;color:#444">No links added.</div>');
+}
+
+// ── Panel init ────────────────────────────────────
+function profShowStep(step) {
+  ['register','verify','editor'].forEach(s => {
+    const el = document.getElementById('prof-step-' + s);
+    if (el) el.style.display = (s === step) ? 'block' : 'none';
+  });
+}
+
+function profInitPanel() {
+  // Restore server URL input
+  const savedUrl = profServerUrl();
+  if (savedUrl) document.getElementById('prof-server-url').value = savedUrl;
+
+  const token    = profToken();
+  const username = profUsername();
+  const pending  = localStorage.getItem('ec_profile_pending_claim');
+
+  if (pending) {
+    document.getElementById('prof-claim-code-display').textContent = pending;
+    profShowStep('verify');
+    return;
+  }
+
+  if (token && username) {
+    // Load profile from server and populate editor
+    profShowStep('editor');
+    document.getElementById('prof-editor-username').textContent = username;
+    if (profServerUrl()) {
+      profApi('GET', '/profile/' + username).then(data => {
+        document.getElementById('prof-editor-name').textContent = data.display_name || username;
+        document.getElementById('prof-display-name').value = data.display_name || '';
+        document.getElementById('prof-bio').value = data.bio || '';
+        document.getElementById('prof-bio-counter').textContent = (data.bio||'').length;
+        document.getElementById('prof-gif-url').value = data.avatar_gif || '';
+        document.getElementById('prof-gif-opacity').value = Math.round((data.avatar_gif_opacity||0.85)*100);
+        document.getElementById('prof-gif-opacity-val').textContent = Math.round((data.avatar_gif_opacity||0.85)*100) + '%';
+        document.getElementById('prof-gif-blend').value = data.avatar_gif_blend || 'normal';
+        if (data.avatar_gif) {
+          const layer = document.getElementById('prof-avatar-gif-layer');
+          layer.style.backgroundImage = 'url("' + data.avatar_gif + '")';
+          layer.style.opacity = data.avatar_gif_opacity || 0.85;
+          layer.style.mixBlendMode = data.avatar_gif_blend || 'normal';
+          layer.style.display = 'block';
+        }
+      }).catch(() => {});
+    }
+    return;
+  }
+
+  profShowStep('register');
+}
+
+// Wire profile tab click
+document.querySelector('[data-tab="profile"]').addEventListener('click', profInitPanel);
+
+
+// ══════════════════════════════════════════════════
+// PROFILE CARD INJECTION ADDON
+// Injected into the kloak webview. Watches for user
+// profile pages and shows EC profile cards.
+// ══════════════════════════════════════════════════
+
+addonRegister({
+  id: 'ec-profile-cards',
+  icon: '🪪',
+  name: 'EC Profile Cards',
+  desc: 'Shows Entropy Client profile cards with linked accounts and avatar overlays on kloak profiles.',
+  category: 'Profile',
+  // The script runs inside the kloak webview page
+  script: (function() {
+    // We need to pass the server URL into the script at injection time
+    const serverUrl = profServerUrl();
+    if (!serverUrl) return '/* EC Profile Cards: no server URL configured */';
+    
+    return `(function(){
+  if (window.__ecProfileCards) return;
+  window.__ecProfileCards = true;
+  const SERVER = ${JSON.stringify(serverUrl)};
+
+  // Build the popup HTML for a profile card
+  function buildCard(data) {
+    const ICONS  = {bluesky:'🦋',youtube:'▶️',discord:'🎮',github:'🐙',twitter:'🐦',twitch:'💜',instagram:'📸'};
+    const LABELS = {bluesky:'Bluesky',youtube:'YouTube',discord:'Discord',github:'GitHub',twitter:'Twitter/X',twitch:'Twitch',instagram:'Instagram'};
+    const URLS   = {bluesky:'https://bsky.app/profile/',youtube:'https://youtube.com/@',github:'https://github.com/',twitter:'https://x.com/',twitch:'https://twitch.tv/',instagram:'https://instagram.com/'};
+    const links = data.social_links || {};
+    let linksHtml = '';
+    Object.entries(links).forEach(function([p, info]) {
+      const href = URLS[p] ? URLS[p] + info.handle : '#';
+      linksHtml += '<a href="' + href + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;font-size:11px;color:#888;text-decoration:none;padding:3px 0;transition:color 0.15s" onmouseover="this.style.color=\'#ff6b00\'" onmouseout="this.style.color=\'#888\'">' +
+        '<span>' + (ICONS[p]||'🔗') + '</span>' +
+        '<span>' + (LABELS[p]||p) + ': @' + info.handle + '</span>' +
+        (info.verified ? '<span style="font-size:9px;color:#28c840;background:rgba(40,200,64,0.1);padding:1px 4px;border-radius:3px">✓</span>' : '') +
+        '</a>';
+    });
+    const gifHtml = data.avatar_gif
+      ? '<div style="position:absolute;inset:0;background-image:url(\''+data.avatar_gif+'\');background-size:cover;background-position:center;opacity:'+(data.avatar_gif_opacity||0.85)+';mix-blend-mode:'+(data.avatar_gif_blend||'normal')+'"></div>' : '';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          '<div style="width:44px;height:44px;border-radius:50%;background:#1a1a1a;border:2px solid rgba(255,107,0,0.3);position:relative;overflow:hidden;flex-shrink:0">' + gifHtml + '</div>' +
+          '<div>' +
+            '<div style="font-size:13px;font-weight:700;color:#fff">' + (data.display_name || data.kloak_username) + '</div>' +
+            '<div style="font-size:10px;color:#555">@' + data.kloak_username + ' · EC Profile</div>' +
+          '</div>' +
+        '</div>' +
+        '<button id="__ec-popup-close" style="background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:4px;line-height:1">×</button>' +
+      '</div>' +
+      (data.bio ? '<div style="font-size:11px;color:#666;line-height:1.5;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #1e1e1e">' + data.bio.replace(/</g,'&lt;') + '</div>' : '') +
+      (linksHtml ? '<div style="display:flex;flex-direction:column;gap:2px">' + linksHtml + '</div>' : '<div style="font-size:11px;color:#444">No social links added.</div>');
+  }
+
+  // Show popup near a given element
+  function showPopup(data, nearEl) {
+    var old = document.getElementById('__ec-profile-popup');
+    if (old) old.remove();
+    var popup = document.createElement('div');
+    popup.id = '__ec-profile-popup';
+    popup.style.cssText = 'position:fixed;z-index:2147483647;background:rgba(13,13,17,0.98);border:1px solid rgba(255,107,0,0.2);border-radius:12px;padding:16px;width:280px;box-shadow:0 20px 60px rgba(0,0,0,0.8);backdrop-filter:blur(20px);font-family:-apple-system,sans-serif;animation:__ecPopIn 0.2s ease;';
+    popup.innerHTML = buildCard(data);
+    // Position near element
+    var rect = nearEl.getBoundingClientRect();
+    var top  = Math.min(rect.bottom + 8, window.innerHeight - 320);
+    var left = Math.min(rect.left, window.innerWidth - 300);
+    popup.style.top  = top + 'px';
+    popup.style.left = left + 'px';
+    document.body.appendChild(popup);
+    // Inject animation keyframes once
+    if (!document.getElementById('__ec-anim')) {
+      var s = document.createElement('style');
+      s.id = '__ec-anim';
+      s.textContent = '@keyframes __ecPopIn{from{opacity:0;transform:scale(0.93) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}';
+      document.head.appendChild(s);
+    }
+    var closeBtn = document.getElementById('__ec-popup-close');
+    if (closeBtn) closeBtn.onclick = function() { popup.remove(); };
+    // Click outside to close
+    setTimeout(function() {
+      document.addEventListener('click', function handler(e) {
+        if (!popup.contains(e.target)) { popup.remove(); document.removeEventListener('click', handler); }
+      });
+    }, 100);
+  }
+
+  // Fetch a profile and show popup
+  var _fetchCache = {};
+  function fetchAndShow(username, el) {
+    username = username.toLowerCase();
+    if (_fetchCache[username] === 'loading') return;
+    if (_fetchCache[username] && _fetchCache[username].data) { showPopup(_fetchCache[username].data, el); return; }
+    if (_fetchCache[username] === 404) return;
+    _fetchCache[username] = 'loading';
+    fetch(SERVER + '/profile/' + username)
+      .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function(data) {
+        _fetchCache[username] = { data: data };
+        showPopup(data, el);
+      })
+      .catch(function(status) {
+        _fetchCache[username] = status === 404 ? 404 : null;
+      });
+  }
+
+  // Watch DOM for username elements to make hoverable
+  // kloak likely shows usernames in spans/divs with specific attributes
+  var _decorated = new WeakSet();
+  function decorateUsernames() {
+    // Target common kloak username patterns - adjust selectors as kloak's DOM evolves
+    var selectors = [
+      '[class*="username"]','[class*="user-name"]','[class*="displayName"]',
+      '[class*="handle"]','[data-username]','[data-user]',
+      '[class*="member-name"]','[class*="memberName"]',
+      '[class*="author"]','[class*="sender"]'
+    ];
+    var els = document.querySelectorAll(selectors.join(','));
+    els.forEach(function(el) {
+      if (_decorated.has(el)) return;
+      var text = (el.dataset.username || el.dataset.user || el.textContent || '').trim().replace(/^@/,'');
+      if (!text || text.length < 2 || text.length > 32 || !(/^[a-z0-9_-]+$/i.test(text))) return;
+      _decorated.add(el);
+      el.style.cursor = 'pointer';
+      el.title = 'View EC profile card';
+      el.addEventListener('click', function(e) {
+        e.stopPropagation();
+        fetchAndShow(text, el);
+      });
+    });
+  }
+
+  // Run on load and on DOM mutations
+  decorateUsernames();
+  var _mo = new MutationObserver(function() { setTimeout(decorateUsernames, 300); });
+  _mo.observe(document.body, { childList: true, subtree: true });
+  window.__ecProfileCardsOff = function() { _mo.disconnect(); var p = document.getElementById('__ec-profile-popup'); if(p) p.remove(); window.__ecProfileCards = false; };
+})();`;
+  })(),
+  onDisable: 'if(window.__ecProfileCardsOff)window.__ecProfileCardsOff();',
+  renderSettings(container) {
+    const serverUrl = profServerUrl();
+    container.innerHTML =
+      '<div style="font-size:11px;color:#666;margin-bottom:8px">Fetches EC profile cards for kloak users who have registered with the EC Profile Server.</div>' +
+      '<div style="font-size:11px;color:' + (serverUrl ? '#28c840' : '#ff5f57') + '">' +
+        (serverUrl ? '✓ Server: ' + serverUrl : '✗ No server URL set. Go to the 🪪 My Profile tab to configure.') +
+      '</div>';
+  },
+});
 
 </script>
 

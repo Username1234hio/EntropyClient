@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: ec-profile-server
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: EC_SECRET
+        generateValue: true
+      - key: BASE_URL
+        value: https://ec-profile-server.onrender.com  # change to your actual Render URL
+    disk:
+      name: profiles-db
+      mountPath: /data
+      sizeGB: 1
