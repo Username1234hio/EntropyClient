@@ -1852,14 +1852,11 @@ function makeThemeCss(bg, accent, text, surface, border) {
   surface = surface || 'rgba(255,255,255,0.06)';
   border  = border  || 'rgba(255,255,255,0.1)';
 
-  // Parse a hex color into [r,g,b] 0-255
   function hexToRgb(hex) {
     hex = hex.replace('#','');
     if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
     return [parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16)];
   }
-
-  // RGB to HSL
   function rgbToHsl(r,g,b) {
     r/=255; g/=255; b/=255;
     var max=Math.max(r,g,b), min=Math.min(r,g,b), h,s,l=(max+min)/2;
@@ -1867,8 +1864,6 @@ function makeThemeCss(bg, accent, text, surface, border) {
       switch(max){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;case b:h=((r-g)/d+4)/6;break;}}
     return [h*360, s*100, l*100];
   }
-
-  // HSL to hex
   function hslToHex(h,s,l) {
     h/=360; s/=100; l/=100;
     function hue2rgb(p,q,t){if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;}
@@ -1876,132 +1871,106 @@ function makeThemeCss(bg, accent, text, surface, border) {
     if(s===0){r=g=b=l;}else{var q=l<0.5?l*(1+s):l+s-l*s,p=2*l-q;r=hue2rgb(p,q,h+1/3);g=hue2rgb(p,q,h);b=hue2rgb(p,q,h-1/3);}
     return '#'+[r,g,b].map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('');
   }
-
-  // Compute a soft pastel complement: rotate hue 150-210deg, high lightness, low-mid saturation
   function pastelComplement(hex) {
     try {
       var rgb = hexToRgb(hex);
       var hsl = rgbToHsl(rgb[0],rgb[1],rgb[2]);
-      var h = (hsl[0] + 180) % 360;          // opposite on color wheel
-      var s = Math.min(hsl[1] * 0.5, 45);    // desaturate for pastels
-      var l = 82;                             // high lightness = soft/light
-      return hslToHex(h, s, l);
+      return hslToHex((hsl[0]+180)%360, Math.min(hsl[1]*0.5,45), 82);
     } catch(e) { return '#e2e8f0'; }
   }
 
-  var bgDark      = 'color-mix(in srgb, ' + bg + ' 82%, #000)';
-  var bgDarker    = 'color-mix(in srgb, ' + bg + ' 68%, #000)';
-  var accentFg    = 'color-mix(in srgb, ' + accent + ' 90%, #fff)';
-  var complement  = pastelComplement(accent);   // pastel opposite of accent
-  var btnText     = complement;                 // readable on accent-colored buttons
+  var bgDark     = 'color-mix(in srgb, ' + bg + ' 80%, #000)';
+  var bgDarker   = 'color-mix(in srgb, ' + bg + ' 62%, #000)';
+  var accentFg   = 'color-mix(in srgb, ' + accent + ' 85%, #fff)';
+  var complement = pastelComplement(accent);
+  var textMuted  = 'color-mix(in srgb, ' + text + ' 55%, transparent)';
 
+  // IMPORTANT: CSS custom properties (--foo) do NOT support !important — browsers silently discard it.
+  // So we set variables without !important, then override every consuming utility class directly.
   return [
-'/* EC Theme */',
+'/* ── EC Theme ── */',
+
+/* 1. CSS variables — NO !important (invalid on custom props, ignored by browsers) */
 ':root, .dark, [data-theme="dark"], body {',
-'  --background: ' + bg + ' !important;',
-'  --layout-chat: ' + bg + ' !important;',
-'  --layout-sidebar: ' + bgDark + ' !important;',
-'  --layout-members: ' + bgDark + ' !important;',
-'  --layout-sidebar-secondary: ' + bgDark + ' !important;',
-'  --card: ' + bgDark + ' !important;',
-'  --popover: ' + bgDark + ' !important;',
-'  --secondary: color-mix(in srgb, ' + accent + ' 12%, ' + bgDark + ') !important;',
-'  --muted: color-mix(in srgb, ' + bg + ' 60%, ' + bgDark + ') !important;',
-'  --border: ' + border + ' !important;',
-'  --input: ' + border + ' !important;',
-'  --ring: ' + accent + ' !important;',
-'  --foreground: ' + text + ' !important;',
-'  --card-foreground: ' + text + ' !important;',
-'  --popover-foreground: ' + text + ' !important;',
-'  --secondary-foreground: ' + accentFg + ' !important;',
-'  --muted-foreground: color-mix(in srgb, ' + text + ' 50%, transparent) !important;',
-'  --primary: ' + accent + ' !important;',
-'  --primary-foreground: ' + btnText + ' !important;',
-'  --accent: color-mix(in srgb, ' + accent + ' 15%, transparent) !important;',
-'  --accent-foreground: ' + accentFg + ' !important;',
+'  --background:               ' + bg        + ';',
+'  --foreground:               ' + text      + ';',
+'  --card:                     ' + bgDark    + ';',
+'  --card-foreground:          ' + text      + ';',
+'  --popover:                  ' + bgDark    + ';',
+'  --popover-foreground:       ' + text      + ';',
+'  --primary:                  ' + accent    + ';',
+'  --primary-foreground:       #ffffff;',
+'  --secondary:                color-mix(in srgb, ' + accent + ' 12%, ' + bgDark + ');',
+'  --secondary-foreground:     ' + accentFg  + ';',
+'  --muted:                    ' + bgDark    + ';',
+'  --muted-foreground:         ' + textMuted + ';',
+'  --accent:                   color-mix(in srgb, ' + accent + ' 15%, transparent);',
+'  --accent-foreground:        ' + accentFg  + ';',
+'  --border:                   ' + border    + ';',
+'  --input:                    ' + border    + ';',
+'  --ring:                     ' + accent    + ';',
+'  --layout-chat:              ' + bg        + ';',
+'  --layout-sidebar:           ' + bgDark    + ';',
+'  --layout-members:           ' + bgDark    + ';',
+'  --layout-sidebar-secondary: ' + bgDark    + ';',
 '}',
-'.bg-layout-sidebar, .bg-layout-members, .bg-layout-sidebar-secondary {',
-'  background-color: ' + bgDark + ' !important;',
-'}',
-'.bg-layout-chat, .bg-background {',
-'  background-color: ' + bg + ' !important;',
-'}',
-'.bg-background\\/20, .bg-muted\\/60, .bg-background\\/50, .bg-background\\/70 {',
-'  background-color: ' + bgDark + ' !important;',
-'  border-color: ' + border + ' !important;',
-'}',
-'[data-resize-handle]::after { background-color: ' + border + ' !important; }',
-'[data-resize-handle]:hover, [data-resize-handle][data-resize-handle-state="drag"] {',
-'  background-color: color-mix(in srgb, ' + accent + ' 50%, transparent) !important;',
-'}',
-'::-webkit-scrollbar-thumb {',
-'  background-color: color-mix(in srgb, ' + accent + ' 55%, ' + bgDarker + ') !important;',
-'  border-radius: 10px;',
-'}',
+
+/* 2. Backgrounds — !important IS valid on regular properties */
+'body, .bg-background { background-color: ' + bg + ' !important; }',
+'.bg-layout-chat { background-color: ' + bg + ' !important; }',
+'.bg-layout-sidebar, .bg-layout-members, .bg-layout-sidebar-secondary,',
+'.bg-card, .bg-popover, .bg-muted, .bg-secondary { background-color: ' + bgDark + ' !important; }',
+'.bg-background\\/20, .bg-muted\\/60, .bg-background\\/50, .bg-background\\/70 { background-color: ' + bgDark + ' !important; border-color: ' + border + ' !important; }',
+
+/* 3. Text — directly target every Tailwind utility class kloak uses for text color.
+   This is necessary because var(--foreground) gets resolved at paint time
+   and kloak's own stylesheet may have higher specificity on some elements. */
+'body, html { color: ' + text + ' !important; }',
+'.text-foreground { color: ' + text + ' !important; }',
+'.text-card-foreground, .text-popover-foreground { color: ' + text + ' !important; }',
+'.text-muted-foreground { color: ' + textMuted + ' !important; }',
+'.text-secondary-foreground, .text-accent-foreground { color: ' + accentFg + ' !important; }',
+'.text-primary { color: ' + accent + ' !important; }',
+/* Propagate to children so nested spans/divs inherit */
+'.text-foreground *, .text-card-foreground * { color: inherit; }',
+
+/* 4. Buttons */
+'.bg-primary, button.bg-primary { background-color: ' + accent + ' !important; color: #fff !important; }',
+'.bg-primary:hover, button.bg-primary:hover { background-color: ' + accentFg + ' !important; }',
+'.border-primary { border-color: ' + accent + ' !important; }',
+'.border-border { border-color: ' + border + ' !important; }',
+
+/* 5. Scrollbar */
+'::-webkit-scrollbar-thumb { background-color: color-mix(in srgb, ' + accent + ' 55%, ' + bgDarker + ') !important; border-radius: 10px; }',
 '::-webkit-scrollbar-thumb:hover { background-color: ' + accent + ' !important; }',
 '::-webkit-scrollbar-track { background-color: transparent !important; }',
-'span[data-orientation="horizontal"]:not([dir]):not([role]) {',
-'  background-color: color-mix(in srgb, ' + accent + ' 20%, ' + bgDark + ') !important;',
-'}',
-'span[data-orientation="horizontal"]:not([dir]):not([role]) > span[data-orientation="horizontal"] {',
-'  background: ' + accent + ' !important;',
-'}',
-'span[role="slider"][data-orientation="horizontal"] {',
-'  background-color: ' + bg + ' !important;',
-'  border-color: ' + accent + ' !important;',
-'}',
-'/* Username — gradient clip (same as cyberpunk.css), inline-block makes it selectable */',
+
+/* 6. Resize handle + sliders */
+'[data-resize-handle]::after { background-color: ' + border + ' !important; }',
+'[data-resize-handle]:hover { background-color: color-mix(in srgb, ' + accent + ' 50%, transparent) !important; }',
+'span[data-orientation="horizontal"]:not([dir]):not([role]) { background-color: color-mix(in srgb, ' + accent + ' 20%, ' + bgDark + ') !important; }',
+'span[data-orientation="horizontal"]:not([dir]):not([role]) > span { background: ' + accent + ' !important; }',
+'span[role="slider"][data-orientation="horizontal"] { background-color: ' + bg + ' !important; border-color: ' + accent + ' !important; }',
+
+/* 7. Inputs */
+'input, textarea { background-color: ' + bgDark + ' !important; border-color: ' + border + ' !important; color: ' + text + ' !important; }',
+'input:focus, textarea:focus { border-color: ' + accent + ' !important; }',
+
+/* 8. Username — gradient clip, tightly scoped */
 '.text-sm.font-medium.text-foreground.truncate {',
-'  background: linear-gradient(135deg, ' + accentFg + ', ' + complement + ') !important;',
+'  background: linear-gradient(135deg, ' + accentFg + ' 0%, ' + complement + ' 100%) !important;',
 '  -webkit-background-clip: text !important;',
+'  background-clip: text !important;',
 '  -webkit-text-fill-color: transparent !important;',
 '  color: transparent !important;',
 '  display: inline-block !important;',
 '}',
-'/* Restore selection on everything else */',
-'*:not(.text-sm.font-medium.text-foreground.truncate) {',
-'  -webkit-text-fill-color: unset;',
-'  user-select: text;',
-'  -webkit-user-select: text;',
+
+/* 9. Message/chat text — ALWAYS #fff, only on markup containers, never broad selectors */
+'[class*="markup"], [class*="messageContent"], [class*="chatContent"], [class*="message-content"] {',
+'  color: #ffffff !important;',
 '}',
-'.bg-primary, button.bg-primary {',
-'  background-color: ' + accent + ' !important;',
-'  color: ' + btnText + ' !important;',
-'  -webkit-text-fill-color: ' + btnText + ' !important;',
-'}',
-'.bg-primary:hover, button.bg-primary:hover { background-color: ' + accentFg + ' !important; }',
-'.text-primary, [class*="text-primary"] { color: ' + accent + ' !important; -webkit-text-fill-color: ' + accent + ' !important; }',
-'.border-primary { border-color: ' + accent + ' !important; }',
-'.bg-card, .bg-popover, .bg-muted, .bg-secondary { background-color: ' + bgDark + ' !important; }',
-'.text-foreground, .text-card-foreground {',
-'  color: ' + text + ' !important;',
-'  -webkit-text-fill-color: ' + text + ' !important;',
-'  user-select: text !important;',
-'  -webkit-user-select: text !important;',
-'}',
-'.text-muted-foreground {',
-'  color: color-mix(in srgb, ' + text + ' 55%, transparent) !important;',
-'  -webkit-text-fill-color: color-mix(in srgb, ' + text + ' 55%, transparent) !important;',
-'}',
-'.text-secondary-foreground, .text-accent-foreground {',
-'  color: ' + accentFg + ' !important;',
-'  -webkit-text-fill-color: ' + accentFg + ' !important;',
-'}',
-'input, textarea {',
-'  background-color: ' + bgDark + ' !important;',
-'  border-color: ' + border + ' !important;',
-'  color: ' + text + ' !important;',
-'  -webkit-text-fill-color: ' + text + ' !important;',
-'}',
-'input:focus, textarea:focus { border-color: ' + accent + ' !important; }',
-'/* Force chat/message body text to stay light — never let themes turn it dark */',
-'[class*="message"] p, [class*="message"] span:not([class*="username"]):not([class*="timestamp"]):not([class*="reaction"]),',
-'[class*="markup"], [class*="messageContent"], [class*="contents"],',
-'p, li, blockquote {',
-'  color: ' + text + ' !important;',
-'  -webkit-text-fill-color: ' + text + ' !important;',
-'}',
-'* { user-select: text; -webkit-user-select: text; }',
+
   ].join('\n');
 }
 
