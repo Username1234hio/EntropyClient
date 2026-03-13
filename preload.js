@@ -47,7 +47,26 @@ contextBridge.exposeInMainWorld('electronAPI', {
   emojiOpenFolder: ()       => ipcRenderer.invoke('emoji-open-folder'),
 
 
+  // Profile API (proxied through main to avoid file:// CORS restrictions)
+  profileApi: (opts) => ipcRenderer.invoke('profile-api', opts),
+
+  // Splash GIF folder
+  splashSaveGif:    (data)     => ipcRenderer.invoke('splash-save-gif', data),
+  splashDeleteGif:  (filePath) => ipcRenderer.invoke('splash-delete-gif', filePath),
+  splashOpenFolder: ()         => ipcRenderer.invoke('splash-open-folder'),
+  splashFetchUrl:   (url)      => ipcRenderer.invoke('splash-fetch-url', url),
+  splashScanFolder: ()         => ipcRenderer.invoke('splash-scan-folder'),
+
   // Addons
   addonsList:       ()     => ipcRenderer.invoke('addons-list'),
   addonsOpenFolder: ()     => ipcRenderer.invoke('addons-open-folder'),
+
+  // Key intercepts (keys Electron swallows before the renderer sees them)
+  onKeyF2: (cb) => ipcRenderer.on('key-f2', () => cb()),
+
+  // Window fullscreen
+  setFullScreen: (val) => ipcRenderer.send('win-set-fullscreen', val),
+
+  // Account switcher
+  switchAccount: (partition) => ipcRenderer.invoke('switch-account', { partition }),
 });

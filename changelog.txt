@@ -3,6 +3,19 @@
 # Entry types: new / imp / fix
 # Lines starting with # are ignored
 
+
+
+VERSION 1.2.3!
+new Screensaver (F2) — press F2 to enter fullscreen screensaver with clock overlay
+new Screensaver cycles your selected splash screen images and GIFs
+new Screensaver settings in Splash Screens tab — interval, shuffle, clock toggle
+new Giphy search integration — search and add trending GIFs as splash screens
+new Splash screen refresh button re-scans your GIF folder for new files
+imp Screensaver exits cleanly on second F2 press, restoring kloak
+imp Splash images now persist to disk as GIF files with no base64 limit
+fix Screensaver no longer flickers or immediately closes on open
+fix ACOUNT SWITCHER ACTUALLY WORKS NOW!!!!!
+
 VERSION 1.0.5!
 new Ambient mode — titlebar tints to match page colours
 new Connection status dot with auto-reconnect on offline

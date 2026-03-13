@@ -175,7 +175,28 @@
     .splash-card .splash-label { position:absolute;bottom:0;left:0;right:0;padding:4px 6px;background:linear-gradient(transparent,rgba(0,0,0,0.75));font-size:9px;color:rgba(255,255,255,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
     .splash-card.is-default { border-color:#ff6b00; }
     .splash-card.is-default .splash-check { background:#ff6b00; display:flex; }
+    .splash-card.is-gif { border-color:#00e5ff; }
+    .splash-card.is-gif .splash-gif-badge { display:flex; }
+    .splash-gif-badge { position:absolute;bottom:26px;right:6px;background:rgba(0,229,255,0.85);color:#000;font-size:8px;font-weight:800;padding:2px 5px;border-radius:4px;display:none;z-index:3;letter-spacing:0.5px; }
+    #splash-bg img { position:absolute;inset:0;width:100%;height:100%;object-fit:cover; }
     #splash-upload-label:hover { background:rgba(255,107,0,0.2);border-color:#ff6b00; }
+    #giphy-results { display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;max-height:220px;overflow-y:auto;margin-top:10px; }
+    .giphy-thumb { position:relative;aspect-ratio:16/9;border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:border-color 0.15s,transform 0.1s;background:#111; }
+    .giphy-thumb:hover { border-color:#00e5ff;transform:scale(1.03); }
+    .giphy-thumb img { width:100%;height:100%;object-fit:cover;display:block; }
+    .giphy-thumb .giphy-add { position:absolute;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;font-size:20px; }
+    .giphy-thumb:hover .giphy-add { display:flex; }
+    #giphy-search-wrap { display:none;margin-top:16px;padding:12px;background:rgba(0,229,255,0.04);border:1px solid rgba(0,229,255,0.15);border-radius:10px; }
+    #screensaver { position:fixed;inset:0;z-index:9999999;display:none;background:#000;cursor:none;-webkit-app-region:no-drag;isolation:isolate; }
+    #screensaver.active { display:flex;align-items:flex-end;justify-content:flex-end; }
+    #screensaver-bg { position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity 0.8s; }
+    #screensaver-gif { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none; }
+    #screensaver-hint { position:relative;z-index:2;padding:12px 18px;font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;text-transform:uppercase;pointer-events:none; }
+    #screensaver-clock { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;text-align:center;pointer-events:none; }
+    #screensaver-time { font-size:72px;font-weight:200;color:rgba(255,255,255,0.85);letter-spacing:4px;text-shadow:0 2px 20px rgba(0,0,0,0.8);font-family:system-ui,sans-serif; }
+    #screensaver-date { font-size:16px;font-weight:300;color:rgba(255,255,255,0.45);margin-top:4px;letter-spacing:2px; }
+    #screensaver-toast { position:absolute;bottom:48px;left:50%;transform:translateX(-50%);z-index:3;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:8px 20px;font-size:12px;color:rgba(255,255,255,0.75);letter-spacing:0.5px;white-space:nowrap;opacity:0;transition:opacity 0.4s;pointer-events:none; }
+    #screensaver-toast.show { opacity:1; }
     .ctrl { -webkit-app-region: no-drag; width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; opacity: 0.8; transition: opacity 0.15s, transform 0.1s; }
     .ctrl:hover { opacity: 1; transform: scale(1.2); }
     #btn-close { background: #ff5f57; } #btn-minimize { background: #febc2e; } #btn-maximize { background: #28c840; }
@@ -440,6 +461,8 @@
     .btn-red   { background: #7a1a1a; color: #fff; }
     .btn-grey  { background: #333; color: #ccc; }
     .btn-blue  { background: #1a4a8a; color: #fff; }
+    .btn-orange { background: rgba(255,107,0,0.18); color: #ff6b00; border: 1px solid rgba(255,107,0,0.35); }
+    .btn-orange:hover { background: rgba(255,107,0,0.3) !important; }
     .status-line { margin-top: 8px; font-size: 11px; color: #555; min-height: 18px; }
     .status-line.ok  { color: #28c840; }
     .status-line.err { color: #ff5f57; }
@@ -580,11 +603,24 @@
 <!-- Splash -->
 <div id="splash">
   <div id="splash-bg"></div>
+  <img id="splash-gif" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;z-index:1;" alt="">
   <div id="splash-bottom">
     <div id="splash-bar-wrap"><div id="splash-bar"></div></div>
     <div id="splash-status">Initializing...</div>
     <div id="splash-version"></div>
   </div>
+</div>
+
+<!-- Screensaver (F2) -->
+<div id="screensaver">
+  <div id="screensaver-bg"></div>
+  <img id="screensaver-gif" alt="">
+  <div id="screensaver-clock">
+    <div id="screensaver-time">00:00</div>
+    <div id="screensaver-date"></div>
+  </div>
+  <div id="screensaver-hint">Press F2 to exit</div>
+  <div id="screensaver-toast">🖥 Screensaver enabled</div>
 </div>
 
 
@@ -907,16 +943,32 @@
         <!-- Splash Screens -->
         <div class="tab-pane" id="pane-splashes">
           <div class="section-title">Custom Splash Screens</div>
-          <div style="font-size:11px;color:#666;margin-bottom:14px">Upload images to use as splash screens. Selected ones cycle every 5 seconds on load. If none selected, the default is used.</div>
+          <div style="font-size:11px;color:#666;margin-bottom:14px">Upload images or GIFs to use as splash screens. GIFs autoplay and are shown with a cyan border. Selected ones cycle on load.</div>
 
           <!-- Upload button -->
           <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px">
             <label id="splash-upload-label" style="display:flex;align-items:center;gap:7px;padding:8px 14px;background:rgba(255,107,0,0.12);border:1px solid rgba(255,107,0,0.35);border-radius:8px;color:#ff9944;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s">
               <span style="font-size:15px">＋</span> Upload Images
-              <input type="file" id="splash-file-input" accept="image/*" multiple style="display:none">
+              <input type="file" id="splash-file-input" accept="image/*,.gif" multiple style="display:none">
             </label>
             <button id="splash-clear-all" style="padding:8px 12px;background:rgba(255,255,255,0.04);border:1px solid #333;border-radius:8px;color:#888;font-size:11px;cursor:pointer;transition:all 0.15s">🗑 Clear All</button>
+            <button id="splash-open-folder-btn" style="padding:8px 12px;background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.2);border-radius:8px;color:#00e5ff;font-size:11px;cursor:pointer;transition:all 0.15s">📂 GIF Folder</button>
+            <button id="splash-giphy-toggle" style="padding:8px 12px;background:rgba(153,51,255,0.1);border:1px solid rgba(153,51,255,0.3);border-radius:8px;color:#cc66ff;font-size:11px;cursor:pointer;transition:all 0.15s">🔍 Giphy Search</button>
+            <button id="splash-refresh-btn" title="Re-scan splashes folder for new GIFs" style="padding:8px 10px;background:rgba(255,255,255,0.04);border:1px solid #333;border-radius:8px;color:#888;font-size:13px;cursor:pointer;transition:all 0.15s">↺</button>
             <span id="splash-count-label" style="font-size:11px;color:#555;margin-left:auto"></span>
+          </div>
+
+          <!-- Giphy Search Panel -->
+          <div id="giphy-search-wrap">
+            <div style="font-size:11px;color:#888;margin-bottom:8px">Search Giphy — click a result to add it as a splash screen</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input id="giphy-search-input" type="text" placeholder="Search Giphy…" style="flex:1;padding:6px 10px;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#e2e8f0;font-size:12px;outline:none">
+              <button id="giphy-search-btn" style="padding:6px 12px;background:rgba(153,51,255,0.2);border:1px solid rgba(153,51,255,0.4);border-radius:6px;color:#cc66ff;font-size:11px;cursor:pointer">Search</button>
+              <button id="giphy-trending-btn" style="padding:6px 10px;background:rgba(255,107,0,0.1);border:1px solid rgba(255,107,0,0.25);border-radius:6px;color:#ff9944;font-size:11px;cursor:pointer">🔥 Trending</button>
+            </div>
+            <div id="giphy-status" style="font-size:10px;color:#555;margin-top:6px;min-height:14px"></div>
+            <div id="giphy-results"></div>
+            <div style="font-size:9px;color:#333;margin-top:8px;text-align:right">Powered by GIPHY</div>
           </div>
 
           <!-- Grid -->
@@ -940,6 +992,28 @@
           <div class="setting-row" style="padding:9px 0">
             <div><div class="setting-label">Shuffle order</div><div class="setting-sub">Randomise which splash shows next</div></div>
             <label class="toggle"><input type="checkbox" id="splash-shuffle"><span class="slider"></span></label>
+          </div>
+
+          <div class="section-title" style="margin-top:22px">🖥 Screensaver (F2)</div>
+          <div style="font-size:11px;color:#666;margin-bottom:14px">Press F2 at any time to activate the screensaver. It cycles your selected splash images fullscreen with a clock overlay.</div>
+          <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+            <div><div class="setting-label">Use splash images as screensaver</div><div class="setting-sub">Selected splash screens will cycle when screensaver is active</div></div>
+            <label class="toggle"><input type="checkbox" id="screensaver-use-splashes" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+            <div><div class="setting-label">Screensaver interval</div><div class="setting-sub">How long each image shows during screensaver</div></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <input type="range" id="screensaver-interval-slider" min="2" max="30" value="5" style="width:80px;accent-color:#00e5ff">
+              <span id="screensaver-interval-val" style="font-size:11px;color:#aaa;min-width:24px">5s</span>
+            </div>
+          </div>
+          <div class="setting-row" style="padding:9px 0;border-bottom:1px solid #222">
+            <div><div class="setting-label">Shuffle screensaver order</div><div class="setting-sub">Randomise image order in screensaver</div></div>
+            <label class="toggle"><input type="checkbox" id="screensaver-shuffle" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-row" style="padding:9px 0">
+            <div><div class="setting-label">Show clock overlay</div><div class="setting-sub">Display time and date on the screensaver</div></div>
+            <label class="toggle"><input type="checkbox" id="screensaver-show-clock" checked><span class="slider"></span></label>
           </div>
         </div>
 
@@ -1256,7 +1330,7 @@ body { background: #0a0a0a !important; }"></textarea>
         <!-- Profile Card -->
         <div class="tab-pane" id="pane-profile">
           <!-- Step indicator -->
-          <div id="prof-step-register" style="display:none">
+          <div id="prof-step-register">
             <div class="section-title" style="margin-top:4px">🪪 Create Your Profile Card</div>
             <p style="font-size:11px;color:#666;margin:0 0 14px">Your profile card lets other Entropy Client users see your linked accounts and avatar overlay.</p>
             <div style="background:rgba(255,107,0,0.06);border:1px solid rgba(255,107,0,0.15);border-radius:8px;padding:12px 14px;margin-bottom:14px">
@@ -1372,13 +1446,10 @@ body { background: #0a0a0a !important; }"></textarea>
             </div>
           </div>
 
-          <!-- Server URL config (always visible at bottom) -->
-          <div style="margin-top:16px;padding-top:12px;border-top:1px solid #161616">
-            <div style="display:flex;align-items:center;gap:8px">
-              <input class="mini-input" id="prof-server-url" placeholder="https://ec-profile-server.onrender.com" style="flex:1;font-size:10px">
-              <button id="prof-server-save-btn" style="background:transparent;border:1px solid #2a2a2a;color:#555;font-size:10px;padding:5px 8px;border-radius:5px;cursor:pointer;font-family:inherit;white-space:nowrap">Save URL</button>
-            </div>
-            <div style="font-size:10px;color:#444;margin-top:4px">Profile server URL</div>
+          <!-- Server URL config (hidden - hardcoded to entropyclient.onrender.com) -->
+          <div style="display:none">
+            <input id="prof-server-url" value="https://entropyclient.onrender.com">
+            <button id="prof-server-save-btn"></button>
           </div>
         </div>
 
@@ -1388,7 +1459,7 @@ body { background: #0a0a0a !important; }"></textarea>
 </div><!-- /modal-backdrop -->
 
 <script>
-const webview  = document.getElementById('site');
+let webview     = document.getElementById('site');
 const bgCanvas = document.getElementById('bg-canvas');
 const pCanvas  = document.getElementById('particle-canvas');
 const bgCtx    = bgCanvas.getContext('2d');
@@ -1434,7 +1505,7 @@ function resizeCanvases(){bgCanvas.width=pCanvas.width=window.innerWidth;bgCanva
 resizeCanvases(); window.addEventListener('resize',resizeCanvases);
 
 // ── Splash ───────────────────────────────────────
-window.electronAPI.getVersion().then(v=>document.getElementById('splash-version').textContent='v'+v);
+if(window.electronAPI&&window.electronAPI.getVersion)window.electronAPI.getVersion().then(v=>document.getElementById('splash-version').textContent='v'+v);
 const splashMsgs=['Initializing...','Loading modules...','Connecting...','Almost ready...'];
 let splashPct=0,msgIdx=0;
 const splashInt=setInterval(()=>{
@@ -1481,12 +1552,15 @@ const DEFAULT_KEYBINDS={
   cmdpalette: {label:'Command palette',     sub:'Quick actions & navigation',default:'Ctrl+p',        action:()=>openCmdPalette()},
   pip:        {label:'Picture-in-picture',  sub:'Float window on top',      default:'Ctrl+Shift+F',   action:()=>togglePip()},
   focusmode:  {label:'Focus mode',          sub:'Hide titlebar (toggle)',   default:'F11',            action:()=>toggleFocusMode()},
+  screensaver: {label:'Screensaver',          sub:'Splash screen slideshow',  default:'F2',             action:()=>openScreensaver()},
 };
 // Load saved keybinds
 try { const saved=JSON.parse(localStorage.getItem('ec_keybinds')||'{}'); Object.keys(saved).forEach(k=>{if(DEFAULT_KEYBINDS[k]) DEFAULT_KEYBINDS[k].current=saved[k];}); } catch{}
 Object.keys(DEFAULT_KEYBINDS).forEach(k=>{ if(!DEFAULT_KEYBINDS[k].current) DEFAULT_KEYBINDS[k].current=DEFAULT_KEYBINDS[k].default; });
 
 document.addEventListener('keydown',e=>{
+  // F2 direct fallback (in case globalShortcut is blocked by the webview)
+
   if(backdrop.classList.contains('open')&&document.activeElement?.tagName==='INPUT') return;
   const combo=buildCombo(e);
   Object.values(DEFAULT_KEYBINDS).forEach(kb=>{ if(combo===kb.current){kb.action();e.preventDefault();} });
@@ -1541,7 +1615,20 @@ function handleZoom(d,reset){
 // ── Update ────────────────────────────────────────
 const updBtn=document.getElementById('btn-update');
 updBtn.onclick=()=>{if(updateState==='idle'||updateState==='error'){setUpdateState('checking');window.electronAPI.checkForUpdate();}else if(updateState==='ready')window.electronAPI.installUpdate();};
-window.electronAPI.onUpdateStatus((s,p)=>setUpdateState(s,p));
+if(window.electronAPI&&window.electronAPI.onUpdateStatus)window.electronAPI.onUpdateStatus((s,p)=>setUpdateState(s,p));
+
+// F5 is intercepted by Electron before keydown fires — listen via IPC instead
+// F2 screensaver IPC listener
+if(window.electronAPI&&window.electronAPI.onKeyF2){
+  console.log('[EC] onKeyF2 listener registered');
+  window.electronAPI.onKeyF2(()=>{
+    console.log('[EC] key-f2 IPC received in renderer');
+    if(typeof window.openScreensaver==='function') window.openScreensaver();
+    else console.error('[EC] openScreensaver not on window');
+  });
+} else {
+  console.error('[EC] electronAPI.onKeyF2 not available');
+}
 function setUpdateState(s,p){
   updateState=s;updBtn.className='tb-btn';
   const m={idle:'↑ Update',checking:'Checking...',available:'↓ Available',downloading:`↓ ${p??0}%`,ready:'↻ Restart',uptodate:'✓ Latest',error:'✗ Error'};
@@ -1559,10 +1646,10 @@ webview.addEventListener('page-title-updated',e=>{document.title=/\(\d+\)/.test(
 const settingsPanel=document.getElementById('settings-panel');
 document.getElementById('settings-toggle').onclick=()=>settingsPanel.classList.toggle('open');
 document.getElementById('settings-close').onclick=()=>settingsPanel.classList.remove('open');
-window.electronAPI.getLoginStartup().then(v=>document.getElementById('toggle-startup').checked=v);
-document.getElementById('toggle-startup').onchange=e=>window.electronAPI.setLoginStartup(e.target.checked);
+if(window.electronAPI&&window.electronAPI.getLoginStartup)window.electronAPI.getLoginStartup().then(v=>document.getElementById('toggle-startup').checked=v);
+document.getElementById('toggle-startup').onchange=e=>{if(window.electronAPI&&window.electronAPI.setLoginStartup)window.electronAPI.setLoginStartup(e.target.checked);};
 document.getElementById('toggle-notifs').onchange=e=>{notifsOn=e.target.checked;};
-window.electronAPI.getVersion().then(v=>{
+if(window.electronAPI&&window.electronAPI.getVersion)window.electronAPI.getVersion().then(v=>{
   document.getElementById('about-row').innerHTML=`Entropy Client v${v}<br><a onclick="window.electronAPI.openExternal('https://kloak.app')">kloak.app</a> &nbsp;·&nbsp; <a onclick="window.electronAPI.openExternal('https://github.com/Username1234hio/KloakDesktopAppBeta-Unoffical-')">GitHub</a>`;
   const av=document.getElementById('about-version');
   if(av)av.textContent='Version '+v;
@@ -1729,6 +1816,9 @@ document.querySelectorAll('.sidebar-tab').forEach(tab=>{
     if(tab.dataset.tab === 'addons'){
       renderAddons();
     }
+    if(tab.dataset.tab === 'profile'){
+      profInitPanel();
+    }
   };
 });
 
@@ -1757,161 +1847,167 @@ webview.addEventListener('did-navigate',async()=>{
 function setStatus(msg,type){const s=document.getElementById('css-status');s.textContent=msg;s.className='status-line '+type;}
 
 // ── Themes ───────────────────────────────────────
-function makeThemeCss(bg, accent, text='#e2e8f0', surface='rgba(255,255,255,0.06)', border='rgba(255,255,255,0.1)') {
-  // Convert hex bg to slightly lighter/darker variants
-  const bgDark   = `color-mix(in srgb, ${bg} 85%, #000)`;
-  const bgLight  = `color-mix(in srgb, ${bg} 90%, #fff)`;
-  const accentDim = `color-mix(in srgb, ${accent} 60%, #000)`;
-  return `
-/* ── EC Theme: CSS custom properties ── */
-:root, .theme-dark, .theme-darker, .theme-midnight,
-[class*="theme-dark"], [class*="colorTheme"] {
-  --background-primary:         ${bg} !important;
-  --background-secondary:       ${bgDark} !important;
-  --background-secondary-alt:   ${bgDark} !important;
-  --background-tertiary:        color-mix(in srgb, ${bg} 80%, #000) !important;
-  --background-accent:          ${accent} !important;
-  --background-floating:        color-mix(in srgb, ${bg} 92%, #000) !important;
-  --background-modifier-hover:  ${surface} !important;
-  --background-modifier-active: color-mix(in srgb, ${accent} 15%, transparent) !important;
-  --background-modifier-selected: color-mix(in srgb, ${accent} 20%, transparent) !important;
-  --channeltextarea-background: ${bgDark} !important;
-  --text-normal:        ${text} !important;
-  --text-muted:         color-mix(in srgb, ${text} 55%, transparent) !important;
-  --text-link:          ${accent} !important;
-  --interactive-normal: color-mix(in srgb, ${text} 80%, transparent) !important;
-  --interactive-hover:  ${text} !important;
-  --interactive-active: ${accent} !important;
-  --interactive-muted:  color-mix(in srgb, ${text} 40%, transparent) !important;
-  --header-primary:     ${text} !important;
-  --header-secondary:   color-mix(in srgb, ${text} 65%, transparent) !important;
-  --brand-experiment:         ${accent} !important;
-  --brand-experiment-560:     ${accent} !important;
-  --brand-experiment-600:     ${accentDim} !important;
-  --scrollbar-thin-thumb:     ${accent} !important;
-  --scrollbar-auto-thumb:     ${accent} !important;
-  --scrollbar-auto-track:     ${bg} !important;
-  --focus-primary:            ${accent} !important;
-  --mention-foreground:       ${accent} !important;
-  --mention-background:       color-mix(in srgb, ${accent} 12%, transparent) !important;
-  --channels-default:         color-mix(in srgb, ${text} 65%, transparent) !important;
-  --channel-icon:             color-mix(in srgb, ${text} 55%, transparent) !important;
-  --deprecated-panel-background: ${bgDark} !important;
-  --deprecated-text-input-bg:    ${bgDark} !important;
-  --deprecated-text-input-border: ${border} !important;
-  --modal-background:           color-mix(in srgb, ${bg} 95%, #000) !important;
-  --elevation-high:             0 8px 32px rgba(0,0,0,0.45) !important;
+function makeThemeCss(bg, accent, text, surface, border) {
+  text    = text    || '#e2e8f0';
+  surface = surface || 'rgba(255,255,255,0.06)';
+  border  = border  || 'rgba(255,255,255,0.1)';
+
+  // Parse a hex color into [r,g,b] 0-255
+  function hexToRgb(hex) {
+    hex = hex.replace('#','');
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    return [parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16)];
+  }
+
+  // RGB to HSL
+  function rgbToHsl(r,g,b) {
+    r/=255; g/=255; b/=255;
+    var max=Math.max(r,g,b), min=Math.min(r,g,b), h,s,l=(max+min)/2;
+    if(max===min){h=s=0;}else{var d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);
+      switch(max){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;case b:h=((r-g)/d+4)/6;break;}}
+    return [h*360, s*100, l*100];
+  }
+
+  // HSL to hex
+  function hslToHex(h,s,l) {
+    h/=360; s/=100; l/=100;
+    function hue2rgb(p,q,t){if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;}
+    var r,g,b;
+    if(s===0){r=g=b=l;}else{var q=l<0.5?l*(1+s):l+s-l*s,p=2*l-q;r=hue2rgb(p,q,h+1/3);g=hue2rgb(p,q,h);b=hue2rgb(p,q,h-1/3);}
+    return '#'+[r,g,b].map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('');
+  }
+
+  // Compute a soft pastel complement: rotate hue 150-210deg, high lightness, low-mid saturation
+  function pastelComplement(hex) {
+    try {
+      var rgb = hexToRgb(hex);
+      var hsl = rgbToHsl(rgb[0],rgb[1],rgb[2]);
+      var h = (hsl[0] + 180) % 360;          // opposite on color wheel
+      var s = Math.min(hsl[1] * 0.5, 45);    // desaturate for pastels
+      var l = 82;                             // high lightness = soft/light
+      return hslToHex(h, s, l);
+    } catch(e) { return '#e2e8f0'; }
+  }
+
+  var bgDark      = 'color-mix(in srgb, ' + bg + ' 82%, #000)';
+  var bgDarker    = 'color-mix(in srgb, ' + bg + ' 68%, #000)';
+  var accentFg    = 'color-mix(in srgb, ' + accent + ' 90%, #fff)';
+  var complement  = pastelComplement(accent);   // pastel opposite of accent
+  var btnText     = complement;                 // readable on accent-colored buttons
+
+  return [
+'/* EC Theme */',
+':root, .dark, [data-theme="dark"], body {',
+'  --background: ' + bg + ' !important;',
+'  --layout-chat: ' + bg + ' !important;',
+'  --layout-sidebar: ' + bgDark + ' !important;',
+'  --layout-members: ' + bgDark + ' !important;',
+'  --layout-sidebar-secondary: ' + bgDark + ' !important;',
+'  --card: ' + bgDark + ' !important;',
+'  --popover: ' + bgDark + ' !important;',
+'  --secondary: color-mix(in srgb, ' + accent + ' 12%, ' + bgDark + ') !important;',
+'  --muted: color-mix(in srgb, ' + bg + ' 60%, ' + bgDark + ') !important;',
+'  --border: ' + border + ' !important;',
+'  --input: ' + border + ' !important;',
+'  --ring: ' + accent + ' !important;',
+'  --foreground: ' + text + ' !important;',
+'  --card-foreground: ' + text + ' !important;',
+'  --popover-foreground: ' + text + ' !important;',
+'  --secondary-foreground: ' + accentFg + ' !important;',
+'  --muted-foreground: color-mix(in srgb, ' + text + ' 50%, transparent) !important;',
+'  --primary: ' + accent + ' !important;',
+'  --primary-foreground: ' + btnText + ' !important;',
+'  --accent: color-mix(in srgb, ' + accent + ' 15%, transparent) !important;',
+'  --accent-foreground: ' + accentFg + ' !important;',
+'}',
+'.bg-layout-sidebar, .bg-layout-members, .bg-layout-sidebar-secondary {',
+'  background-color: ' + bgDark + ' !important;',
+'}',
+'.bg-layout-chat, .bg-background {',
+'  background-color: ' + bg + ' !important;',
+'}',
+'.bg-background\\/20, .bg-muted\\/60, .bg-background\\/50, .bg-background\\/70 {',
+'  background-color: ' + bgDark + ' !important;',
+'  border-color: ' + border + ' !important;',
+'}',
+'[data-resize-handle]::after { background-color: ' + border + ' !important; }',
+'[data-resize-handle]:hover, [data-resize-handle][data-resize-handle-state="drag"] {',
+'  background-color: color-mix(in srgb, ' + accent + ' 50%, transparent) !important;',
+'}',
+'::-webkit-scrollbar-thumb {',
+'  background-color: color-mix(in srgb, ' + accent + ' 55%, ' + bgDarker + ') !important;',
+'  border-radius: 10px;',
+'}',
+'::-webkit-scrollbar-thumb:hover { background-color: ' + accent + ' !important; }',
+'::-webkit-scrollbar-track { background-color: transparent !important; }',
+'span[data-orientation="horizontal"]:not([dir]):not([role]) {',
+'  background-color: color-mix(in srgb, ' + accent + ' 20%, ' + bgDark + ') !important;',
+'}',
+'span[data-orientation="horizontal"]:not([dir]):not([role]) > span[data-orientation="horizontal"] {',
+'  background: ' + accent + ' !important;',
+'}',
+'span[role="slider"][data-orientation="horizontal"] {',
+'  background-color: ' + bg + ' !important;',
+'  border-color: ' + accent + ' !important;',
+'}',
+'/* Username — gradient clip (same as cyberpunk.css), inline-block makes it selectable */',
+'.text-sm.font-medium.text-foreground.truncate {',
+'  background: linear-gradient(135deg, ' + accentFg + ', ' + complement + ') !important;',
+'  -webkit-background-clip: text !important;',
+'  -webkit-text-fill-color: transparent !important;',
+'  color: transparent !important;',
+'  display: inline-block !important;',
+'}',
+'/* Restore selection on everything else */',
+'*:not(.text-sm.font-medium.text-foreground.truncate) {',
+'  -webkit-text-fill-color: unset;',
+'  user-select: text;',
+'  -webkit-user-select: text;',
+'}',
+'.bg-primary, button.bg-primary {',
+'  background-color: ' + accent + ' !important;',
+'  color: ' + btnText + ' !important;',
+'  -webkit-text-fill-color: ' + btnText + ' !important;',
+'}',
+'.bg-primary:hover, button.bg-primary:hover { background-color: ' + accentFg + ' !important; }',
+'.text-primary, [class*="text-primary"] { color: ' + accent + ' !important; -webkit-text-fill-color: ' + accent + ' !important; }',
+'.border-primary { border-color: ' + accent + ' !important; }',
+'.bg-card, .bg-popover, .bg-muted, .bg-secondary { background-color: ' + bgDark + ' !important; }',
+'.text-foreground, .text-card-foreground {',
+'  color: ' + text + ' !important;',
+'  -webkit-text-fill-color: ' + text + ' !important;',
+'  user-select: text !important;',
+'  -webkit-user-select: text !important;',
+'}',
+'.text-muted-foreground {',
+'  color: color-mix(in srgb, ' + text + ' 55%, transparent) !important;',
+'  -webkit-text-fill-color: color-mix(in srgb, ' + text + ' 55%, transparent) !important;',
+'}',
+'.text-secondary-foreground, .text-accent-foreground {',
+'  color: ' + accentFg + ' !important;',
+'  -webkit-text-fill-color: ' + accentFg + ' !important;',
+'}',
+'input, textarea {',
+'  background-color: ' + bgDark + ' !important;',
+'  border-color: ' + border + ' !important;',
+'  color: ' + text + ' !important;',
+'  -webkit-text-fill-color: ' + text + ' !important;',
+'}',
+'input:focus, textarea:focus { border-color: ' + accent + ' !important; }',
+'/* Force chat/message body text to stay light — never let themes turn it dark */',
+'[class*="message"] p, [class*="message"] span:not([class*="username"]):not([class*="timestamp"]):not([class*="reaction"]),',
+'[class*="markup"], [class*="messageContent"], [class*="contents"],',
+'p, li, blockquote {',
+'  color: ' + text + ' !important;',
+'  -webkit-text-fill-color: ' + text + ' !important;',
+'}',
+'* { user-select: text; -webkit-user-select: text; }',
+  ].join('\n');
 }
 
-/* ── Backgrounds ── */
-html, body, #app-mount, [class*="app-"],
-[class*="base-"], [class*="content-"],
-[class*="chat-"], [class*="chatContent"],
-[class*="messagesWrapper"], [class*="scroller"] {
-  background-color: ${bg} !important;
-}
-[class*="sidebar"], [class*="guilds"],
-[class*="guildsList"], [class*="navBar"],
-[class*="panels-"], [class*="panel-"],
-[class*="privateChannels"] {
-  background-color: ${bgDark} !important;
-}
-[class*="titleBar"], [class*="title-bar"],
-[class*="toolbar"], [class*="topbar"] {
-  background-color: ${bgDark} !important;
-  border-bottom: 1px solid ${border} !important;
-}
-
-/* ── Channels ── */
-[class*="channel-"], [class*="channelName"],
-[class*="linkChannel"], [class*="containerDefault"] {
-  color: color-mix(in srgb, ${text} 70%, transparent) !important;
-}
-[class*="channel-"][class*="selected"],
-[class*="channel-"][class*="active"],
-[class*="containerDefault"][class*="modeSelected"] {
-  background-color: color-mix(in srgb, ${accent} 18%, transparent) !important;
-  color: ${text} !important;
-}
-[class*="channel-"]:hover, [class*="containerDefault"]:hover {
-  background-color: color-mix(in srgb, ${accent} 10%, transparent) !important;
-  color: ${text} !important;
-}
-
-/* ── Messages ── */
-[class*="message-"], [class*="messageContent"],
-[class*="markup-"], [class*="cozyMessage"] {
-  color: ${text} !important;
-}
-[class*="message-"]:hover, [class*="messageListItem"]:hover {
-  background-color: ${surface} !important;
-}
-[class*="username"], [class*="usernameClickable"] {
-  color: color-mix(in srgb, ${accent} 90%, #fff) !important;
-}
-[class*="timestamp-"] { color: color-mix(in srgb, ${text} 38%, transparent) !important; }
-
-/* ── Input / Textarea ── */
-[class*="textArea-"], [class*="textAreaSlate"],
-[class*="inner-"] > [class*="textArea"] {
-  background-color: ${bgDark} !important;
-  color: ${text} !important;
-}
-[class*="channelTextArea"] {
-  background-color: color-mix(in srgb, ${bg} 80%, #000) !important;
-  border: 1px solid ${border} !important;
-}
-
-/* ── Buttons ── */
-[class*="colorBrand"], [class*="lookFilled"][class*="colorBrand"],
-button[class*="button-"][class*="filled"] {
-  background-color: ${accent} !important;
-  color: #fff !important;
-}
-[class*="colorBrand"]:hover { background-color: ${accentDim} !important; }
-[class*="colorLink"] { color: ${accent} !important; }
-
-/* ── Modals ── */
-[class*="modal-"], [class*="container-"][role="dialog"],
-[class*="backdrop-"] ~ [class*="layers-"] [class*="root-"] {
-  background-color: color-mix(in srgb, ${bg} 95%, #000) !important;
-}
-
-/* ── Scrollbars ── */
-::-webkit-scrollbar-track { background: ${bg} !important; }
-::-webkit-scrollbar-thumb { background: ${accent} !important; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, ${accent} 80%, #fff) !important; }
-
-/* ── Mention / code ── */
-[class*="mention"], [class*="inlineCode"] {
-  background: color-mix(in srgb, ${accent} 12%, transparent) !important;
-  color: ${accent} !important;
-}
-code, pre, [class*="codeBlock"] {
-  background: ${bgDark} !important;
-  border: 1px solid ${border} !important;
-  color: ${text} !important;
-}
-
-/* ── Reactions ── */
-[class*="reaction-"] {
-  background: ${surface} !important;
-  border-color: ${border} !important;
-}
-[class*="reaction-"][class*="reactionMe"] {
-  background: color-mix(in srgb, ${accent} 18%, transparent) !important;
-  border-color: ${accent} !important;
-}
-
-/* ── Server list icons ── */
-[class*="blobContainer"], [class*="lottieIcon"] {
-  background-color: ${bgDark} !important;
-}
-[class*="pill-"] { background-color: ${accent} !important; }
-`.trim();
-}
 const THEMES=[
   {id:'default',   name:'Default',   preview:{bg:'#1e2124',accent:'#94a3b8'},css:''},
+  {id:'cyberpunk', name:'Cyberpunk', preview:{bg:'#0f0f13',accent:'#00e5ff'},css:makeThemeCss('#0f0f13','#00e5ff','#d0f0f4','rgba(0,229,255,0.08)','rgba(0,229,255,0.2)')},
   {id:'entropy',   name:'Entropy',   preview:{bg:'#0d0800',accent:'#ff6b00'},css:makeThemeCss('#0d0800','#ff6b00','#ffd4a8','rgba(255,107,0,0.08)','rgba(255,107,0,0.2)')},
   {id:'midnight',  name:'Midnight',  preview:{bg:'#0a0a18',accent:'#818cf8'},css:makeThemeCss('#0a0a18','#818cf8','#c7d2fe','rgba(129,140,248,0.08)','rgba(129,140,248,0.2)')},
   {id:'forest',    name:'Forest',    preview:{bg:'#071a07',accent:'#4ade80'},css:makeThemeCss('#071a07','#4ade80','#bbf7d0','rgba(74,222,128,0.08)','rgba(74,222,128,0.2)')},
@@ -2081,21 +2177,114 @@ if(!accounts.length)accounts=[{id:'main',name:'Main',color:'#ff6b00',partition:'
 function renderAccounts(){
   const list=document.getElementById('account-list');list.innerHTML='';
   accounts.forEach(acc=>{
-    const d=document.createElement('div');d.className='account-card'+(acc.id===activeAccount?' active-account':'');
-    d.innerHTML=`<div class="account-avatar" style="background:${acc.color}22;color:${acc.color}">${acc.name[0].toUpperCase()}</div><div class="account-info"><div class="account-name">${acc.name}</div><div class="account-sub">Session: ${acc.partition}</div></div>${acc.id!=='main'?'<button class="account-switch">Switch</button><button class="account-del">✕</button>':'<button class="account-switch">Switch</button>'}`;
-    d.querySelector('.account-switch').onclick=()=>switchAccount(acc);
+    const isActive = acc.id === activeAccount;
+    const d=document.createElement('div');
+    d.className='account-card'+(isActive?' active-account':'');
+    d.innerHTML=`
+      <div class="account-avatar" style="background:${acc.color}22;color:${acc.color}">${acc.name[0].toUpperCase()}</div>
+      <div class="account-info">
+        <div class="account-name">${acc.name}</div>
+        <div class="account-sub">${isActive ? '● Active' : 'Session: '+acc.partition}</div>
+      </div>
+      ${isActive
+        ? '<span style="font-size:10px;color:#ff6b00;padding:4px 10px">Active</span>'
+        : '<button class="account-switch">Switch</button>'
+      }
+      ${acc.id!=='main' ? '<button class="account-del">✕</button>' : ''}
+    `;
+    if(!isActive) d.querySelector('.account-switch').onclick=()=>switchAccount(acc);
     const del=d.querySelector('.account-del');
-    if(del)del.onclick=()=>{if(acc.id==='main')return;accounts=accounts.filter(a=>a.id!==acc.id);saveAccounts();renderAccounts();};
+    if(del) del.onclick=()=>{
+      if(acc.id==='main') return;
+      accounts=accounts.filter(a=>a.id!==acc.id);
+      saveAccounts(); renderAccounts();
+    };
     list.appendChild(d);
   });
 }
-function switchAccount(acc){
-  activeAccount=acc.id;
-  webview.setAttribute('partition',acc.partition);
-  webview.loadURL('https://kloak.app/auth?mode=login');
+
+async function switchAccount(acc) {
+  if (acc.id === activeAccount) return;
+
+  // Prepare the session in main process (sets user-agent etc.)
+  if (window.electronAPI && window.electronAPI.switchAccount) {
+    await window.electronAPI.switchAccount(acc.partition).catch(() => {});
+  }
+
+  activeAccount = acc.id;
+  saveAccounts();
+
+  // Replace the webview element entirely — partition can't be changed on a live webview
+  const oldWv = document.getElementById('site');
+  const parent = oldWv.parentNode;
+
+  const newWv = document.createElement('webview');
+  newWv.id = 'site';
+  newWv.src = 'https://kloak.app/auth?mode=login';
+  newWv.setAttribute('partition', acc.partition);
+  newWv.setAttribute('allowpopups', '');
+  // Copy computed style/class from old webview
+  newWv.style.cssText = oldWv.style.cssText;
+  newWv.className = oldWv.className;
+
+  parent.replaceChild(newWv, oldWv);
+
+  // Re-attach essential event listeners on the new webview element
+  attachWebviewListeners(newWv);
+
   closeModal();
+
+  // Update the widget bar account label if present
+  const accLabel = document.getElementById('tb-account-label');
+  if (accLabel) accLabel.textContent = acc.name;
 }
 function saveAccounts(){localStorage.setItem('ec_accounts',JSON.stringify(accounts));}
+
+// Re-attaches all critical webview listeners after an account switch replaces the element
+function attachWebviewListeners(wv) {
+  // Update the global reference so all existing code uses the new element
+  webview = wv;
+
+  // Title → unread badge + window title
+  wv.addEventListener('page-title-updated', e => {
+    const match = e.title && e.title.match(/\((\d+)\)/);
+    unreadCount = match ? parseInt(match[1]) : 0;
+    document.title = unreadCount > 0 ? '🔴 Entropy Client' : 'Entropy Client';
+    const badge = document.getElementById('unread-badge');
+    if (badge) { badge.textContent = unreadCount; badge.classList.toggle('show', unreadCount > 0); }
+    const tbCount = document.getElementById('tb-unread-count');
+    if (tbCount) tbCount.textContent = unreadCount;
+  });
+
+  // Re-apply CSS + theme on load
+  wv.addEventListener('did-finish-load', reapplyPersistedCss);
+  wv.addEventListener('did-finish-load', () => {
+    if (activeTheme && activeTheme !== 'default') applyTheme(activeTheme);
+  });
+
+  // Nav sound
+  wv.addEventListener('did-start-navigation', () => {
+    if (document.getElementById('sound-nav') && document.getElementById('sound-nav').checked) playSound('nav');
+  });
+
+  // Per-server zoom
+  wv.addEventListener('did-navigate', e => applyServerZoom(e.url || wv.getURL()));
+
+  // Star / bookmark appearance
+  wv.addEventListener('did-navigate', updateStarAppearance);
+  wv.addEventListener('did-navigate-in-page', updateStarAppearance);
+  wv.addEventListener('did-finish-load', updateStarAppearance);
+
+  // Font override
+  wv.addEventListener('did-finish-load', () => {
+    const f = localStorage.getItem('ec_font_override');
+    if (f) applyFontOverride(f);
+  });
+
+  // Crash recovery
+  wv.addEventListener('crashed', () => showCrashScreen && showCrashScreen());
+  wv.addEventListener('render-process-gone', () => showCrashScreen && showCrashScreen());
+}
 document.getElementById('acc-add').onclick=()=>{
   const name=document.getElementById('acc-name').value.trim();
   const color=document.getElementById('acc-color').value;
@@ -2977,6 +3166,15 @@ const OB_STEPS = [
       ['💾', 'CSS Injector saves automatically — no need to re-paste after refresh'],
       ['🎨', 'Custom theme files (ember, sapphire, cyberpunk) loaded from your themes folder'],
       ['🔤', 'Font override, compact mode, and titlebar height in Main Settings'],
+    ]
+  },
+  {
+    icon: '🖥', title: 'Screensaver & Splash Screens',
+    desc: 'Upload images or GIFs as splash screens — they also power the built-in screensaver. Press F2 any time to activate it fullscreen.',
+    features: [
+      ['F2', 'Toggle the fullscreen screensaver — press F2 again to exit back to kloak'],
+      ['🖼️', 'Upload images or search Giphy in the Splash Screens tab'],
+      ['⚙️', 'Set screensaver interval, shuffle order, and clock in Splash Screens settings'],
     ]
   },
   {
@@ -4070,6 +4268,10 @@ document.querySelector('[data-tab="titlebar"]').addEventListener('click', () => 
   let splashes = [];
   let splashInterval = 5;
   let splashShuffle  = false;
+  let ssUseSplashes  = true;
+  let ssInterval     = 5;
+  let ssShuffle      = true;
+  let ssShowClock    = true;
 
   function loadSplashState() {
     try {
@@ -4078,6 +4280,10 @@ document.querySelector('[data-tab="titlebar"]').addEventListener('click', () => 
     } catch {}
     splashInterval = parseInt(localStorage.getItem('ec_splash_interval') || '5');
     splashShuffle  = localStorage.getItem('ec_splash_shuffle') === '1';
+    ssUseSplashes  = localStorage.getItem('ec_ss_use_splashes') !== '0';
+    ssInterval     = parseInt(localStorage.getItem('ec_ss_interval') || '5');
+    ssShuffle      = localStorage.getItem('ec_ss_shuffle') !== '0';
+    ssShowClock    = localStorage.getItem('ec_ss_show_clock') !== '0';
   }
 
   function saveSplashState() {
@@ -4099,7 +4305,7 @@ document.querySelector('[data-tab="titlebar"]').addEventListener('click', () => 
     grid.innerHTML = '';
     const sel = splashes.filter(s => s.selected).length;
     countLbl.textContent = splashes.length
-      ? `${splashes.length} image${splashes.length!==1?'s':''} · ${sel} selected`
+      ? `${splashes.length} file${splashes.length!==1?'s':''} (${splashes.filter(s=>s.isGif).length} GIF) · ${sel} selected`
       : '';
 
     if (!splashes.length) {
@@ -4115,8 +4321,9 @@ document.querySelector('[data-tab="titlebar"]').addEventListener('click', () => 
       card.className = 'splash-card' + (sp.selected ? ' selected' : '');
 
       const img = document.createElement('img');
-      img.src = sp.dataUrl;
+      img.src = sp.isGif && sp.filePath ? 'file://' + sp.filePath : (sp.dataUrl || '');
       img.loading = 'lazy';
+      if (sp.isGif) img.setAttribute('data-gif', '1');
 
       const check = document.createElement('div');
       check.className = 'splash-check';
@@ -4126,15 +4333,30 @@ document.querySelector('[data-tab="titlebar"]').addEventListener('click', () => 
       del.className = 'splash-del';
       del.textContent = '✕';
       del.title = 'Remove';
-      del.onclick = e => { e.stopPropagation(); splashes.splice(idx, 1); saveSplashState(); renderSplashGrid(); };
+      del.onclick = e => {
+        e.stopPropagation();
+        const sp = splashes[idx];
+        if (sp.isGif && sp.filePath && window.electronAPI && window.electronAPI.splashDeleteGif) {
+          window.electronAPI.splashDeleteGif(sp.filePath).catch(() => {});
+        }
+        splashes.splice(idx, 1);
+        saveSplashState();
+        renderSplashGrid();
+      };
+
+      const badge = document.createElement('div');
+      badge.className = 'splash-gif-badge';
+      badge.textContent = 'GIF';
 
       const label = document.createElement('div');
       label.className = 'splash-label';
       label.textContent = sp.name;
 
+      if (sp.isGif) card.classList.add('is-gif');
       card.appendChild(img);
       card.appendChild(check);
       card.appendChild(del);
+      card.appendChild(badge);
       card.appendChild(label);
 
       card.onclick = () => {
@@ -4149,30 +4371,170 @@ document.querySelector('[data-tab="titlebar"]').addEventListener('click', () => 
 
   // ── Upload handler ────────────────────────────────
   function handleSplashUpload(files) {
+    const arr = Array.from(files).filter(f => f.type.startsWith('image/') || f.type === 'image/gif' || f.name.toLowerCase().endsWith('.gif'));
     let done = 0;
-    Array.from(files).forEach(file => {
-      if (!file.type.startsWith('image/')) return;
+    if (!arr.length) return;
+    arr.forEach(file => {
+      const isGif = file.type === 'image/gif' || file.name.toLowerCase().endsWith('.gif');
       const reader = new FileReader();
       reader.onload = e => {
-        // Compress to JPEG at lower quality to save localStorage space
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          // Cap at 800px wide for preview quality (enough to look good at card size)
-          const maxW = 800;
-          const scale = Math.min(1, maxW / img.width);
-          canvas.width  = Math.round(img.width  * scale);
-          canvas.height = Math.round(img.height * scale);
-          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
-          splashes.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2), name: file.name, dataUrl, selected: true });
-          done++;
-          if (done === files.length) { saveSplashState(); renderSplashGrid(); }
-        };
-        img.src = e.target.result;
+        if (isGif) {
+          // Save GIF to dedicated folder on disk via IPC — keeps localStorage small
+          const id = Date.now() + '-' + Math.random().toString(36).slice(2);
+          const arrayBuf = e.target.result; // readAsArrayBuffer result
+          const uint8 = new Uint8Array(arrayBuf);
+          if (window.electronAPI && window.electronAPI.splashSaveGif) {
+            window.electronAPI.splashSaveGif({ id, name: file.name, buffer: Array.from(uint8) })
+              .then(res => {
+                if (res.ok) {
+                  splashes.push({ id, name: file.name, filePath: res.filePath, isGif: true, selected: true });
+                } else {
+                  console.warn('[EC] Failed to save GIF:', res.error);
+                }
+                done++;
+                if (done === arr.length) { saveSplashState(); renderSplashGrid(); }
+              });
+          } else {
+            // Fallback: store as base64 dataUrl if no IPC
+            const reader2 = new FileReader();
+            reader2.onload = ev => {
+              splashes.push({ id, name: file.name, dataUrl: ev.target.result, isGif: true, selected: true });
+              done++;
+              if (done === arr.length) { saveSplashState(); renderSplashGrid(); }
+            };
+            reader2.readAsDataURL(file);
+          }
+          return; // don't fall through to readAsDataURL
+        } else {
+          // Compress static images to JPEG to save localStorage space
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxW = 800;
+            const scale = Math.min(1, maxW / img.width);
+            canvas.width  = Math.round(img.width  * scale);
+            canvas.height = Math.round(img.height * scale);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+            splashes.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2), name: file.name, dataUrl, isGif: false, selected: true });
+            done++;
+            if (done === arr.length) { saveSplashState(); renderSplashGrid(); }
+          };
+          img.src = e.target.result;
+        }
       };
-      reader.readAsDataURL(file);
+      if (isGif) {
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.readAsDataURL(file);
+      }
     });
+  }
+
+  // ── Giphy Search ─────────────────────────────────
+  // Public beta key — users can override in settings via ec_giphy_key
+  const GIPHY_KEY = localStorage.getItem('ec_giphy_key') || 'GlVGYHkr3WSBnllca54iNt0yFbjz7L65';
+  const GIPHY_BASE = 'https://api.giphy.com/v1/gifs';
+
+  async function giphyFetch(endpoint, params) {
+    const qs = new URLSearchParams({ api_key: GIPHY_KEY, limit: 20, rating: 'g', ...params }).toString();
+    const url = GIPHY_BASE + endpoint + '?' + qs;
+    const res = await fetch(url);
+    return res.json();
+  }
+
+  function renderGiphyResults(gifs) {
+    const grid   = document.getElementById('giphy-results');
+    const status = document.getElementById('giphy-status');
+    grid.innerHTML = '';
+    if (!gifs || !gifs.length) { status.textContent = 'No results found.'; return; }
+    status.textContent = gifs.length + ' results — click to add';
+    gifs.forEach(gif => {
+      const preview = gif.images.fixed_width_small.url;  // small preview
+      const full    = gif.images.original.url;           // full GIF URL
+      const name    = (gif.title || gif.id) + '.gif';
+
+      const thumb = document.createElement('div');
+      thumb.className = 'giphy-thumb';
+      thumb.title = gif.title || '';
+
+      const img = document.createElement('img');
+      img.src = preview;
+      img.loading = 'lazy';
+
+      const add = document.createElement('div');
+      add.className = 'giphy-add';
+      add.textContent = '＋';
+
+      thumb.appendChild(img);
+      thumb.appendChild(add);
+
+      thumb.onclick = async () => {
+        add.textContent = '⏳';
+        thumb.style.pointerEvents = 'none';
+        try {
+          const id = Date.now() + '-' + Math.random().toString(36).slice(2);
+          let buffer = null;
+
+          if (window.electronAPI && window.electronAPI.splashFetchUrl) {
+            const res = await window.electronAPI.splashFetchUrl(full);
+            if (res.ok) buffer = res.buffer;
+          } else {
+            // Fallback: fetch in renderer (may be blocked by CSP in some setups)
+            const r = await fetch(full);
+            const ab = await r.arrayBuffer();
+            buffer = Array.from(new Uint8Array(ab));
+          }
+
+          if (buffer && window.electronAPI && window.electronAPI.splashSaveGif) {
+            const saved = await window.electronAPI.splashSaveGif({ id, name, buffer });
+            if (saved.ok) {
+              splashes.push({ id, name, filePath: saved.filePath, isGif: true, selected: true });
+              saveSplashState();
+              renderSplashGrid();
+              add.textContent = '✓';
+              setTimeout(() => { add.textContent = '＋'; thumb.style.pointerEvents = ''; }, 1200);
+              return;
+            }
+          }
+          // If no IPC, store dataUrl fallback
+          if (buffer) {
+            const blob = new Blob([new Uint8Array(buffer)], { type: 'image/gif' });
+            const dataUrl = await new Promise(res => { const r = new FileReader(); r.onload = e => res(e.target.result); r.readAsDataURL(blob); });
+            splashes.push({ id, name, dataUrl, isGif: true, selected: true });
+            saveSplashState();
+            renderSplashGrid();
+            add.textContent = '✓';
+            setTimeout(() => { add.textContent = '＋'; thumb.style.pointerEvents = ''; }, 1200);
+          }
+        } catch(e) {
+          add.textContent = '✗';
+          setTimeout(() => { add.textContent = '＋'; thumb.style.pointerEvents = ''; }, 1500);
+        }
+      };
+
+      grid.appendChild(thumb);
+    });
+  }
+
+  async function giphySearch(query) {
+    const status = document.getElementById('giphy-status');
+    status.textContent = 'Searching…';
+    document.getElementById('giphy-results').innerHTML = '';
+    try {
+      const json = await giphyFetch('/search', { q: query });
+      renderGiphyResults(json.data);
+    } catch(e) { status.textContent = 'Search failed. Check your connection.'; }
+  }
+
+  async function giphyTrending() {
+    const status = document.getElementById('giphy-status');
+    status.textContent = 'Loading trending…';
+    document.getElementById('giphy-results').innerHTML = '';
+    try {
+      const json = await giphyFetch('/trending', {});
+      renderGiphyResults(json.data);
+    } catch(e) { status.textContent = 'Failed to load trending.'; }
   }
 
   // ── Wire UI ───────────────────────────────────────
@@ -4185,7 +4547,42 @@ document.querySelector('[data-tab="titlebar"]').addEventListener('click', () => 
     const shuf   = document.getElementById('splash-shuffle');
     if (slider) { slider.value = splashInterval; val.textContent = splashInterval + 's'; }
     if (shuf)   shuf.checked = splashShuffle;
+    // Sync screensaver controls
+    const ssUse = document.getElementById('screensaver-use-splashes');
+    const ssSlider = document.getElementById('screensaver-interval-slider');
+    const ssVal = document.getElementById('screensaver-interval-val');
+    const ssShuf = document.getElementById('screensaver-shuffle');
+    const ssClock = document.getElementById('screensaver-show-clock');
+    if (ssUse) ssUse.checked = ssUseSplashes;
+    if (ssSlider) { ssSlider.value = ssInterval; ssVal.textContent = ssInterval + 's'; }
+    if (ssShuf) ssShuf.checked = ssShuffle;
+    if (ssClock) ssClock.checked = ssShowClock;
   });
+
+  document.getElementById('splash-giphy-toggle').onclick = () => {
+    const wrap = document.getElementById('giphy-search-wrap');
+    const isOpen = wrap.style.display === 'block';
+    wrap.style.display = isOpen ? 'none' : 'block';
+    document.getElementById('splash-giphy-toggle').style.background = isOpen
+      ? 'rgba(153,51,255,0.1)' : 'rgba(153,51,255,0.25)';
+    if (!isOpen && !document.getElementById('giphy-results').children.length) {
+      giphyTrending(); // auto-load trending on first open
+    }
+  };
+
+  document.getElementById('giphy-search-btn').onclick = () => {
+    const q = document.getElementById('giphy-search-input').value.trim();
+    if (q) giphySearch(q);
+  };
+
+  document.getElementById('giphy-search-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const q = e.target.value.trim();
+      if (q) giphySearch(q);
+    }
+  });
+
+  document.getElementById('giphy-trending-btn').onclick = () => giphyTrending();
 
   document.getElementById('splash-file-input').addEventListener('change', e => {
     handleSplashUpload(e.target.files);
@@ -4195,11 +4592,25 @@ document.querySelector('[data-tab="titlebar"]').addEventListener('click', () => 
   document.getElementById('splash-clear-all').onclick = () => {
     if (!splashes.length) return;
     if (confirm('Remove all custom splash screens?')) {
+      // Delete any GIF files from disk
+      if (window.electronAPI && window.electronAPI.splashDeleteGif) {
+        splashes.filter(s => s.isGif && s.filePath).forEach(s => {
+          window.electronAPI.splashDeleteGif(s.filePath).catch(() => {});
+        });
+      }
       splashes = [];
       saveSplashState();
       renderSplashGrid();
     }
   };
+
+  document.getElementById('splash-open-folder-btn').onclick = () => {
+    if (window.electronAPI && window.electronAPI.splashOpenFolder) {
+      window.electronAPI.splashOpenFolder();
+    }
+  };
+
+  document.getElementById('splash-refresh-btn').onclick = () => refreshSplashList();
 
   document.getElementById('splash-interval-slider').oninput = e => {
     splashInterval = parseInt(e.target.value);
@@ -4212,40 +4623,26 @@ document.querySelector('[data-tab="titlebar"]').addEventListener('click', () => 
     saveSplashState();
   };
 
-  // ── Splash cycling during load ────────────────────
-  // Called by the existing splash init (replaces the static background)
-  function startSplashCycle() {
-    loadSplashState();
-    const active = splashes.filter(s => s.selected);
-    if (!active.length) return; // fall back to default splash.png
+  // Screensaver settings
+  document.getElementById('screensaver-use-splashes').onchange = e => {
+    ssUseSplashes = e.target.checked;
+    localStorage.setItem('ec_ss_use_splashes', ssUseSplashes ? '1' : '0');
+  };
+  document.getElementById('screensaver-interval-slider').oninput = e => {
+    ssInterval = parseInt(e.target.value);
+    document.getElementById('screensaver-interval-val').textContent = ssInterval + 's';
+    localStorage.setItem('ec_ss_interval', ssInterval);
+  };
+  document.getElementById('screensaver-shuffle').onchange = e => {
+    ssShuffle = e.target.checked;
+    localStorage.setItem('ec_ss_shuffle', ssShuffle ? '1' : '0');
+  };
+  document.getElementById('screensaver-show-clock').onchange = e => {
+    ssShowClock = e.target.checked;
+    localStorage.setItem('ec_ss_show_clock', ssShowClock ? '1' : '0');
+  };
 
-    const bg = document.getElementById('splash-bg');
-    if (!bg) return;
-
-    let pool = splashShuffle ? shuffleArray(active.slice()) : active.slice();
-    let idx  = 0;
-
-    function show(i) {
-      const sp = pool[i % pool.length];
-      bg.style.transition = 'opacity 0.6s';
-      bg.style.opacity    = '0';
-      setTimeout(() => {
-        bg.style.backgroundImage = `url('${sp.dataUrl}')`;
-        bg.style.opacity         = '1';
-      }, 600);
-    }
-
-    show(0);
-    const cycleTimer = setInterval(() => {
-      idx++;
-      if (splashShuffle && idx >= pool.length) { pool = shuffleArray(active.slice()); idx = 0; }
-      show(idx);
-    }, splashInterval * 1000);
-
-    // Stop cycling once splash is dismissed
-    webview.addEventListener('did-finish-load', () => clearInterval(cycleTimer), { once: true });
-  }
-
+  // ── Shared helpers ───────────────────────────────
   function shuffleArray(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -4254,8 +4651,231 @@ document.querySelector('[data-tab="titlebar"]').addEventListener('click', () => 
     return arr;
   }
 
-  // Kick off cycling immediately (splash is visible at this point)
-  startSplashCycle();
+  // Apply a splash entry to a pair of {bg div, gif img} elements
+  function applySplashEntry(sp, bgEl, gifEl) {
+    if (!sp) return;
+    if (sp.isGif) {
+      bgEl.style.backgroundImage = 'none';
+      bgEl.style.opacity = '0';
+      if (gifEl) { gifEl.src = sp.filePath ? 'file://' + sp.filePath : (sp.dataUrl || ''); gifEl.style.display = 'block'; gifEl.style.opacity = '1'; }
+    } else {
+      if (gifEl) { gifEl.style.display = 'none'; gifEl.src = ''; }
+      bgEl.style.backgroundImage = 'url("' + (sp.dataUrl || '') + '")';
+      bgEl.style.opacity = '1';
+    }
+  }
+
+  // Build a cycle engine: returns a stop() function
+  function buildCycleEngine(active, bgEl, gifEl, intervalSec, shuffle, onStop) {
+    if (!active || !active.length) return function() {};
+    let pool    = shuffle ? shuffleArray(active.slice()) : active.slice();
+    let idx     = 0;
+    let stopped = false;
+
+    function show(i) {
+      if (stopped) return;
+      const sp = pool[i % pool.length];
+      // Fade out
+      bgEl.style.transition = 'opacity 0.8s';
+      bgEl.style.opacity = '0';
+      if (gifEl) { gifEl.style.transition = 'opacity 0.8s'; gifEl.style.opacity = '0'; }
+      setTimeout(() => {
+        if (stopped) return;
+        // Swap content while invisible
+        applySplashEntry(sp, bgEl, gifEl);
+        // Force reflow so transition triggers on the fade-in
+        void bgEl.offsetWidth;
+        // Fade in
+        bgEl.style.transition = 'opacity 0.8s';
+        bgEl.style.opacity = '1';
+        if (gifEl && gifEl.style.display !== 'none') {
+          gifEl.style.transition = 'opacity 0.8s';
+          gifEl.style.opacity = '1';
+        }
+      }, 800);
+    }
+
+    // Show first frame immediately
+    applySplashEntry(pool[0], bgEl, gifEl);
+    bgEl.style.opacity = '1';
+
+    const ms = Math.max(2, intervalSec) * 1000;
+    const timer = setInterval(() => {
+      if (stopped) return;
+      idx++;
+      if (idx >= pool.length) {
+        pool = shuffle ? shuffleArray(active.slice()) : active.slice();
+        idx = 0;
+      }
+      show(idx);
+    }, ms);
+
+    return function stop() {
+      stopped = true;
+      clearInterval(timer);
+      if (onStop) onStop();
+    };
+  }
+
+  // ── Startup splash cycle ──────────────────────────
+  // Overrides the default splash.png immediately with user's custom splashes
+  function startSplashCycle() {
+    loadSplashState();
+    const active = splashes.filter(s => s.selected);
+    if (!active.length) return; // fall back to default splash.png
+
+    const bg     = document.getElementById('splash-bg');
+    const gifImg = document.getElementById('splash-gif');
+    if (!bg) return;
+
+    const stop = buildCycleEngine(active, bg, gifImg, splashInterval, splashShuffle, null);
+    webview.addEventListener('did-finish-load', stop, { once: true });
+  }
+
+  // ── Refresh splash list ───────────────────────────
+  // Re-scans the splashes folder + merges any new GIF files found on disk
+  async function refreshSplashList() {
+    const btn = document.getElementById('splash-refresh-btn');
+    if (btn) { btn.textContent = '⏳'; btn.disabled = true; }
+    try {
+      if (window.electronAPI && window.electronAPI.splashScanFolder) {
+        const res = await window.electronAPI.splashScanFolder();
+        if (res.ok && res.files.length) {
+          const existingPaths = new Set(splashes.filter(s => s.filePath).map(s => s.filePath));
+          let added = 0;
+          res.files.forEach(f => {
+            if (!existingPaths.has(f.filePath)) {
+              splashes.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2), name: f.fileName, filePath: f.filePath, isGif: true, selected: true });
+              added++;
+            }
+          });
+          if (added) { saveSplashState(); }
+        }
+      }
+    } catch(e) { console.warn('[EC] Refresh error', e); }
+    loadSplashState();
+    renderSplashGrid();
+    if (btn) { btn.textContent = '↺'; btn.disabled = false; }
+  }
+
+  // ── Screensaver (F5) ─────────────────────────────
+  let screensaverActive = false;
+  let screensaverStop   = null;
+  let screensaverClockTimer = null;
+
+  function updateScreensaverClock() {
+    const now  = new Date();
+    const hh   = String(now.getHours()).padStart(2, '0');
+    const mm   = String(now.getMinutes()).padStart(2, '0');
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const dateStr = days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate();
+    const timeEl = document.getElementById('screensaver-time');
+    const dateEl = document.getElementById('screensaver-date');
+    if (timeEl) timeEl.textContent = hh + ':' + mm;
+    if (dateEl) dateEl.textContent = dateStr;
+  }
+
+  window.openScreensaver = function openScreensaver() {
+    if (screensaverActive) return;
+    screensaverActive = true;
+
+    const ss     = document.getElementById('screensaver');
+    const bg     = document.getElementById('screensaver-bg');
+    const gifImg = document.getElementById('screensaver-gif');
+    if (!ss) { screensaverActive = false; return; }
+
+    // Show the screensaver div
+    ss.style.display = 'flex';
+
+    // Hide the webview — native element renders above all CSS z-index
+    const wv = document.getElementById('site');
+    if (wv) wv.style.visibility = 'hidden';
+
+    // Go fullscreen
+    if (window.electronAPI && window.electronAPI.setFullScreen) window.electronAPI.setFullScreen(true);
+
+    // Clock
+    updateScreensaverClock();
+    screensaverClockTimer = setInterval(updateScreensaverClock, 30000);
+
+    // Toast — show after 600ms so fullscreen settles first
+    setTimeout(() => {
+      const toast = document.getElementById('screensaver-toast');
+      if (toast) {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+      }
+    }, 600);
+
+    // Splash cycle — use screensaver-specific settings
+    loadSplashState();
+    const active = splashes.filter(s => s.selected);
+    if (active.length && ssUseSplashes) {
+      screensaverStop = buildCycleEngine(active, bg, gifImg, ssInterval, ssShuffle, null);
+    }
+
+    // Dismiss — wait 800ms so the open event doesn't immediately close it
+    setTimeout(() => {
+      function dismiss() {
+        window.closeScreensaver();
+      }
+      ss.addEventListener('click', dismiss, { once: true });
+      document.addEventListener('keydown', dismiss, { once: true });
+    }, 800);
+  }
+
+  window.closeScreensaver = function closeScreensaver() {
+    if (!screensaverActive) return;
+    screensaverActive = false;
+    if (screensaverStop) { screensaverStop(); screensaverStop = null; }
+    clearInterval(screensaverClockTimer);
+
+    // Restore webview
+    const wv = document.getElementById('site');
+    if (wv) wv.style.visibility = 'visible';
+
+    // Exit fullscreen
+    if (window.electronAPI && window.electronAPI.setFullScreen) window.electronAPI.setFullScreen(false);
+
+    const ss = document.getElementById('screensaver');
+    if (ss) ss.style.display = 'none';
+    const gifImg = document.getElementById('screensaver-gif');
+    if (gifImg) { gifImg.src = ''; gifImg.style.display = 'none'; }
+  }
+
+  // Auto-scan GIF folder on startup to pick up any files added outside the app
+  async function startupScanAndCycle() {
+    try {
+      if (window.electronAPI && window.electronAPI.splashScanFolder) {
+        const res = await window.electronAPI.splashScanFolder();
+        if (res && res.ok && res.files && res.files.length) {
+          loadSplashState();
+          const existingPaths = new Set(splashes.filter(s => s.filePath).map(s => s.filePath));
+          let added = 0;
+          res.files.forEach(f => {
+            if (!existingPaths.has(f.filePath)) {
+              splashes.push({
+                id: 'auto-' + Date.now() + '-' + Math.random().toString(36).slice(2),
+                name: f.fileName, filePath: f.filePath, isGif: true, selected: true
+              });
+              added++;
+            }
+          });
+          if (added) {
+            saveSplashState();
+            console.log('[EC] Auto-imported', added, 'new splash file(s) from disk');
+          }
+        }
+      }
+    } catch(e) {
+      console.warn('[EC] Startup scan error:', e);
+    }
+    startSplashCycle();
+  }
+
+  // Kick off startup scan then begin cycling
+  startupScanAndCycle();
 
 })();
 
@@ -4684,11 +5304,12 @@ addonRegister({
 // ══════════════════════════════════════════════════
 
 const EC_PROFILE_SERVER_KEY = 'ec_profile_server_url';
+const EC_PROFILE_SERVER_DEFAULT = 'https://entropyclient.onrender.com';
 const EC_PROFILE_TOKEN_KEY  = 'ec_profile_token';
 const EC_PROFILE_USER_KEY   = 'ec_profile_username';
 
 function profServerUrl() {
-  return (localStorage.getItem(EC_PROFILE_SERVER_KEY) || '').replace(/\/$/, '');
+  return EC_PROFILE_SERVER_DEFAULT;
 }
 
 function profToken()    { return localStorage.getItem(EC_PROFILE_TOKEN_KEY) || ''; }
@@ -4696,10 +5317,15 @@ function profUsername() { return localStorage.getItem(EC_PROFILE_USER_KEY) || ''
 
 async function profApi(method, path, body, token) {
   const url = profServerUrl() + path;
-  const opts = {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-  };
+  // Route through IPC so main process makes the fetch —
+  // avoids CORS/file:// restrictions in the BrowserWindow
+  if (window.electronAPI && window.electronAPI.profileApi) {
+    const result = await window.electronAPI.profileApi({ method, url, body: body || null, token: token || null });
+    if (!result.ok) throw new Error((result.data && result.data.error) || ('HTTP ' + result.status));
+    return result.data;
+  }
+  // Fallback: direct fetch (works in browser dev environment)
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
   if (token) opts.headers['Authorization'] = 'Bearer ' + token;
   if (body)  opts.body = JSON.stringify(body);
   const r = await fetch(url, opts);
@@ -4766,20 +5392,70 @@ document.getElementById('prof-register-btn').addEventListener('click', async fun
   const username = document.getElementById('prof-username-input').value.trim().toLowerCase();
   const status = document.getElementById('prof-register-status');
   if (!username) { status.style.color = '#ff5f57'; status.textContent = 'Enter your kloak username'; return; }
-  if (!profServerUrl()) { status.style.color = '#ff5f57'; status.textContent = 'Set a server URL below first'; return; }
+
   this.disabled = true;
   this.textContent = '...';
-  status.style.color = '#666';
-  status.textContent = 'Connecting...';
+
+  // ── DEBUG: show every step visibly ──
+  const dbg = (msg, col) => {
+    status.style.color = col || '#ff6b00';
+    status.textContent = msg;
+    console.log('[EC Profile Register]', msg);
+  };
+
+  dbg('Step 1: checking electronAPI...');
+  await new Promise(r => setTimeout(r, 300));
+
+  if (!window.electronAPI) {
+    dbg('✗ electronAPI is undefined', '#ff5f57'); this.disabled=false; this.textContent='Get Code'; return;
+  }
+  if (!window.electronAPI.profileApi) {
+    dbg('✗ electronAPI.profileApi is undefined', '#ff5f57'); this.disabled=false; this.textContent='Get Code'; return;
+  }
+
+  dbg('Step 2: calling IPC profile-api...');
+  await new Promise(r => setTimeout(r, 300));
+
+  const url = profServerUrl() + '/profile/register';
+  dbg('Step 3: URL = ' + url);
+  await new Promise(r => setTimeout(r, 300));
+
   try {
-    const data = await profApi('POST', '/profile/register', { kloak_username: username });
+    const ipcResult = await window.electronAPI.profileApi({
+      method: 'POST',
+      url,
+      body: { kloak_username: username },
+      token: null,
+    });
+
+    dbg('Step 4: IPC returned — ok=' + ipcResult.ok + ' status=' + ipcResult.status);
+    await new Promise(r => setTimeout(r, 400));
+
+    if (!ipcResult.ok) {
+      const errMsg = (ipcResult.data && ipcResult.data.error) || ('HTTP ' + ipcResult.status);
+      dbg('✗ Server error: ' + errMsg, '#ff5f57');
+      this.disabled = false; this.textContent = 'Get Code'; return;
+    }
+
+    const data = ipcResult.data;
+    dbg('Step 5: claim_code = ' + (data.claim_code || '(none)'));
+    await new Promise(r => setTimeout(r, 400));
+
+    if (!data.claim_code) {
+      dbg('✗ No claim_code in response. Full response: ' + JSON.stringify(data), '#ff5f57');
+      this.disabled = false; this.textContent = 'Get Code'; return;
+    }
+
     localStorage.setItem(EC_PROFILE_USER_KEY, username);
     localStorage.setItem('ec_profile_pending_claim', data.claim_code);
     document.getElementById('prof-claim-code-display').textContent = data.claim_code;
+    dbg('✓ Success! Switching to verify step...', '#28c840');
+    await new Promise(r => setTimeout(r, 600));
     profShowStep('verify');
+
   } catch(e) {
-    status.style.color = '#ff5f57';
-    status.textContent = e.message;
+    dbg('✗ Exception: ' + e.message, '#ff5f57');
+    console.error('[EC Profile Register] full error:', e);
   } finally {
     this.disabled = false;
     this.textContent = 'Get Code';
@@ -4976,51 +5652,65 @@ function profShowStep(step) {
 }
 
 function profInitPanel() {
-  // Restore server URL input
-  const savedUrl = profServerUrl();
-  if (savedUrl) document.getElementById('prof-server-url').value = savedUrl;
+  try {
+    // Restore server URL
+    const savedUrl = profServerUrl();
+    const urlInput = document.getElementById('prof-server-url');
+    if (urlInput && savedUrl) urlInput.value = savedUrl;
 
-  const token    = profToken();
-  const username = profUsername();
-  const pending  = localStorage.getItem('ec_profile_pending_claim');
+    const token    = profToken();
+    const username = profUsername();
+    const pending  = localStorage.getItem('ec_profile_pending_claim');
 
-  if (pending) {
-    document.getElementById('prof-claim-code-display').textContent = pending;
-    profShowStep('verify');
-    return;
-  }
-
-  if (token && username) {
-    // Load profile from server and populate editor
-    profShowStep('editor');
-    document.getElementById('prof-editor-username').textContent = username;
-    if (profServerUrl()) {
-      profApi('GET', '/profile/' + username).then(data => {
-        document.getElementById('prof-editor-name').textContent = data.display_name || username;
-        document.getElementById('prof-display-name').value = data.display_name || '';
-        document.getElementById('prof-bio').value = data.bio || '';
-        document.getElementById('prof-bio-counter').textContent = (data.bio||'').length;
-        document.getElementById('prof-gif-url').value = data.avatar_gif || '';
-        document.getElementById('prof-gif-opacity').value = Math.round((data.avatar_gif_opacity||0.85)*100);
-        document.getElementById('prof-gif-opacity-val').textContent = Math.round((data.avatar_gif_opacity||0.85)*100) + '%';
-        document.getElementById('prof-gif-blend').value = data.avatar_gif_blend || 'normal';
-        if (data.avatar_gif) {
-          const layer = document.getElementById('prof-avatar-gif-layer');
-          layer.style.backgroundImage = 'url("' + data.avatar_gif + '")';
-          layer.style.opacity = data.avatar_gif_opacity || 0.85;
-          layer.style.mixBlendMode = data.avatar_gif_blend || 'normal';
-          layer.style.display = 'block';
-        }
-      }).catch(() => {});
+    if (pending) {
+      const codeEl = document.getElementById('prof-claim-code-display');
+      if (codeEl) codeEl.textContent = pending;
+      profShowStep('verify');
+      return;
     }
-    return;
-  }
 
-  profShowStep('register');
+    if (token && username) {
+      profShowStep('editor');
+      const unEl = document.getElementById('prof-editor-username');
+      if (unEl) unEl.textContent = username;
+      if (savedUrl) {
+        profApi('GET', '/profile/' + username).then(function(data) {
+          var el;
+          el = document.getElementById('prof-editor-name');    if (el) el.textContent = data.display_name || username;
+          el = document.getElementById('prof-display-name');   if (el) el.value = data.display_name || '';
+          el = document.getElementById('prof-bio');            if (el) { el.value = data.bio || ''; }
+          el = document.getElementById('prof-bio-counter');    if (el) el.textContent = (data.bio||'').length;
+          el = document.getElementById('prof-gif-url');        if (el) el.value = data.avatar_gif || '';
+          var op = Math.round((data.avatar_gif_opacity||0.85)*100);
+          el = document.getElementById('prof-gif-opacity');    if (el) el.value = op;
+          el = document.getElementById('prof-gif-opacity-val');if (el) el.textContent = op + '%';
+          el = document.getElementById('prof-gif-blend');      if (el) el.value = data.avatar_gif_blend || 'normal';
+          if (data.avatar_gif) {
+            var layer = document.getElementById('prof-avatar-gif-layer');
+            if (layer) {
+              layer.style.backgroundImage = 'url("' + data.avatar_gif + '")';
+              layer.style.opacity = data.avatar_gif_opacity || 0.85;
+              layer.style.mixBlendMode = data.avatar_gif_blend || 'normal';
+              layer.style.display = 'block';
+            }
+          }
+        }).catch(function() {});
+      }
+      return;
+    }
+
+    // Default: show registration
+    profShowStep('register');
+  } catch(err) {
+    console.error('[EC Profile] profInitPanel error:', err);
+    // Fallback: force show register step directly
+    ['register','verify','editor'].forEach(function(s) {
+      var el = document.getElementById('prof-step-' + s);
+      if (el) el.style.display = s === 'register' ? 'block' : 'none';
+    });
+  }
 }
 
-// Wire profile tab click
-document.querySelector('[data-tab="profile"]').addEventListener('click', profInitPanel);
 
 
 // ══════════════════════════════════════════════════

@@ -12,7 +12,8 @@ const fs   = require('fs');
 // ── Constants ─────────────────────────────────────────────────────────────────
 const STATE_FILE = path.join(app.getPath('userData'), 'window-state.json');
 const THEMES_DIR  = path.join(app.getPath('userData'), 'themes');
-const ADDONS_DIR  = path.join(app.getPath('userData'), 'addons');
+const ADDONS_DIR   = path.join(app.getPath('userData'), 'addons');
+const SPLASHES_DIR = path.join(app.getPath('userData'), 'splashes');
 
 
 const ICON_ICO   = path.join(__dirname, 'icon.ico');
@@ -63,6 +64,8 @@ function createWindow() {
   win.once('ready-to-show', () => win.show());
   win.on('resize', () => saveWindowState(win));
   win.on('move',   () => saveWindowState(win));
+
+
 
 
   win.on('close', (e) => {
@@ -629,6 +632,7 @@ function ensureThemesFolder() {
 
 // Window controls
 ipcMain.on('win-minimize', (e) => BrowserWindow.fromWebContents(e.sender).minimize());
+ipcMain.on('win-set-fullscreen', (_e, val) => { if (win) win.setFullScreen(val); });
 ipcMain.on('win-maximize', (e) => {
   const w = BrowserWindow.fromWebContents(e.sender);
   w.isMaximized() ? w.unmaximize() : w.maximize();
@@ -763,6 +767,87 @@ ipcMain.handle('addons-list', () => {
   return result;
 });
 
+// profile-api — proxy HTTP calls to the profile server from main process
+// (avoids CORS/fetch restrictions when overlay.html loads from file://)
+ipcMain.handle('profile-api', async (_e, { method, url, body, token }) => {
+  try {
+    const opts = {
+      method: method || 'GET',
+      headers: { 'Content-Type': 'application/json', 'User-Agent': 'EntropyClient/1.0' },
+    };
+    if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+    if (body)  opts.body = JSON.stringify(body);
+    const r = await fetch(url, opts);
+    const data = await r.json();
+    return { ok: r.ok, status: r.status, data };
+  } catch (e) {
+    return { ok: false, status: 0, data: { error: e.message } };
+  }
+});
+
+// splash-save-gif — write a GIF file to the splashes folder
+ipcMain.handle('splash-save-gif', (_e, { id, name, buffer }) => {
+  try {
+    if (!fs.existsSync(SPLASHES_DIR)) fs.mkdirSync(SPLASHES_DIR, { recursive: true });
+    // Sanitize filename and always use .gif extension
+    const safeName = name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.[^.]+$/, '') + '.gif';
+    const fileName = id + '_' + safeName;
+    const filePath = path.join(SPLASHES_DIR, fileName);
+    fs.writeFileSync(filePath, Buffer.from(buffer));
+    return { ok: true, filePath, fileName };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+});
+
+// splash-delete-gif — remove a GIF file from the splashes folder
+ipcMain.handle('splash-delete-gif', (_e, filePath) => {
+  try {
+    if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+});
+
+// splash-fetch-url — fetch a remote URL and return its bytes (used for Giphy downloads)
+ipcMain.handle('splash-fetch-url', async (_e, url) => {
+  try {
+    const https = require('https');
+    const http  = require('http');
+    const lib   = url.startsWith('https') ? https : http;
+    return await new Promise((resolve, reject) => {
+      lib.get(url, { headers: { 'User-Agent': 'EntropyClient/1.0' } }, res => {
+        const chunks = [];
+        res.on('data', c => chunks.push(c));
+        res.on('end', () => resolve({ ok: true, buffer: Array.from(Buffer.concat(chunks)) }));
+        res.on('error', reject);
+      }).on('error', reject);
+    });
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+});
+
+// splash-scan-folder — return list of GIF files currently in the splashes folder
+ipcMain.handle('splash-scan-folder', () => {
+  try {
+    if (!fs.existsSync(SPLASHES_DIR)) return { ok: true, files: [] };
+    const files = fs.readdirSync(SPLASHES_DIR)
+      .filter(f => f.toLowerCase().endsWith('.gif'))
+      .map(f => ({ fileName: f, filePath: path.join(SPLASHES_DIR, f) }));
+    return { ok: true, files };
+  } catch (e) {
+    return { ok: false, error: e.message, files: [] };
+  }
+});
+
+// splash-open-folder — reveal the splashes folder in file explorer
+ipcMain.handle('splash-open-folder', () => {
+  if (!fs.existsSync(SPLASHES_DIR)) fs.mkdirSync(SPLASHES_DIR, { recursive: true });
+  shell.openPath(SPLASHES_DIR);
+});
+
 // addons-open-folder — reveal addons folder in file explorer
 ipcMain.handle('addons-open-folder', () => {
   ensureAddonsFolder();
@@ -786,6 +871,20 @@ ipcMain.handle('emoji-rename', (_e, { id, newName }) => {
 // emoji-open-folder — no-op (kept for API compat, no local folder used)
 ipcMain.handle('emoji-open-folder', () => Promise.resolve());
 
+// Account switcher — sets up the partition's user-agent then signals ready
+ipcMain.handle('switch-account', async (_e, { partition }) => {
+  try {
+    const ses = session.fromPartition(partition);
+    ses.setUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    );
+    return { ok: true };
+  } catch (err) {
+    console.error('[EC] switch-account error:', err);
+    return { ok: false, error: err.message };
+  }
+});
+
 // ══════════════════════════════════════════════════════════════════════════════
 // APP LIFECYCLE
 // ══════════════════════════════════════════════════════════════════════════════
@@ -793,6 +892,129 @@ app.whenReady().then(() => {
   session.fromPartition('persist:main').setUserAgent(
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
   );
+
+  // F2 screensaver — call openScreensaver directly via executeJavaScript
+  // This bypasses the entire IPC/preload chain which may not be wired up correctly
+  const f2Registered = globalShortcut.register('F2', () => {
+    console.log('[EC] F2 fired via globalShortcut');
+    if (!win) return;
+
+    // Go fullscreen via IPC if opening, exit if closing
+    win.webContents.executeJavaScript(`
+      (function() {
+        var ss  = document.getElementById('screensaver');
+        var wv  = document.getElementById('site');
+        if (!ss) return 'no-ss-element';
+
+        // CLOSE if already active
+        if (window.__ssActive) {
+          window.__ssActive = false;
+          ss.style.cssText = 'position:fixed;inset:0;z-index:9999999;display:none;background:#000;cursor:none;';
+          if (wv) wv.style.visibility = 'visible';
+          var gif = document.getElementById('screensaver-gif');
+          if (gif) { gif.src = ''; gif.style.display = 'none'; }
+          var bg2 = document.getElementById('screensaver-bg');
+          if (bg2) bg2.style.backgroundImage = 'none';
+          if (window.__ssClockTimer) { clearInterval(window.__ssClockTimer); window.__ssClockTimer = null; }
+          if (window.__ssCycleStop) { window.__ssCycleStop(); window.__ssCycleStop = null; }
+          return 'closed';
+        }
+
+        // OPEN
+        window.__ssActive = true;
+
+        // Read screensaver settings
+        var useSplashes = localStorage.getItem('ec_ss_use_splashes') !== '0';
+        var interval    = parseInt(localStorage.getItem('ec_ss_interval') || '5');
+        var shuffle     = localStorage.getItem('ec_ss_shuffle') !== '0';
+        var showClock   = localStorage.getItem('ec_ss_show_clock') !== '0';
+
+        // Hide webview (native layer — must be hidden for screensaver to show)
+        if (wv) wv.style.visibility = 'hidden';
+
+        // Show screensaver
+        ss.style.cssText = 'position:fixed;inset:0;z-index:2147483647;display:flex !important;align-items:flex-end;justify-content:flex-end;background:#000;cursor:none;';
+
+        // Clock
+        var clockEl = document.getElementById('screensaver-clock');
+        if (clockEl) clockEl.style.display = showClock ? '' : 'none';
+        if (showClock) {
+          var timeEl = document.getElementById('screensaver-time');
+          var dateEl = document.getElementById('screensaver-date');
+          function tick() {
+            var now = new Date();
+            var hh = String(now.getHours()).padStart(2,'0');
+            var mm = String(now.getMinutes()).padStart(2,'0');
+            var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            if (timeEl) timeEl.textContent = hh + ':' + mm;
+            if (dateEl) dateEl.textContent = days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate();
+          }
+          tick();
+          window.__ssClockTimer = setInterval(tick, 30000);
+        }
+
+        // Toast
+        setTimeout(function() {
+          var toast = document.getElementById('screensaver-toast');
+          if (toast) { toast.classList.add('show'); setTimeout(function() { toast.classList.remove('show'); }, 2500); }
+        }, 600);
+
+        // Splash images cycle
+        if (useSplashes) {
+          try {
+            var raw = localStorage.getItem('ec_splashes');
+            var splashes = raw ? JSON.parse(raw) : [];
+            var active = splashes.filter(function(s) { return s.selected; });
+            if (active.length) {
+              var bg  = document.getElementById('screensaver-bg');
+              var gif = document.getElementById('screensaver-gif');
+              if (typeof buildCycleEngine === 'function') {
+                window.__ssCycleStop = buildCycleEngine(active, bg, gif, interval, shuffle, null);
+              } else {
+                // fallback: show first image statically
+                var first = active[0];
+                if (first.isGif && first.filePath && bg) {
+                  bg.style.backgroundImage = 'none';
+                  if (gif) { gif.src = 'file://' + first.filePath; gif.style.display = 'block'; }
+                } else if (first.dataUrl && bg) {
+                  bg.style.backgroundImage = 'url(' + first.dataUrl + ')';
+                  bg.style.backgroundSize = 'cover';
+                  bg.style.backgroundPosition = 'center';
+                }
+              }
+            }
+          } catch(e) {}
+        }
+
+        return 'opened';
+      })();
+    `).then(function(result) {
+      console.log('[EC] screensaver result:', result);
+      if (result === 'opened') {
+        win.setFullScreen(true);
+      } else if (result === 'closed') {
+        win.setFullScreen(false);
+      }
+    }).catch(function(err) { console.error('[EC] executeJavaScript error:', err); });
+  });
+  console.log('[EC] globalShortcut F2 registered:', f2Registered);
+
+  // Hook guest webContents (the <webview>) via web-contents-created
+  // before-input-event fires before the page JS sees the key
+  app.on('web-contents-created', (_e, wc) => {
+    console.log('[EC] web-contents-created type:', wc.getType());
+    if (wc.getType() === 'webview') {
+      console.log('[EC] Attaching before-input-event to webview');
+      wc.on('before-input-event', (e, input) => {
+        if (input.type === 'keyDown' && input.key === 'F2') {
+          console.log('[EC] F2 caught via webview before-input-event');
+          e.preventDefault();
+          if (win) win.webContents.send('key-f2');
+        }
+      });
+    }
+  });
 
   globalShortcut.register('CommandOrControl+Shift+K', () => {
     if (!win) return;
